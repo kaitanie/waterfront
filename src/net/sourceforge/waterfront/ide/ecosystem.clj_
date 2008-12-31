@@ -74,8 +74,7 @@
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
 
-
-   
+  
 ; domain specific 
 
 (defn print-app [app]    
@@ -85,34 +84,8 @@
   (println "--------------------------------------------")
   app)
 
-
-
-
 ;;;;; custom text-pane
-
-
-
-(defn new-clojure-paragraph-view [elem] 
-  (proxy [javax.swing.text.ParagraphView] [elem]
-    (layout [width height]
-      (proxy-super layout Short/MAX_VALUE height))
-    (getMinimumSpan [axis] 
-      (proxy-super getPreferredSpan axis) )))
-
-
-
-(defn new-clojure-view-factory [inner] 
-  (proxy [javax.swing.text.ViewFactory] []
-    (create [elem]
-      (if (= (.getName elem) javax.swing.text.AbstractDocument/ParagraphElementName)
-        (new-clojure-paragraph-view elem)     
-        (.create inner elem) ))))
-
-(defn new-clojure-editor-kit [] 
-  (proxy [javax.swing.text.StyledEditorKit] []
-    (getViewFactory [] 
-      (new-clojure-view-factory (proxy-super getViewFactory)) )))
-        
+       
 (defn paint-line-numbers [sp tp lnp g] 
   (if (or (<= (.getWidth tp) 0) (<= (.getHeight tp) 0) (nil? (.modelToView tp 0)))
     nil
@@ -156,7 +129,6 @@
         sp (javax.swing.JScrollPane. tp)
         composite (javax.swing.JPanel.)]
 
-    (.setEditorKit tp (new-clojure-editor-kit))
     (swap! parts (fn [x] { :text-pane tp :scroll-pane sp :line-number-panel lnp }))
     (doto composite
       (.setLayout (java.awt.BorderLayout.))
@@ -167,18 +139,10 @@
     
 
 
+; config
 
-; config & persistent storage
 (defn something-to-load? [app]
   (and (pos? (count (app :recent-files))) (.exists (path-to-file (first (app :recent-files))))) )
-
-
-
-
-
-
-
-; config
 
 (defn read-stored-config []
   (let [dir (path-to-file (. System getProperty "user.home"))
@@ -201,19 +165,10 @@
 
 
 
-;;;;; menu actions
-
-
-
-
-
 
 (def show-ecosystem-window)
 
-(def standard-menu 
-)
 
-; main function
 
 
 (defn run-observers [prev next observers]
@@ -224,6 +179,7 @@
       (recur prev new-next (rest observers)) )))
 
 
+; main function
 (defn show-ecosystem-window [cfg] (let [
   state (new java.util.HashMap)
   put-mutable (fn [key value] (.put state key value) value)
@@ -235,9 +191,6 @@
   output-label (new JLabel "(no output yet)")
   output-window (javax.swing.JPanel.)
   lower-win (javax.swing.JTabbedPane.)
-  manager (new javax.swing.undo.UndoManager)
-  file-chooser (new javax.swing.JFileChooser (. System getProperty "user.dir"))
-
                
         dispatch (fn dispatch
           ([action]
@@ -272,19 +225,6 @@
             (mousePressed [e] (show-popup popup-menu e))
             (mouseReleased [e] (show-popup popup-menu e)) ))                              
        
-
-        configure-document-settings (fn[area]
-          (let [aux (fn [offset text]
-                  (translate-characters (column-of (.getText area) offset) text))]
-
-            (.. area (getDocument) (putProperty javax.swing.text.DefaultEditorKit/EndOfLineStringProperty "\n"))
-            (.. area (getDocument) (setDocumentFilter
-              (proxy [javax.swing.text.DocumentFilter] [] 
-                (insertString [fb offset text attrs]
-                  (proxy-super insertString fb offset (aux offset text) attrs))      
-                (replace [fb offset length text attrs]
-                  (proxy-super replace fb offset length (aux offset text) attrs)) ))))) 
-
         default-config { 
           :x0 100
           :y0 50
@@ -302,8 +242,6 @@
           :eval-count 1,
           :area area, 
           :frame frame, 
-          :undo-manager manager, 
-          :file-chooser file-chooser, 
           :output-label output-label,
           :lower-window lower-win
           :menu [
@@ -319,7 +257,6 @@
     (put-mutable :entracne 0)
     (put-mutable :number-of-children 0)
 
-    (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
 
     (add-paren-matching area)
 
@@ -331,8 +268,6 @@
         (changedUpdate [evt] ()) ))
       
     (let [app (get-mutable :ecosystem)]
-      (.. area (getDocument) (addUndoableEditListener manager)) 
-      (configure-document-settings area)
       (doto frame
         (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
         (.setLayout (new BorderLayout))
@@ -349,7 +284,7 @@
         (.setSize (app :width0) (app :height0))
         (.setLocation (app :x0) (app :y0))
         (.setVisible true))
-      (dispatch (fn[x] (apply (eval (app :startup)) (list (get-mutable :ecosystem)))) "bootstrap" { })
+      (dispatch (fn[x] (apply (eval (app :startup)) (list (get-mutable :ecosystem)))) "bootstrap" {} )
          
       (when (something-to-load? app)        
         (dispatch (fn [x] (assoc x :file-name (first (app :recent-files)))) "Loading from config")
@@ -360,9 +295,9 @@
 (def run-func (fn []
   (println "tranform=" transform)
   (try 
+    (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
     (show-ecosystem-window { :title-prefix ""})
     (catch Throwable t (.printStackTrace t))) ))
-
 
 
 

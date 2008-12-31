@@ -2,15 +2,6 @@
 
 (refer 'net.sourceforge.waterfront.kit)
 
-(import 
-  '(javax.swing JFrame JLabel JScrollPane JTextField JButton JTextArea UIManager JMenuItem JMenu JMenuBar)
-  '(javax.swing JPopupMenu KeyStroke JSplitPane JOptionPane)
-  '(javax.swing.event CaretEvent CaretListener)
-  '(javax.swing.text DefaultStyledDocument StyleConstants StyleConstants$CharacterConstants SimpleAttributeSet)
-  '(java.awt Color)
-  '(java.awt.event ActionListener KeyEvent ActionEvent)
-  '(java.awt GridLayout BorderLayout Font EventQueue)
-  '(java.io File))
 
 (defn install-undo-manager [app]
   (let [um (javax.swing.undo.UndoManager.)]
@@ -31,10 +22,5 @@
       :action (fn m-undo [app] (when (.canUndo (app :undo-manager)) (.undo (app :undo-manager))) app) }
     { :name "Redo" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_Y 
       :action (fn m-redo [app] (when (.canRedo (app :undo-manager)) (.redo (app :undo-manager))) app) } )))))
-
-
-
-
-
 
 

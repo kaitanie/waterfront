@@ -122,22 +122,16 @@
       { :name "Exit" :mnemonic KeyEvent/VK_X :action exit-application } )))))
 
 
+(defn add-chooser [app]
+  (assoc app :file-chooser (javax.swing.JFileChooser. (. System getProperty "user.dir"))) )
+
 (fn [app] 
   (.addWindowListener (app :frame)
     (proxy [java.awt.event.WindowAdapter] []
       (windowClosing [e] 
         ((app :dispatch) exit-application) )))
   
-  (transform (add-file-menu (add-title-observer app)) :actions {}
-   (fn[curr] (assoc curr :load-document load-document)) ))
-   
-
-
-
-
-
-
-
-
-
+  (transform (add-file-menu (add-title-observer (add-chooser app))) :actions {}
+    (fn[curr] (assoc curr :load-document load-document)) ))
+  
 
