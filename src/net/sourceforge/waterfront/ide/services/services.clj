@@ -12,6 +12,9 @@
   '(java.io File))
 
 
+(require 'net.sourceforge.waterfront.kit.kit)
+(refer 'net.sourceforge.waterfront.kit)
+
 ; Source code manipulation
 
 (defn column-of
@@ -108,11 +111,24 @@
 (test (var translate-characters))
 
 
-(defn add-observers [app new-observers]
+(defn add-observers [app & new-observers]
   (transform 
     app 
     :observers 
     [] 
     (fn [observers] 
-      (apply vector (concat observers new-observers))) ))
+      (apply vector (concat observers (apply vector new-observers)))) ))
+
+
+(defn add-to-menu [app parent-menu-name & new-items]
+  (transform app :menu { }
+    (partial change-menu parent-menu-name (fn [existing-items] (conj existing-items 
+      (apply vector new-items)))) ))
+
+(defn triggered-by [f & keys]
+  (fn [old-app new-app]
+    (if (maps-differ-on old-app new-app keys)
+      (f old-app new-app)
+      new-app )))
+
 

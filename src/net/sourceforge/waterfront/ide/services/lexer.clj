@@ -235,8 +235,7 @@
               (map (fn [x] (x :length)) (tokenize "(count\"ABCDEFG\")")))
 
             (assert-eq '(0 1 6 15)
-              (map (fn [x] (x :where)) (tokenize "(count\"ABCDEFG\")")))
-)}
+              (map (fn [x] (x :where)) (tokenize "(count\"ABCDEFG\")"))) )}
 
   ([text]
     (tokenize text 0))
@@ -454,7 +453,10 @@
     (. StyleConstants (setForeground (styles :mismatch) Color/RED))
 
     (.start (new Thread (runnable update-cache cache)))
-    (.start (new javax.swing.Timer 200 (new-action-listener (fn [e] (update-new-text text-pane cache prev-on-paren styles))))) )
+    (.start (new javax.swing.Timer 200 
+      (new-action-listener 
+        (fn [e] 
+          (update-new-text text-pane cache prev-on-paren styles))))) )
   
   text-pane)
 
@@ -470,8 +472,14 @@
   (.setSize 800 600)
   (.setVisible true)))
 
-
 ;(show-frame)
+
+
+
+
+
+
+
 
 
 
