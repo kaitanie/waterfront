@@ -69,7 +69,6 @@
 (require 'net.sourceforge.waterfront.kit.kit)
 (refer 'net.sourceforge.waterfront.kit)
 
-(require 'net.sourceforge.waterfront.ide.services.lexer)
 
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
@@ -84,7 +83,7 @@
   (println "--------------------------------------------")
   app)
 
-;;;;; custom text-pane
+; custom text-pane
        
 (defn paint-line-numbers [sp tp lnp g] 
   (if (or (<= (.getWidth tp) 0) (<= (.getHeight tp) 0) (nil? (.modelToView tp 0)))
@@ -148,7 +147,7 @@
   (let [dir (path-to-file (. System getProperty "user.home"))
         file (new java.io.File dir ".ecosystem.config.clj")]   
     (if (not (.exists file))
-      { }
+      {}
       (load-file (.getAbsolutePath file)) )))
 
 (defn get-merged-config [default-config cfg-1 cfg-2]
@@ -159,7 +158,7 @@
         file (new java.io.File dir ".ecosystem.config.clj")]
 
     (write-file 
-      (pretty-print (merge { }(sort (assoc (select-keys app (app :keys-to-save))
+      (pretty-print (merge {} (sort (assoc (select-keys app (app :keys-to-save))
            :startup (cons 'quote (list (app :startup))) ))))
       file )))
 
@@ -201,7 +200,7 @@
  
           ([action name old-app]
           (put-mutable :entracne (inc (get-mutable :entracne)))          
-          (when (not= action identity)
+          (when name
             (println (get-mutable :entracne) "dispatching " name))
             
             (let [candidate-new-app 
@@ -256,17 +255,7 @@
     (put-mutable :ecosystem (get-merged-config default-config cfg overriding-config))
     (put-mutable :entracne 0)
     (put-mutable :number-of-children 0)
-
-
-    (add-paren-matching area)
-
-      
-    (.addDocumentListener (.getDocument area) 
-      (proxy [javax.swing.event.DocumentListener] []
-        (insertUpdate [evt] (dispatch identity "insertUpdate"))
-        (removeUpdate [evt] (dispatch identity "removeUpdate"))
-        (changedUpdate [evt] ()) ))
-      
+            
     (let [app (get-mutable :ecosystem)]
       (doto frame
         (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
@@ -298,6 +287,5 @@
     (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
     (show-ecosystem-window { :title-prefix ""})
     (catch Throwable t (.printStackTrace t))) ))
-
 
 
