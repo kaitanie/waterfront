@@ -1,6 +1,8 @@
 (ns net.sourceforge.waterfront.ide.plugins)
 
 (refer 'net.sourceforge.waterfront.kit)
+(require 'net.sourceforge.waterfront.ide.services.services)
+(refer 'net.sourceforge.waterfront.ide.services)
 
 (import 
   '(javax.swing JFrame JLabel JScrollPane JTextField JButton JTextArea UIManager JMenuItem JMenu JMenuBar)
@@ -33,28 +35,8 @@
 (defn is-dirty [app]
   (not= (.getText (app :area)) (app :initial-text)) )
   
-;;;; observers
 
-(defn update-title [old-app, app]
-  (.setTitle (app :frame)
-    (str "Ecosystem " (app :title-prefix) ": "
-      (if (unknown-document? app)
-        "Unnamed"
-        (str (if (is-dirty app) "*" "") (.getName (get-current-document app)) " - " (get-current-document-path app)) )))
-   app)
-
-
-(defn add-title-observer [app]
-  (transform 
-    app 
-    :observers 
-    [] 
-    (fn [observers] 
-      (apply vector 
-        (concat  
-          [update-title]
-          observers )))))
-
+; actions
 
 (def save-directly (fn [app]
  (let [text (.getText (app :area))]                          
@@ -108,22 +90,30 @@
 
 
 (defn add-file-menu [app]
-  (transform app :menu nil 
-    (partial change-menu "File" (fn [items] (conj items 
-      { :name "New" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_N :action (fn m-new [app] 
+  (add-to-menu app "File" 
+    { :name "New" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_N :action (fn m-new [app] 
                               (show-ecosystem-window (merge app {
                                 :title-prefix (app :title-prefix)
                                 :file-name :unknown :initial-text "" }))
                               app) }
-      { :name "Open" :mnemonic KeyEvent/VK_O :key KeyEvent/VK_O :action open-file }
-      { :name "Save" :mnemonic KeyEvent/VK_S :key KeyEvent/VK_S :action save-now }
-      { :name "Save as..." :mnemonic KeyEvent/VK_A :action save-as }
-      { }
-      { :name "Exit" :mnemonic KeyEvent/VK_X :action exit-application } )))))
+    { :name "Open" :mnemonic KeyEvent/VK_O :key KeyEvent/VK_O :action open-file }
+    { :name "Save" :mnemonic KeyEvent/VK_S :key KeyEvent/VK_S :action save-now }
+    { :name "Save as..." :mnemonic KeyEvent/VK_A :action save-as }
+    {}
+    { :name "Exit" :mnemonic KeyEvent/VK_X :action exit-application } ))
 
 
 (defn add-chooser [app]
   (assoc app :file-chooser (javax.swing.JFileChooser. (. System getProperty "user.dir"))) )
+
+(defn update-title [old-app, app]
+  (.setTitle (app :frame)
+    (str "Ecosystem " (app :title-prefix) ": "
+      (if (unknown-document? app)
+        "Unnamed"
+        (str (if (is-dirty app) "*" "") (.getName (get-current-document app)) " - " (get-current-document-path app)) )))
+   app)
+
 
 (fn [app] 
   (.addWindowListener (app :frame)
@@ -131,7 +121,7 @@
       (windowClosing [e] 
         ((app :dispatch) exit-application) )))
   
-  (transform (add-file-menu (add-title-observer (add-chooser app))) :actions {}
+  (transform (add-file-menu (add-chooser (add-observers app update-title))) :actions {}
     (fn[curr] (assoc curr :load-document load-document)) ))
   
 

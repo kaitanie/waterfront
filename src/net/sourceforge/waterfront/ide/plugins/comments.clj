@@ -6,16 +6,7 @@
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
 
-(import 
-  '(javax.swing JFrame JLabel JScrollPane JTextField JButton JTextArea UIManager JMenuItem JMenu JMenuBar)
-  '(javax.swing JPopupMenu KeyStroke JSplitPane JOptionPane)
-  '(javax.swing.event CaretEvent CaretListener)
-  '(javax.swing.text DefaultStyledDocument StyleConstants StyleConstants$CharacterConstants SimpleAttributeSet)
-  '(java.awt Color)
-  '(java.awt.event ActionListener KeyEvent ActionEvent)
-  '(java.awt GridLayout BorderLayout Font EventQueue)
-  '(java.io File))
-
+(import '(java.awt.event KeyEvent ))
 
         (def toggle-comment (fn [app start end]
           (let [src (.getText (app :area))
@@ -48,10 +39,12 @@
 
 
 (fn [app] 
-  (transform app :menu nil 
-    (partial change-menu "Source" (fn [items] (conj items { :name "Toggle Comment"
-      :mnemonic KeyEvent/VK_T :key KeyEvent/VK_SEMICOLON 
-      :action (fn m-toggle [app] (toggle-comment app (.getSelectionStart (app :area)) (.getSelectionEnd (app :area)))) })))))
+  (add-to-menu app "Source" 
+    { :name "Toggle Comment" :mnemonic KeyEvent/VK_T :key KeyEvent/VK_SEMICOLON 
+      :action (fn m-toggle [app] 
+        (toggle-comment app (.getSelectionStart (app :area)) (.getSelectionEnd (app :area)))) }))
+
+
 
 
 

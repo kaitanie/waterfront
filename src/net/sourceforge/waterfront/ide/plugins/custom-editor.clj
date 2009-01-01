@@ -24,8 +24,16 @@
       (new-clojure-view-factory (proxy-super getViewFactory)) )))
 
 
-(defn customize-text-pane [area]
+(defn customize-text-pane [app area]
+    (.setSelectedTextColor area java.awt.Color/WHITE)
+    (.setSelectionColor area (java.awt.Color. 49 106 197))
     (.setEditorKit area (new-clojure-editor-kit))
+    (.addDocumentListener (.getDocument area) 
+      (proxy [javax.swing.event.DocumentListener] []
+        (insertUpdate [evt] ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
+        (removeUpdate [evt] ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
+        (changedUpdate [evt] ()) ))
+
     (let [aux (fn [offset text]
             (translate-characters (column-of (.getText area) offset) text))]
 
@@ -36,9 +44,9 @@
             (proxy-super insertString fb offset (aux offset text) attrs))      
           (replace [fb offset length text attrs]
             (proxy-super replace fb offset length (aux offset text) attrs)) ))))) 
-
+    
 (fn [app] 
-  (customize-text-pane (app :area))
+  (customize-text-pane app (app :area))
   app)
 
 

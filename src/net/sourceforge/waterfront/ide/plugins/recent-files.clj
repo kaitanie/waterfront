@@ -2,6 +2,8 @@
 
 (refer 'net.sourceforge.waterfront.kit)
 
+(require 'net.sourceforge.waterfront.ide.services.services)
+(refer 'net.sourceforge.waterfront.ide.services)
 
 
 (defn to-vec [elements]
@@ -63,20 +65,7 @@
                           (fn [ks] 
                             (if (includes :recent-files ks)
                               ks
-                              (conj ks :recent-files) ))))
-        add-observer (fn [app] 
-                        (transform 
-                          app 
-                          :observers 
-                          [] 
-                          (fn [observers] 
-                            (apply vector 
-                              (concat  
-                                [recent-files-observer recent-files-menu-observer]
-                                observers )))))]
-  (add-save-key (add-observer app)) ))
-
-
-
+                              (conj ks :recent-files) ))))]
+  (add-save-key (add-observers app recent-files-observer recent-files-menu-observer))))
 
 

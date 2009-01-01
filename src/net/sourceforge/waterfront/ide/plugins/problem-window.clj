@@ -21,7 +21,7 @@
               (.setSelectedComponent (new-app :lower-window) scrolled) )))
           new-app)]    
     (.addTab (app :lower-window) "Problems" scrolled)
-    (add-observers (assoc app :problem-window problem-window) [update-problem])))
+    (add-observers (assoc app :problem-window problem-window) update-problem)))
 
 
 

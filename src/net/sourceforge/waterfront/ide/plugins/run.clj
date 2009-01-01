@@ -2,6 +2,9 @@
 
 (refer 'net.sourceforge.waterfront.kit)
 
+(require 'net.sourceforge.waterfront.ide.services.services)
+(refer 'net.sourceforge.waterfront.ide.services)
+
 (import 
   '(javax.swing JFrame JLabel JScrollPane JTextField JButton JTextArea UIManager JMenuItem JMenu JMenuBar)
   '(javax.swing JPopupMenu KeyStroke JSplitPane JOptionPane)
@@ -64,20 +67,18 @@
 
 
 (fn [app] 
-  (transform app :menu nil 
-    (partial change-menu "Run" (fn [items] (conj items 
+  (add-to-menu app "Run" 
     { :name "Run" :key KeyEvent/VK_W :mask ActionEvent/ALT_MASK :action (fn m-run [app] 
                         (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
                         (let [t0 (. System currentTimeMillis) 
                               sel-text (get-selected-text app (.getText (app :area)))
-                              syntax-problems (find-syntax-errors sel-text)
+                              syntax-problems (find-syntax-errors "" sel-text)
                               output-and-errors (if (empty? syntax-problems) (run-program app sel-text) (list "" syntax-problems))]
                           (assoc app 
                             :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
                             :output-text (first output-and-errors)
                             :problems (second output-and-errors)
-                            :eval-count (inc (app :eval-count) )))) })))))
-
+                            :eval-count (inc (app :eval-count) )))) }))
 
 
 

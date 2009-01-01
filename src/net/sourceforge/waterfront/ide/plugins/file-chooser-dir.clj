@@ -2,6 +2,8 @@
 
 (refer 'net.sourceforge.waterfront.kit)
 
+(require 'net.sourceforge.waterfront.ide.services.services)
+(refer 'net.sourceforge.waterfront.ide.services)
 
 (defn file-chooser-dir-observer [old-app new-app] 
   (when (maps-differ-on old-app new-app :file-name)
@@ -10,8 +12,9 @@
 
 
 (fn [app] 
-  (transform app :observers []
-    (fn[observers] (cons file-chooser-dir-observer observers)) ))
+  (add-observers app file-chooser-dir-observer))
+
+
 
 
 

@@ -2,16 +2,10 @@
 
 (refer 'net.sourceforge.waterfront.kit)
 
-(import 
-  '(javax.swing JFrame JLabel JScrollPane JTextField JButton JTextArea UIManager JMenuItem JMenu JMenuBar)
-  '(javax.swing JPopupMenu KeyStroke JSplitPane JOptionPane)
-  '(javax.swing.event CaretEvent CaretListener)
-  '(javax.swing.text DefaultStyledDocument StyleConstants StyleConstants$CharacterConstants SimpleAttributeSet)
-  '(java.awt Color)
-  '(java.awt.event ActionListener KeyEvent ActionEvent)
-  '(java.awt GridLayout BorderLayout Font EventQueue)
-  '(java.io File))
+(require 'net.sourceforge.waterfront.ide.services.services)
+(refer 'net.sourceforge.waterfront.ide.services)
 
+(import '(javax.swing JOptionPane))
 
 (defn line-to-offset 
   { :test (fn []
@@ -69,11 +63,11 @@
 
 
 (fn [app] 
-  (transform app :menu nil 
-    (partial change-menu "Edit" (fn [items] (conj items 
-      nil 
+  (add-to-menu app "Edit" {}
       { :name "Goto" :key java.awt.event.KeyEvent/VK_G :mnemonic java.awt.event.KeyEvent/VK_G  
-        :action (fn[app] (goto-line app)) })))))
+        :action (fn[app] (goto-line app)) }))
+
+
 
 
 
