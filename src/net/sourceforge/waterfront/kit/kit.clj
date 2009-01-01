@@ -125,7 +125,10 @@
 
 (defn runnable [f & args]
   (proxy [Runnable] []
-    (run [] (apply f args))))
+    (run [] 
+      (try
+        (apply f args)
+        (catch Throwable t (.printStackTrace t)) ))))
 
 ; swing utlities
 
@@ -278,4 +281,5 @@
 (defn pass [msg x]
    (println msg (pretty-print x))
    x)
+
 
