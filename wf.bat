@@ -1,1 +1,1 @@
-@java -cp .;src;c:\tools\clojure\clojure.jar clojure.lang.Repl src\net\sourceforge\waterfront\ide\main.clj 
+@java -cp src;..\lab\bin\;c:\tools\clojure\clojure.jar clojure.lang.Repl src\net\sourceforge\waterfront\ide\main.clj 
