@@ -5,6 +5,7 @@
   '(javax.swing.text StyleConstants))
 
 
+
 (require 'net.sourceforge.waterfront.kit.kit)
 (refer 'net.sourceforge.waterfront.kit)
 
@@ -395,70 +396,102 @@
 (test (var get-mate))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;                                                   ;
+;         UI STUFF                                  ;
+;                                                   ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn update-cache [cache]  
-  (let [snapshot @cache]
-    (when (or (nil? (snapshot :pairs)) (not= (snapshot :new-text) (snapshot :text)))
-      (let [t (snapshot :new-text)]
-        (swap! cache (fn[x] { :new-text t :text t, :pairs (compute-paren-matching-pairs t) })) ))
-    (. Thread sleep 100)
-    (recur cache) ))
+(defn- turn-off [text-pane cache styles]
+  (let [offsets (@cache :offsets)
+        doc (.getDocument text-pane)
+        plain-style (styles :plain) ]
+    (doseq [curr offsets]
+      (.setCharacterAttributes doc curr 1 plain-style true) 
+    (swap! cache (fn [x] (assoc x :offsets nil))) )))
 
-(defn- set-char-style [doc offset attr]
-  (let [elem (.getCharacterElement doc offset)
-        as (.getAttributes elem)]
-      (println "(class as)=" (class as) "class attr=" (class attr))
-      (.addAttributes as attr) ))
-    
+(defn- turn-on [text-pane cache styles pos1 pos2 match-kind]
+  (let [doc (.getDocument text-pane)
+        attr (if (= :match match-kind) 
+                (styles :match) 
+                (styles :mismatch))]
+      (.setCharacterAttributes doc pos2 1 attr true) 
+      (.setCharacterAttributes doc pos1 1 attr true) 
+      (swap! cache (fn [x] (assoc x :offsets (cons pos1 (cons pos2 (x :offsets)))))) ))
 
-(defn highlight-char [doc offset paren-info text-attributes]
-  (when (and (not (nil? paren-info)) (>= (second paren-info) 0))
-    (let [attr (if (= :match (first paren-info)) 
-                (text-attributes :match) 
-                (text-attributes :mismatch))]
-      (.setCharacterAttributes doc (second paren-info) 1 attr true)
-      (.setCharacterAttributes doc offset 1 attr true) )))
-
-
-(defn- turn-off [text-pane prev-on-paren styles]
-  (let [mate @prev-on-paren 
-        doc (.getDocument text-pane)]
-    (when mate
-;        (set-char-style doc (first mate) (styles :plain))
-;        (set-char-style doc (second mate) (styles :plain))
-      (.setCharacterAttributes (.getDocument text-pane) (second mate) 1 (styles :plain) true) 
-      (.setCharacterAttributes (.getDocument text-pane) (first mate) 1 (styles :plain) true) 
-      (swap! prev-on-paren (fn [x] nil)) )))
-
-(defn update-new-text [text-pane cache prev-on-paren styles]
+(defn- my-document-observer [text-pane cache]
   (let [c @cache 
         nt (.getText text-pane)
         len (count nt)
         pos (min (dec len) (dec (.getCaretPosition text-pane)))]
     (when (not= nt (c :new-text))
-      (swap! cache (fn[curr-value-of-cache] (assoc curr-value-of-cache :new-text nt)) ))
+      (swap! cache (fn[curr-value-of-cache] (assoc curr-value-of-cache :new-text nt)) ))))
 
-    (if (not= (c :caret-pos) pos)
-      (swap! cache (fn[curr-value-of-cache] (assoc curr-value-of-cache :caret-pos pos)))
-      (when (and (= (c :new-text) (c :text)) (= (c :caret-pos) pos))
-        (let [ch (if (neg? pos) :nothing (.charAt nt pos))
-              on-paren (if (= ch :nothing) false (>= (.indexOf "()[]{}" (str ch)) 0))
-              curr-mate (if on-paren
-                          (get-mate-from-pairs (c :pairs) pos)
-                          nil )]
-          (when curr-mate
-            (highlight-char (.getDocument text-pane) pos curr-mate styles) )
-          (swap! prev-on-paren (fn[x] (if curr-mate (list pos (second curr-mate)) nil)))
-          (swap! cache (fn[curr-value-of-cache] (assoc curr-value-of-cache :caret-pos pos))) )))))
+(defn- my-caret-observer [text-pane cache styles]
+  (let [c @cache 
+        nt (.getText text-pane)
+        len (count nt)
+        pos (min (dec len) (dec (.getCaretPosition text-pane)))]
+    (swap! cache (fn[x] (assoc x :new-pos pos))) ))
+    
+
+
+(defn- show [msg v]
+  (println msg v)
+  v)
+
+; runs on the non-GUI thread
+(defn- text-changed [text-pane cache]
+  (let [snapshot @cache 
+        t (.getText text-pane)]
+      (swap! cache (fn[x] (assoc x :text t :pairs (compute-paren-matching-pairs t))) )))
+  
+
+; runs on the non-GUI thread
+(defn- pos-changed [text-pane cache styles]
+  (let [snapshot @cache 
+        t (snapshot :text)
+        len0 (.length t)
+        len (.length (.getText text-pane))
+        pos (min (dec len) (snapshot :new-pos)) ]
+      (swap! cache (fn[x] (assoc x :new-pos pos :pos pos)) )
+      
+      (let [ch (if (neg? pos) :nothing (.charAt t pos))
+            on-paren (if (= ch :nothing) false (>= (.indexOf "()[]{}" (str ch)) 0))
+            curr-mate (if on-paren
+                        (get-mate-from-pairs (snapshot :pairs) pos)
+                        nil )]
+        (when curr-mate
+          (later (fn [] (turn-on text-pane cache styles pos (second curr-mate) (first curr-mate) ))) ))))
+      
+
+; runs on the non-GUI thread
+(defn worker [text-pane cache styles]
+  (let [c @cache]
+    (cond
+      (not= (c :new-text) (c :text))
+      (do 
+        (turn-off text-pane cache styles)
+        (text-changed text-pane cache))
+
+      (not= (c :new-pos) (c :pos))
+      (do
+        (turn-off text-pane cache styles)
+        (pos-changed text-pane cache styles))
+
+      :else
+      nil )
+    (Thread/sleep 100)
+    (recur text-pane cache styles) ))
+
 
 (defn add-paren-matching [text-pane]
   (let [cache (atom { :new-text "" :text nil :pairs nil })
-        prev-on-paren (atom nil)
         styles {
           :plain (new javax.swing.text.SimpleAttributeSet)
           :match (new javax.swing.text.SimpleAttributeSet)
           :mismatch (new javax.swing.text.SimpleAttributeSet)}
-        remove-colors (partial turn-off text-pane prev-on-paren styles)]
+        remove-colors (partial turn-off text-pane cache styles)]
 
     (. StyleConstants (setBackground (styles :match) (Color. 220 220 220)))
     (. StyleConstants (setBold (styles :match) true))
@@ -468,36 +501,38 @@
     (. StyleConstants (setBold (styles :mismatch) true))
     (. StyleConstants (setForeground (styles :mismatch) Color/RED))
 
-    (.start (new Thread (runnable update-cache cache)))
-    (.start (new javax.swing.Timer 200 
-      (new-action-listener 
-        (fn [e] 
-          (update-new-text text-pane cache prev-on-paren styles) ))))
+    (.addDocumentListener (.getDocument text-pane)
+      (proxy [javax.swing.event.DocumentListener] []
+        (insertUpdate [e] (my-document-observer text-pane cache))
+        (removeUpdate [e] (my-document-observer text-pane cache))
+        (changedUpdate [e] nil) ))
   
-;    (.addCaretListener text-pane 
-;      (proxy [javax.swing.event.CaretListener] []
-;        (caretUpdate [e]
-;          (remove-colors) )))
-
+    (.addCaretListener text-pane 
+      (proxy [javax.swing.event.CaretListener] []
+        (caretUpdate [e] (my-caret-observer text-pane cache styles)) ))
 
     (.addKeyListener text-pane
       (proxy [java.awt.event.KeyListener] []
         (keyTyped [e] nil)
         (keyPressed [e] (remove-colors))
         (keyReleased [e] nil) ))
+
+
+    (.start (Thread. (runnable worker text-pane cache styles)))
           
     (fn [] (println "Before change called") (remove-colors)) ))
 
         
 (defn show-frame [] 
-  (let [tp (javax.swing.JTextPane.)
-        bef-change (add-paren-matching tp)]
-    (doto (new javax.swing.JFrame)
-      (.setLayout (new java.awt.BorderLayout))
+  (let [tp (javax.swing.JTextPane.)]
+   (add-paren-matching tp)
+   (doto (new javax.swing.JFrame)
+      (.setLayout (java.awt.BorderLayout.))
       (.add (
-        new javax.swing.JScrollPane 
+        javax.swing.JScrollPane.
           (doto tp
             (.setFont (java.awt.Font. "Courier New" java.awt.Font/PLAIN 16))
+            (.setText "(defn fac[n] (if (zero? n) 1 (* n (fac (dec n)))))") 
             (.setText (slurp "C:/tools/clojure/src/clj/clojure/core.clj")) ))
         (. java.awt.BorderLayout CENTER))
       (.setTitle "Title")
@@ -505,5 +540,7 @@
       (.setVisible true) )))
 
 ;(show-frame)
+
+
 
 

@@ -3,6 +3,7 @@
 (refer 'net.sourceforge.waterfront.kit)
 (refer 'net.sourceforge.waterfront.ide.services)
 
+
 (defn new-clojure-paragraph-view [elem] 
   (proxy [javax.swing.text.ParagraphView] [elem]
     (layout [width height]
@@ -18,20 +19,21 @@
         (.create inner elem) ))))
 
 (defn new-clojure-editor-kit [] 
-  (proxy [javax.swing.text.StyledEditorKit] []
-    (getViewFactory [] 
-      (new-clojure-view-factory (proxy-super getViewFactory)) )))
-
+  (let [default-vf (.getViewFactory (javax.swing.text.StyledEditorKit.))
+        custom-vf (new-clojure-view-factory default-vf)]
+   (proxy [javax.swing.text.StyledEditorKit] []
+      (getViewFactory [] custom-vf)) ))
 
 (defn customize-text-pane [app area]
   (.setSelectedTextColor area java.awt.Color/WHITE)
-  (.setSelectionColor area (java.awt.Color. 49 106 197))
-  (.setEditorKit area (new-clojure-editor-kit))
+  (.setSelectionColor area (java.awt.Color. 49 106 197)) 
+  (.setEditorKit area (net.sourceforge.waterfront.ide.services.NoWrapEditorKit.))
+;  (.setEditorKit area (new-clojure-editor-kit))
   (.addDocumentListener (.getDocument area) 
     (proxy [javax.swing.event.DocumentListener] []
       (insertUpdate [evt] ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
       (removeUpdate [evt] ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
-      (changedUpdate [evt] ()) ))
+      (changedUpdate [evt] ()) )) 
 
   (let [aux (fn [offset text]
       (translate-characters (column-of (.getText area) offset) text))]
@@ -43,7 +45,7 @@
           ((app :dispatch) (fn [a] ((a :before-change))))
           (proxy-super replace fb offset length (aux offset text) attrs)) ))) )
  
-  (.. area (getDocument) (putProperty javax.swing.text.DefaultEditorKit/EndOfLineStringProperty "\n")) ) 
+  (.. area (getDocument) (putProperty javax.swing.text.DefaultEditorKit/EndOfLineStringProperty "\n")) )
   
 
   
@@ -52,9 +54,5 @@
   (if (app :before-change)
     app
     (assoc app :before-change (fn [] nil)) ))
-
-
-
-
 
 
