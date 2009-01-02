@@ -16,7 +16,6 @@
 (defn update-font [old-app new-app]
   (when (maps-differ-on old-app new-app :font-size :font-name :font-style :area :file-name)
     (let [f (java.awt.Font. (new-app :font-name) (new-app :font-style) (new-app :font-size))]
-      (println "area="  (new-app :area) " f=" f)
       (.setFont (new-app :area) f)
       (.setFont (new-app :problem-window) f)
       (.setFont (new-app :output-area) f) ))
@@ -31,6 +30,7 @@
 
 (fn [app] 
     (add-observers app update-menu update-font update-output-label))
+
 
 
 

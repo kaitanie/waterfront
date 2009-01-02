@@ -4,8 +4,10 @@
 (require 'net.sourceforge.waterfront.ide.services.lexer)
 
 (fn [app]   
-  (add-paren-matching (app :area))
-  app)
+  (let [before-update-func (add-paren-matching (app :area))]
+    (assoc app :before-change before-update-func) ))
+
+
 
 
 

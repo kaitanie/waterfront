@@ -30,6 +30,12 @@
 ; make the list of app items that are saved part of app itself.
 ; allow show doc (F1) on symbols which are not from the global namespace
 ; make load document an observer-driven action triggered by a new :file-name value
+; rename 
+; find unused variables
+; generate overloading
+; extract function
+; stop-and-inspect
+
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -185,8 +191,8 @@
   get-mutable (fn [key] (.get state key))
   frame (new JFrame "Ecosystem")
   lnp-widgets (create-line-numbers-components)
-
   area (lnp-widgets :text-pane)
+  
   output-label (new JLabel "(no output yet)")
   output-window (javax.swing.JPanel.)
   lower-win (javax.swing.JTabbedPane.)
@@ -228,7 +234,7 @@
           :x0 100
           :y0 50
           :width0 800
-          :height0 600
+          :height0 1000
           :font-size 20
           :font-name "Courier New"
           :font-style Font/PLAIN
@@ -260,15 +266,14 @@
       (doto frame
         (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
         (.setLayout (new BorderLayout))
-        (.add 
-          (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) (lnp-widgets :composite) 
+        (.add (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) (lnp-widgets :composite) 
                                   (doto (javax.swing.JPanel.)
                                     (.setLayout (BorderLayout.))
                                     (.add output-label BorderLayout/NORTH)
                                     (.add lower-win BorderLayout/CENTER)))       
             (.setDividerLocation 300)
-            (.setResizeWeight 1.0))
-          (. BorderLayout CENTER))
+            (.setResizeWeight 1.0) )
+          (. BorderLayout CENTER) )
         (.pack)
         (.setSize (app :width0) (app :height0))
         (.setLocation (app :x0) (app :y0))
@@ -277,8 +282,8 @@
          
       (when (something-to-load? app)        
         (dispatch (fn [x] (assoc x :file-name (first (app :recent-files)))) "Loading from config")
-        (dispatch (fn[app] (dispatch ((app :actions) :load-document))))
-   ))))
+        (dispatch (fn[app] (dispatch ((app :actions) :load-document)))) )
+   )))
 
 
 (def run-func (fn []

@@ -9,6 +9,7 @@
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
 
+
 (defn highlight-syntax [styles area]  
   (let [doc (.getDocument area)
         text (.getText area)
@@ -52,6 +53,11 @@
 ))
  
 
+(defn mute-highlight-syntax [styles area undo-manager]  
+  (try
+    (.mute undo-manager)
+    (highlight-syntax styles area)
+    (finally (.unmute undo-manager))))
 
 ;(defn- text-observer [styles old-app new-app] nil)
 ;
@@ -103,7 +109,10 @@
       app ;(add-observers app (partial text-observer styles))
      "Source"
       { :name "Highlight syntax" :mnemonic KeyEvent/VK_T  :key KeyEvent/VK_F4 :mask 0
-        :action (fn[app] (highlight-syntax styles (app :area))) } )))
+        :action (fn[app] (mute-highlight-syntax styles (app :area) (app :undo-manager))) } )))
+
+
+
 
 
 
