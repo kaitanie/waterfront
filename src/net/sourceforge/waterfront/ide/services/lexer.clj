@@ -407,7 +407,7 @@
         doc (.getDocument text-pane)
         plain-style (styles :plain) ]
     (doseq [curr offsets]
-      (.setCharacterAttributes doc curr 1 plain-style true) 
+      (.setCharacterAttributes doc curr 1 plain-style true)    
     (swap! cache (fn [x] (assoc x :offsets nil))) )))
 
 (defn- turn-on [text-pane cache styles pos1 pos2 match-kind]

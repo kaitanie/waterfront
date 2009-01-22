@@ -85,13 +85,13 @@
 
 
 (defn- new-undo-manager [text-component]
-   (net.sourceforge.waterfront.ide.services.SmartUndoManager.) )
+;  (net.sourceforge.waterfront.ide.services.SmartUndoManager.) )
 ;  (proxy [net.sourceforge.waterfront.ide.services.SmartUndoManager] [text-component]
 ;    (addEdit [an-edit]
 ;      (println "undoable edit: significant? " (.isSignificant an-edit) 
 ;        "name:" (.getPresentationName an-edit) " class:" (class an-edit) )
 ;      (proxy-super addEdit an-edit) ))
-;  (javax.swing.undo.UndoManager.) )
+  (javax.swing.undo.UndoManager.) )
 
 
 (defn install-undo-manager [app]

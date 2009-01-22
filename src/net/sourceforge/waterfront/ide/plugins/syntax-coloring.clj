@@ -13,7 +13,7 @@
 (defn highlight-syntax [styles area]  
   (let [doc (.getDocument area)
         text (.getText area)
-        tokens (filter (fn [x] (not= (x :kind) :token-blank)) (tokenize text))
+        tokens (tokenize text)
         with-images (map (fn [x] 
                       (if (not= (x :kind) :token-symbol)
                         x
@@ -44,20 +44,20 @@
                                 x )))
                           with-images)
               
-        styled (filter (fn[x] (x :style)) (map (fn [x] (assoc x :style (get styles (x :kind)))) fixed-kinds))]
+        choose-style (fn [x] 
+         (let [res (get styles (x :kind))]
+            (if res res (styles :plain)) ))
+            
+        styled (map (fn [x] (assoc x :style (choose-style x))) fixed-kinds)]
 
-    (.setCharacterAttributes doc 0 (count text) (styles :plain) true)    
-    (doseq [curr styled]
-      (.setCharacterAttributes doc (curr :where) (curr :length) (curr :style) true) )
+;    (.setCharacterAttributes doc 0 (count text) (styles :plain) true)    
 
-))
+   (doseq [curr styled]
+     (.setCharacterAttributes doc (curr :where) (curr :length) (curr :style) true) )))
  
 
 (defn mute-highlight-syntax [styles area undo-manager]  
-  (try
-    (.mute undo-manager)
-    (highlight-syntax styles area)
-    (finally (.unmute undo-manager))))
+  (highlight-syntax styles area) )
 
 ;(defn- text-observer [styles old-app new-app] nil)
 ;
@@ -67,13 +67,19 @@
 
 
 (defn- coloring-loop [styles prev-text area dispatch-func]
-  (Thread/sleep 9000)  
+  (Thread/sleep 250)  
   (let [new-text (.getText area)]
-    (when (not= prev-text new-text)
-      (println "Highlighting")
-      (highlight-syntax styles area) )
-    (recur styles new-text area dispatch-func)))
- 
+    (cond
+      (= prev-text new-text)
+      (recur styles new-text area dispatch-func)
+      
+      :else
+      (do
+        (Thread/sleep 100)  
+        (let [same (= (.getText area) new-text)]
+          (when same
+            (highlight-syntax styles area) )            
+          (recur styles (if same new-text prev-text) area dispatch-func) )))))
        
 (fn [app]
   (let [styles {
@@ -110,10 +116,6 @@
      "Source"
       { :name "Highlight syntax" :mnemonic KeyEvent/VK_T  :key KeyEvent/VK_F4 :mask 0
         :action (fn[app] (mute-highlight-syntax styles (app :area) (app :undo-manager))) } )))
-
-
-
-
 
 
 

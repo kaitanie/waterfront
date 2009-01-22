@@ -28,7 +28,6 @@
   (.setSelectedTextColor area java.awt.Color/WHITE)
   (.setSelectionColor area (java.awt.Color. 49 106 197)) 
   (.setEditorKit area (net.sourceforge.waterfront.ide.services.NoWrapEditorKit.))
-;  (.setEditorKit area (new-clojure-editor-kit))
   (.addDocumentListener (.getDocument area) 
     (proxy [javax.swing.event.DocumentListener] []
       (insertUpdate [evt] ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
