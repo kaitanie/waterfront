@@ -33,7 +33,10 @@
   (and (not (unknown-document? app)) (.exists (get-current-document app))))
 
 (defn is-dirty [app]
-  (not= (.getText (app :area)) (app :initial-text)) )
+  (not= 
+   (.getText 
+      (app :area) ) 
+   (app :initial-text)) )
   
 
 ; actions

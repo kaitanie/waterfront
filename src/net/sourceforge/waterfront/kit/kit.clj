@@ -150,7 +150,7 @@
       ((graphics-wrapper f) g) )))        
 
 (defn new-custom-text-pane [f]
-  (proxy [javax.swing.JTextPane] []
+  (proxy [net.sourceforge.waterfront.ide.services.HighlightingTextPane] []
     (paint [g]
       (proxy-super paint g)
       (f g) )))

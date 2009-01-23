@@ -30,8 +30,16 @@
   (.setEditorKit area (net.sourceforge.waterfront.ide.services.NoWrapEditorKit.))
   (.addDocumentListener (.getDocument area) 
     (proxy [javax.swing.event.DocumentListener] []
-      (insertUpdate [evt] ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
-      (removeUpdate [evt] ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
+      (insertUpdate [evt] 
+         ((app :dispatch) 
+            (fn [app] 
+               (println "app:area nil?" (nil? (app :area)))
+               (assoc app :text 
+                  (.getText 
+                     (app :area)
+                  ))) nil))
+      (removeUpdate [evt] 
+         ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
       (changedUpdate [evt] ()) )) 
 
   (let [aux (fn [offset text]
@@ -41,7 +49,6 @@
         (insertString [fb offset text attrs]
           (proxy-super insertString fb offset (aux offset text) attrs))      
         (replace [fb offset length text attrs]
-          ((app :dispatch) (fn [a] ((a :before-change))))
           (proxy-super replace fb offset length (aux offset text) attrs)) ))) )
  
   (.. area (getDocument) (putProperty javax.swing.text.DefaultEditorKit/EndOfLineStringProperty "\n")) )
@@ -50,8 +57,6 @@
   
 (fn [app] 
   (customize-text-pane app (app :area))
-  (if (app :before-change)
-    app
-    (assoc app :before-change (fn [] nil)) ))
+  app)
 
 

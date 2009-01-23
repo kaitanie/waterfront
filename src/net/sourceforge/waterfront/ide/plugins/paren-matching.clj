@@ -6,13 +6,9 @@
 (refer 'net.sourceforge.waterfront.ide.services)
 
 (fn [app]   
-  (let [before-update-func (add-paren-matching (app :area))]
-    (assoc app :before-change before-update-func) ))
-
-
-
-
-
+  (add-paren-matching (app :area))
+  app)
+  
 
 
 

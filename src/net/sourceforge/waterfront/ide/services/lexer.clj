@@ -402,22 +402,25 @@
 ;                                                   ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; this function assumes that text-pane offers a "clearHighlights" method
 (defn- turn-off [text-pane cache styles]
-  (let [offsets (@cache :offsets)
-        doc (.getDocument text-pane)
-        plain-style (styles :plain) ]
-    (doseq [curr offsets]
-      (.setCharacterAttributes doc curr 1 plain-style true)    
-    (swap! cache (fn [x] (assoc x :offsets nil))) )))
+  (.clearHighlights text-pane)
+  (swap! cache (fn [x] (assoc x :offsets nil))) )
 
+;    (doseq [curr offsets]
+;      (.setCharacterAttributes doc curr 1 plain-style true)    
+
+; this function assumes that text-pane offers a "addHighlights" method
 (defn- turn-on [text-pane cache styles pos1 pos2 match-kind]
   (let [doc (.getDocument text-pane)
         attr (if (= :match match-kind) 
                 (styles :match) 
                 (styles :mismatch))]
-      (.setCharacterAttributes doc pos2 1 attr true) 
-      (.setCharacterAttributes doc pos1 1 attr true) 
+      (.addHighlights text-pane (. StyleConstants getBackground attr) pos1)
+      (.addHighlights text-pane (. StyleConstants getBackground attr) pos2)
       (swap! cache (fn [x] (assoc x :offsets (cons pos1 (cons pos2 (x :offsets)))))) ))
+;      (.setCharacterAttributes doc pos2 1 attr true) 
+;      (.setCharacterAttributes doc pos1 1 attr true) 
 
 (defn- my-document-observer [text-pane cache]
   (let [c @cache 
@@ -518,9 +521,7 @@
         (keyReleased [e] nil) ))
 
 
-    (.start (Thread. (runnable worker text-pane cache styles)))
-          
-    (fn [] (println "Before change called") (remove-colors)) ))
+    (.start (Thread. (runnable worker text-pane cache styles))) ))
 
         
 (defn show-frame [] 

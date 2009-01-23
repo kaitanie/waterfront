@@ -130,7 +130,7 @@
               (.setPreferredSize (java.awt.Dimension. 50 30)) )
 
         scroll-bar-ui (javax.swing.plaf.basic.BasicScrollBarUI.)
-        tp (new-custom-text-pane (fn [g] (.repaint lnp)))
+        tp (new-custom-text-pane (fn [g] (.repaint lnp)) )
         sp (javax.swing.JScrollPane. tp)
         composite (javax.swing.JPanel.)]
 
