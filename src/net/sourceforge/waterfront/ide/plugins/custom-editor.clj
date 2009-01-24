@@ -31,13 +31,7 @@
   (.addDocumentListener (.getDocument area) 
     (proxy [javax.swing.event.DocumentListener] []
       (insertUpdate [evt] 
-         ((app :dispatch) 
-            (fn [app] 
-               (println "app:area nil?" (nil? (app :area)))
-               (assoc app :text 
-                  (.getText 
-                     (app :area)
-                  ))) nil))
+         ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil) )
       (removeUpdate [evt] 
          ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
       (changedUpdate [evt] ()) )) 
@@ -58,5 +52,6 @@
 (fn [app] 
   (customize-text-pane app (app :area))
   app)
+
 
 

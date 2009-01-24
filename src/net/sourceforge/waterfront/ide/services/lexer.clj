@@ -500,9 +500,9 @@
     (. StyleConstants (setBold (styles :match) true))
     (. StyleConstants (setForeground (styles :match) Color/BLUE))
 
-    (. StyleConstants (setBackground (styles :mismatch) (Color. 220 220 220)))
+;    (. StyleConstants (setBackground (styles :mismatch) (Color. 220 220 220)))
     (. StyleConstants (setBold (styles :mismatch) true))
-    (. StyleConstants (setForeground (styles :mismatch) Color/RED))
+    (. StyleConstants (setBackground (styles :mismatch) Color/RED))
 
     (.addDocumentListener (.getDocument text-pane)
       (proxy [javax.swing.event.DocumentListener] []
@@ -540,7 +540,6 @@
       (.setSize 800 600)
       (.setVisible true) )))
 
-;(show-frame)
 
 
 
