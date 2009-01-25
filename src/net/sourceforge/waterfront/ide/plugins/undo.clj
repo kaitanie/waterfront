@@ -32,11 +32,12 @@
     (add-observers (assoc app :undo-manager um) new-file-observer) ))
 
 (fn [app] 
-  (add-to-menu (install-undo-manager app) "Edit" 
+  (add-to-menu (install-undo-manager (load-plugin app "menu-observer.clj")) "Edit" 
     {}
     { :name "Undo" :mnemonic KeyEvent/VK_U :key KeyEvent/VK_Z 
       :action (fn m-undo [app] (when (.canUndo (app :undo-manager)) (.undo (app :undo-manager))) app) }
     { :name "Redo" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_Y 
       :action (fn m-redo [app] (when (.canRedo (app :undo-manager)) (.redo (app :undo-manager))) app) }))
   
+
 

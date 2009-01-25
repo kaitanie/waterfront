@@ -81,12 +81,12 @@
       (let [file-name (if (unknown-document? app) 
                          "Unnamed" 
                          (.getName (get-current-document app)))
-            reply (. JOptionPane showConfirmDialog (app :frame)
+            reply (. JOptionPane showOptionDialog (app :frame)
                     (str "'" file-name "' has been modified. Save changes?")
-                    "Save File" (. JOptionPane YES_NO_CANCEL_OPTION))]
-        (when (= reply (. JOptionPane YES_OPTION))
+                    "Save File" (. JOptionPane YES_NO_CANCEL_OPTION) JOptionPane/QUESTION_MESSAGE, nil, (to-array ["Yes" "No" "Cancel"]), "Cancel"  )]
+        (when (= reply 0) ; Save!
           (save-now app))
-        (when (not= reply (. JOptionPane CANCEL_OPTION))
+        (when (and (not= reply JOptionPane/CLOSED_OPTION) (not= reply 2)) ; not Cancel!
           (save-config app)
           (.dispose (app :frame)) )
          app ))))
@@ -124,8 +124,6 @@
       (windowClosing [e] 
         ((app :dispatch) exit-application) )))
   
-    (transform (add-file-menu (add-chooser (add-observers app update-title))) :actions {}
+    (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
-
-
 

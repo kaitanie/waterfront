@@ -67,7 +67,7 @@
 
 
 (fn [app] 
-  (add-to-menu app "Run" 
+  (add-to-menu (load-plugin app "menu-observer.clj") "Run" 
     { :name "Run" :key KeyEvent/VK_W :mask ActionEvent/ALT_MASK :action (fn m-run [app] 
                         (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
                         (let [t0 (. System currentTimeMillis) 
@@ -79,6 +79,7 @@
                             :output-text (first output-and-errors)
                             :problems (second output-and-errors)
                             :eval-count (inc (app :eval-count) )))) }))
+
 
 
 

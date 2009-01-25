@@ -37,10 +37,11 @@
     (find-next new-app) ))
 
 (fn [app] 
-  (add-to-menu app "Edit" 
+  (add-to-menu (load-plugin app "menu-observer.clj") "Edit" 
     {}
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } ))
+
 
 
 

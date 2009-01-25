@@ -112,10 +112,11 @@
 ;      (.start) )
 
     (add-to-menu 
-      app ;(add-observers app (partial text-observer styles))
+      (load-plugin app "menu-observer.clj") ;(add-observers app (partial text-observer styles))
      "Source"
       { :name "Highlight syntax" :mnemonic KeyEvent/VK_T  :key KeyEvent/VK_F4 :mask 0
         :action (fn[app] (mute-highlight-syntax styles (app :area) (app :undo-manager))) } )))
+
 
 
 
