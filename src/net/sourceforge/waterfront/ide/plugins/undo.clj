@@ -18,7 +18,7 @@
 
 
 (defn- new-file-observer [old-app new-app] 
-  (when (maps-differ-on old-app new-app :file-name)
+  (when (maps-differ-on old-app new-app :file-name :loaded-at)
     (.discardAllEdits (new-app :undo-manager)) )
   new-app)
 
@@ -32,12 +32,16 @@
     (add-observers (assoc app :undo-manager um) new-file-observer) ))
 
 (fn [app] 
-  (add-to-menu (install-undo-manager (load-plugin app "menu-observer.clj")) "Edit" 
+  (add-to-menu (install-undo-manager (load-plugin app "menu-observer.clj" "file.clj")) "Edit" 
     {}
     { :name "Undo" :mnemonic KeyEvent/VK_U :key KeyEvent/VK_Z 
       :action (fn m-undo [app] (when (.canUndo (app :undo-manager)) (.undo (app :undo-manager))) app) }
     { :name "Redo" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_Y 
       :action (fn m-redo [app] (when (.canRedo (app :undo-manager)) (.redo (app :undo-manager))) app) }))
   
+
+
+
+
 
 

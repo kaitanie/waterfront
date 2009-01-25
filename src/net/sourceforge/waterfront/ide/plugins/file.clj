@@ -60,6 +60,7 @@
 
 (def load-document (fn [app]
  (let [new-app (assoc app 
+   :loaded-at (java.util.Date.)
    :initial-text (if (file-name-exists app)
                    (.replace (slurp (get-current-document-path app)) "\r\n" "\n")
                    ""))]
@@ -126,4 +127,5 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
 
