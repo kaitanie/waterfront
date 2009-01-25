@@ -1,7 +1,6 @@
 (ns net.sourceforge.waterfront.ide.plugins)
 
 
-
 (refer 'net.sourceforge.waterfront.kit)
 
 (require 'net.sourceforge.waterfront.ide.services.lexer)
@@ -39,9 +38,4 @@
     { :name "Redo" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_Y 
       :action (fn m-redo [app] (when (.canRedo (app :undo-manager)) (.redo (app :undo-manager))) app) }))
   
-
-
-
-
-
 

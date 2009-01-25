@@ -2,10 +2,8 @@
 ; different thread for execution
 ; stop running button
 ; click on error -> jump to location
-; interpret menu definitions
 ; ns, line numbers in error messages
 ; syntax coloring
-; recently opened
 ; replace
 ; highlight current line
 ; move word: stop at "-"
@@ -13,21 +11,18 @@
 ; syntax checking also on selected text
 ; fix line numbers when running/syntax checking selected text
 ; View menu: show Output window, show Prolbems window
-; grouped undo/redo
 ; jump to matching paren
 ; make undo/redo/copy/cut/paste/jump-to-matching enabled only when applicable
-; make paren highlighting invisible WRT undo/redo
 ; recent searches drop box
 ; incremental search
 ; eval just like in REPL
-; solve issues of window focuse
+; solve issues of window focus
 ; bug: (count (replicate 100 \a))
 ; multi-tab editor
 ; reformat source
 ; jump to decl.
 ; revert
 ; indent/unindent block
-; make the list of app items that are saved part of app itself.
 ; allow show doc (F1) on symbols which are not from the global namespace
 ; make load document an observer-driven action triggered by a new :file-name value
 ; rename 
@@ -35,7 +30,9 @@
 ; generate overloading
 ; extract function
 ; stop-and-inspect
-
+; make load last open file a plugin
+; make window placement inside the frame a dynamic property (DSL specified by app, a-la :menu)
+; allow executing code to change app
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -44,6 +41,11 @@
 ; 27-Dec-08: line wrapping
 ; 26-Dec-08: line end is always \n 
 ; 26-Dec-08: uncomment
+; ??-Dec-08: interpret menu definitions
+; ??-Dec-08: recently opened
+; ??-Dec-08: make the list of app items that are saved part of app itself.
+; 23-Jan-09: grouped undo/redo
+; 25-Jan-09: make paren highlighting invisible WRT undo/redo
 
 
 ; Highlights:
@@ -196,7 +198,7 @@
   state (new java.util.HashMap)
   put-mutable (fn [key value] (.put state key value) value)
   get-mutable (fn [key] (.get state key))
-  frame (new JFrame "Ecosystem")
+  frame (new JFrame "Waterfront")
   lnp-widgets (create-line-numbers-components)
   area (lnp-widgets :text-pane)
   
@@ -300,4 +302,7 @@
     (show-ecosystem-window { :title-prefix ""})
     (catch Throwable t (.printStackTrace t))) ))
 
+
+
+(* 3 99)
 
