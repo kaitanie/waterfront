@@ -16,6 +16,7 @@
 (defn recent-files-observer 
   "Maintain a history of opened files" 
   [old-app new-app]  
+  
   (when (maps-differ-on old-app new-app :file-name)
     (transform new-app :recent-files [] 
       (fn [fs] 
@@ -25,6 +26,8 @@
             (cons   ; Remove the file name from the list and push it on front
               (new-app :file-name)
               (filter (fn [x] (not= x (new-app :file-name))) fs) )))))))
+
+              
 
 
 
@@ -38,12 +41,16 @@
 (defn create-history-items [recent-files]
    (map create-a-history-item (take 9 recent-files) (iterate inc 1)) )
 
+
 (defn recent-files-menu-observer [old-app new-app] 
   "Add menu items to open recently opened files"
 
-  (when (or (maps-differ-on old-app new-app :recent-files) (= :unknown (old-app :file-name)))
+   (when (or 
+            (maps-differ-on old-app new-app :recent-files) 
+            (nil? (new-app :recent-menu-created))
+        )
     (let [result 
-      (transform new-app :menu nil 
+      (transform (assoc new-app :recent-menu-created true) :menu nil 
         (partial 
           change-menu 
           "File" 
@@ -51,8 +58,9 @@
             (to-vec 
               (apply conj 
                 (to-vec (filter (fn [x] (not (:is-history-item (meta x)))) items))
-                (to-vec (cons (add-history-tag { }) (create-history-items (new-app :recent-files)))) )))))]            
-      result)))
+                (to-vec (cons (add-history-tag { }) (create-history-items (new-app :recent-files)))) )))))]
+      result )))
+      
             
 
 (fn [app] 
@@ -65,7 +73,15 @@
                           (fn [ks] 
                             (if (includes :recent-files ks)
                               ks
-                              (conj ks :recent-files) ))))]
-  (add-save-key (add-observers app recent-files-observer recent-files-menu-observer))))
+                              (conj ks :recent-files) ))))
+
+      result (add-save-key          
+          (add-observers 
+            (load-plugin app "menu-observer.clj") 
+            recent-files-observer recent-files-menu-observer) 
+          )
+]
+
+      result ))
 
 

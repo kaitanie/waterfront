@@ -110,6 +110,10 @@
 
 (test (var translate-characters))
 
+(defn load-plugin [app & plugin-names]
+  (if (empty? plugin-names)
+    app
+    (recur ((app :load-plugin) app (first plugin-names)) (rest plugin-names)) ))
 
 (defn add-observers [app & new-observers]
   (transform 
@@ -130,5 +134,6 @@
     (if (maps-differ-on old-app new-app keys)
       (f old-app new-app)
       new-app )))
+
 
 

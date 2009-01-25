@@ -5,16 +5,6 @@
 (refer 'net.sourceforge.waterfront.ide.services)
 
 
-(defn update-menu [old-app new-app]
-  (when (maps-differ-on old-app new-app :menu)
-    (let [menu-bar (create-menu-from-desc 
-                      (fn [callback] (fn[event] ((new-app :dispatch) callback))) (new-app :menu))]
-      (.setJMenuBar (new-app :frame) menu-bar) )
-      (.validate (new-app :frame)) )
-  new-app)
-
-
-
 (defn update-output-label [old-app, new-app]
   (when (maps-differ-on old-app new-app :output-title)
     (.setText (new-app :output-label) (new-app :output-title))) 
@@ -22,7 +12,8 @@
 
 
 (fn [app] 
-    (add-observers app update-menu update-output-label) )
+    (add-observers app update-output-label) )
+
 
 
 

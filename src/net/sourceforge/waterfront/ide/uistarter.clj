@@ -179,10 +179,17 @@
 (defn run-observers [prev next observers]
   (if (or (nil? observers) (empty? observers))
     next
-    (let [temp ((first observers) prev next)
+    (do
+      (let [temp ((first observers) prev next)
           new-next (if temp temp next)]
-      (recur prev new-next (rest observers)) )))
+         (recur prev new-next (rest observers)) ))))
 
+(defn run-observers-till-fixpoint [prev next]
+  (let [observers (next :observers)
+        new-next (run-observers prev next observers)]
+    (if (= new-next next)
+      new-next
+      (recur next new-next) )))
 
 ; main function
 (defn show-ecosystem-window [cfg] (let [
@@ -217,7 +224,7 @@
                                   
             (put-mutable :ecosystem new-app)
             (when (zero? (put-mutable :entracne (dec (get-mutable :entracne))))
-              (put-mutable :ecosystem (run-observers old-app new-app (new-app :observers))) )
+              (put-mutable :ecosystem (run-observers-till-fixpoint old-app new-app)) )
             (get-mutable :ecosystem) )))
                                 
 

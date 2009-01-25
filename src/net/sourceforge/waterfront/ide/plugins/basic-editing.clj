@@ -9,7 +9,7 @@
 (refer 'net.sourceforge.waterfront.ide.services)
 
 (fn [app] 
-  (add-to-menu app "Edit" 
+  (add-to-menu (load-plugin app "menu-observer.clj") "Edit" 
     {}
     { :name "Copy" :mnemonic KeyEvent/VK_C 
       :action (fn m-copy [app] (.copy (app :area)) app) }
@@ -22,6 +22,7 @@
 
     { :name "Select All" :mnemonic KeyEvent/VK_A :key KeyEvent/VK_A 
       :action (fn m-select-all [app] (.selectAll (app :area)) app) } ))
+
 
 
 

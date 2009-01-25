@@ -124,7 +124,8 @@
       (windowClosing [e] 
         ((app :dispatch) exit-application) )))
   
-  (transform (add-file-menu (add-chooser (add-observers app update-title))) :actions {}
-    (fn[curr] (assoc curr :load-document load-document)) ))
-  
+    (transform (add-file-menu (add-chooser (add-observers app update-title))) :actions {}
+      (fn[curr] (assoc curr :load-document load-document)) ))
+
+
 

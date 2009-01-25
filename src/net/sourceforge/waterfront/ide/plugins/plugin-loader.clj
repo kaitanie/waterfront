@@ -7,7 +7,7 @@
 
 
 
-(defn- load-plugin [app curr-plugin-name]
+(defn- load-plugin-impl [app curr-plugin-name]
   (if (includes curr-plugin-name (app :loaded-plugins))
     app
     (let [
@@ -19,7 +19,7 @@
 
 (defn plugin-observer [old-app new-app] 
   (reduce 
-    (fn [curr-app curr-plugin-name] (load-plugin curr-app curr-plugin-name))
+    (fn [curr-app curr-plugin-name] (load-plugin-impl curr-app curr-plugin-name))
     new-app 
     (remove-all (new-app :plugins) (new-app :loaded-plugins) []) ))
             
@@ -27,7 +27,7 @@
 
 
 (fn [app] 
-  (transform (assoc app :loaded-plugins [] :load-plugin load-plugin) :observers []
+  (transform (assoc app :loaded-plugins [] :load-plugin load-plugin-impl) :observers []
     (fn[observers] (cons plugin-observer observers)) ))
 
 
