@@ -1,3 +1,6 @@
+
+(def *app* { })
+
 (ns net.sourceforge.waterfront.ide.plugins)
 
 (refer 'net.sourceforge.waterfront.kit)
@@ -16,7 +19,6 @@
   '(java.io File))
 
 
-(def ecosystem { })
 
 (defn read-objects-from-file [f]
   (let [stream (new clojure.lang.LineNumberingPushbackReader (new java.io.FileReader f))]
@@ -39,7 +41,7 @@
 
 
         (def eval-objects (fn [app objects]  
-          (binding [ecosystem (assoc app :program objects) ]
+          (binding [*app* (assoc app :program objects) ]
             (doseq [i objects]
               (println (eval i)) ))))
 
@@ -49,7 +51,8 @@
           (let [src-file (get-temp-file) 
                 stream (new java.io.StringWriter)
                 print-writer (new java.io.PrintWriter stream true)]
-            (binding [*err* print-writer 
+            (binding [
+                      *err* print-writer 
                       *out* print-writer]
               (write-file text src-file)
               (try 
@@ -67,19 +70,22 @@
 
 
 (fn [app] 
-  (add-to-menu (load-plugin app "menu-observer.clj") "Run" 
-    { :name "Run" :key KeyEvent/VK_W :mask ActionEvent/ALT_MASK :action (fn m-run [app] 
-                        (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
-                        (let [t0 (. System currentTimeMillis) 
-                              sel-text (get-selected-text app (.getText (app :area)))
-                              syntax-problems (find-syntax-errors "" sel-text)
-                              output-and-errors (if (empty? syntax-problems) (run-program app sel-text) (list "" syntax-problems))]
-                          (assoc app 
-                            :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
-                            :output-text (first output-and-errors)
-                            :problems (second output-and-errors)
-                            :eval-count (inc (app :eval-count) )))) }))
-
-
+  (let [a (atom {})
+        change-func (fn[key val] (swap! a (fn [curr-app] (assoc curr-app key val))))]
+    (add-to-menu (load-plugin app "menu-observer.clj") "Run" 
+      { :name "Run" :key KeyEvent/VK_W :mask ActionEvent/ALT_MASK :action (fn m-run [app] 
+                          (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
+                          (let [t0 (. System currentTimeMillis) 
+                                sel-text (get-selected-text app (.getText (app :area)))
+                                syntax-problems (find-syntax-errors "" sel-text)
+                                output-and-errors 
+                                  (if (empty? syntax-problems) 
+                                    (run-program (assoc app :change change-func) sel-text) 
+                                    (list "" syntax-problems))]
+                            (assoc (merge app @a)
+                              :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
+                              :output-text (first output-and-errors)
+                              :problems (second output-and-errors)
+                              :eval-count (inc (app :eval-count) )))) })))
 
 
