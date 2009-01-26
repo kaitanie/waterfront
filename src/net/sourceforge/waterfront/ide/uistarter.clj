@@ -33,6 +33,13 @@
 ; make load last open file a plugin
 ; make window placement inside the frame a dynamic property (DSL specified by app, a-la :menu)
 ; allow executing code to change app
+; change return value of (*app* :change)
+; Status bar
+; Help -> Status shows current plugins
+; Help -> Env show environment
+; Scrapbook file
+; remember position in each file
+ 
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -304,5 +311,5 @@
 
 
 
-(* 3 99)
+
 

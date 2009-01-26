@@ -1,5 +1,5 @@
 
-(def *app* { })
+(def *app* {})
 
 (ns net.sourceforge.waterfront.ide.plugins)
 
@@ -87,5 +87,6 @@
                               :output-text (first output-and-errors)
                               :problems (second output-and-errors)
                               :eval-count (inc (app :eval-count) )))) })))
+
 
 

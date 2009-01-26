@@ -265,6 +265,15 @@
    
    ([x indent] 
    (cond 
+      (and (map? x) (empty? x))
+      "{}"
+
+      (and (vector? x) (empty? x))
+      "[]"
+
+      (and (seq? x) (empty? x))
+      "()"
+
       (map? x)
       (pretty-print-map x indent)
       
@@ -281,5 +290,6 @@
 (defn pass [msg x]
    (println msg (pretty-print x))
    x)
+
 
 
