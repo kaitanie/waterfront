@@ -8,41 +8,47 @@
 
 (import '(java.awt.event KeyEvent ))
 
-        (def toggle-comment (fn [app start end]
-          (let [src (.getText (app :area))
-                from (get-line-start src (min start end))
-                to  (max (inc from) (if (zero? (column-of src (max start end)))
-                                     (max start end) 
-                                     (get-line-end src (max start end))))
-                turn-comment-off (= \; (.charAt src from))
-                sb (new StringBuilder)]
-            (loop [i from 
-                   line-start true]
-              (when (< i to)
-                (let [c (.charAt src i)]
-                  (cond
-                    (and line-start (not turn-comment-off))
-                    (do (.append sb ";") (.append sb c))
+(defn- toggle-comment [app start end]
+  (let [src (.getText (app :area))
+        from (get-line-start src (min start end))
+        to  (max (inc from) (if (zero? (column-of src (max start end)))
+                              (max start end) 
+                              (get-line-end src (max start end))))
+        turn-comment-off (= \; (.charAt src from))
+        sb (new StringBuilder)]
+    (loop [i from 
+            line-start true]
+      (when (< i to)
+        (let [c (.charAt src i)]
+          (cond
+            (and line-start (not turn-comment-off))
+            (do (.append sb ";") (.append sb c))
 
-                    (and line-start turn-comment-off (= c \;))
-                    nil
+            (and line-start turn-comment-off (= c \;))
+            nil
 
-                    (and line-start turn-comment-off (not= c \;))
-                    (.append sb c)
+            (and line-start turn-comment-off (not= c \;))
+            (.append sb c)
 
-                    :else
-                    (.append sb c) ))
+            :else
+            (.append sb c) ))
 
-                (recur (inc i) (= \newline (.charAt src i))) ))
-            (.select (app :area) from to)
-            (.replaceSelection (app :area) (str sb)) )))
+        (recur (inc i) (= \newline (.charAt src i))) ))
+    (.select (app :area) from to)
+    (.replaceSelection (app :area) (str sb)) ))
 
 
 (fn [app] 
-  (add-to-menu app "Source" 
+  (add-to-menu (load-plugin app "undo.clj") "Source" 
     { :name "Toggle Comment" :mnemonic KeyEvent/VK_T :key KeyEvent/VK_SEMICOLON 
-      :action (fn m-toggle [app] 
-        (toggle-comment app (.getSelectionStart (app :area)) (.getSelectionEnd (app :area)))) }))
+      :action (create-undo-transaction (fn [app] (toggle-comment app (.getSelectionStart (app :area)) (.getSelectionEnd (app :area))))) }))
+
+
+
+
+
+
+
 
 
 

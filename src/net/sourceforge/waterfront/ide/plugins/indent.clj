@@ -82,11 +82,13 @@
     
 
 (fn [app] 
- (add-to-menu app "Source" 
-  { :name "Unindent" :key KeyEvent/VK_TAB :mask java.awt.event.InputEvent/SHIFT_MASK
-    :action (fn [app] 
-       (unindent app (.getText (app :area)) (.getSelectionStart (app :area)) (.getSelectionEnd (app :area)))
-       app )}))
+  (add-to-menu (load-plugin app "undo.clj") "Source" 
+    { :name "Unindent" :key KeyEvent/VK_TAB :mask java.awt.event.InputEvent/SHIFT_MASK
+      :action (create-undo-transaction (fn [app] 
+        (unindent app (.getText (app :area)) (.getSelectionStart (app :area)) (.getSelectionEnd (app :area))) 
+        app ))}))
+
+
 
 
 

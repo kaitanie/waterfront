@@ -32,14 +32,13 @@
 ; stop-and-inspect
 ; make load last open file a plugin
 ; make window placement inside the frame a dynamic property (DSL specified by app, a-la :menu)
-; allow executing code to change app
 ; change return value of (*app* :change)
 ; Status bar
 ; Help -> Status shows current plugins
 ; Help -> Env show environment
 ; Scrapbook file
 ; remember position in each file
- 
+; A green/red indicator to show compilation status - syntax 
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -53,6 +52,7 @@
 ; ??-Dec-08: make the list of app items that are saved part of app itself.
 ; 23-Jan-09: grouped undo/redo
 ; 25-Jan-09: make paren highlighting invisible WRT undo/redo
+; 26-Jan-09: (app :change) is a functions that allow currently executing code to change app 
 
 
 ; Highlights:
@@ -308,7 +308,6 @@
     (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
     (show-ecosystem-window { :title-prefix ""})
     (catch Throwable t (.printStackTrace t))) ))
-
 
 
 

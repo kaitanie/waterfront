@@ -30,6 +30,15 @@
     (.. (app :area) (getDocument) (addUndoableEditListener um))
     (add-observers (assoc app :undo-manager um) new-file-observer) ))
 
+(defn create-undo-transaction [f]
+  "A helper function. Returns a function that runs f in a dedicated transaction WRT undo. All changes made by f to the document will be undone/redone together"
+  (fn [app]
+    (try
+      (.setSticky (app :undo-manager) true)
+      (f app)
+      (finally
+        (.setSticky (app :undo-manager) true) ))))
+
 (fn [app] 
   (add-to-menu (install-undo-manager (load-plugin app "menu-observer.clj" "file.clj")) "Edit" 
     {}
@@ -38,4 +47,5 @@
     { :name "Redo" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_Y 
       :action (fn m-redo [app] (when (.canRedo (app :undo-manager)) (.redo (app :undo-manager))) app) }))
   
+
 
