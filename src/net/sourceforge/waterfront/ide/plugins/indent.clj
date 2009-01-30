@@ -88,8 +88,3 @@
         (unindent app (.getText (app :area)) (.getSelectionStart (app :area)) (.getSelectionEnd (app :area))) 
         app ))}))
 
-
-
-
-
-
