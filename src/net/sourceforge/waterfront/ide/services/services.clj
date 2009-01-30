@@ -87,6 +87,47 @@
 (test (var get-line-end))
 
 
+(defn- offset-from-pos-seq [line column seq result l c]
+  (cond 
+    (> l line)
+    -1
+
+    (empty? seq)
+    -1
+
+    (and (= l line) (= c column))
+    result
+    
+    :else
+    (if (= \newline (first seq))
+      (recur line column (rest seq) (inc result) (inc l) 0)
+      (recur line column (rest seq) (inc result) l (inc c)) )))
+
+(defn offset-from-pos 
+  "Find the offset corresponding to the given line, column (both are 1-based) WRT the given text"
+  { :test (fn[]
+            (assert (= 0 (offset-from-pos 1 1 "abcd\nefg"))) 
+            (assert (= 1 (offset-from-pos 1 2 "abcd\nefg"))) 
+            (assert (= 2 (offset-from-pos 1 3 "abcd\nefg"))) 
+            (assert (= 3 (offset-from-pos 1 4 "abcd\nefg"))) 
+            (assert (= 4 (offset-from-pos 1 5 "abcd\nefg"))) 
+            (assert (= -1 (offset-from-pos 1 1 ""))) 
+            (assert (= 0 (offset-from-pos 1 1 "a"))) 
+            (assert (= -1 (offset-from-pos 1 6 "abcd\nefg"))) 
+            (assert (= 5 (offset-from-pos 2 1 "abcd\nefg"))) 
+            (assert (= 6 (offset-from-pos 2 2 "abcd\nefg"))) 
+            (assert (= 7 (offset-from-pos 2 3 "abcd\nef\n"))) 
+            (assert (= 8 (offset-from-pos 3 1 "abcd\nef\ng"))) 
+            (assert (= -1 (offset-from-pos 90 1 "abcd\nef\ng"))) )}
+  [line column text]
+    (if (string? text)
+      (offset-from-pos-seq (dec line) (dec column) (seq text) 0 0 0)
+      (offset-from-pos-seq (dec line) (dec column) text 0 0 0) ))
+
+(test (var offset-from-pos))
+
+  
+
 
 (defn translate-characters 
   { :test (fn []
@@ -134,6 +175,8 @@
     (if (maps-differ-on old-app new-app keys)
       (f old-app new-app)
       new-app )))
+
+
 
 
 
