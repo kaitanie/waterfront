@@ -1,72 +1,4 @@
 
-; different thread for execution
-; stop running button
-; click on error -> jump to location
-; ns, line numbers in error messages
-; syntax coloring
-; replace
-; highlight current line
-; scrapbook
-; syntax checking also on selected text
-; fix line numbers when running/syntax checking selected text
-; View menu: show Output window, show Prolbems window
-; jump to matching paren
-; make undo/redo/copy/cut/paste/jump-to-matching enabled only when applicable
-; recent searches drop box
-; incremental search
-; eval just like in REPL
-; solve issues of window focus
-; bug: (count (replicate 100 \a))
-; multi-tab editor
-; reformat source
-; jump to decl.
-; revert
-; indent/unindent block
-; allow show doc (F1) on symbols which are not from the global namespace
-; make load document an observer-driven action triggered by a new :file-name value
-; rename 
-; find unused variables
-; generate overloading
-; extract function
-; stop-and-inspect
-; make window placement inside the frame a dynamic property (DSL specified by app, a-la :menu)
-; change return value of (*app* :change)
-; Status bar
-; Help -> Status shows current plugins
-; Help -> Env show environment
-; Scrapbook file
-; remember position in each file
-; A green/red indicator to show compilation status - syntax 
-
-; 28-Dec-08: plugins (setup function)
-; 28-Dec-08: Bug fix - Exception in dispatch are now caught
-; 28-Dec-08: show doc
-; 28-Dec-08: goto
-; 27-Dec-08: line wrapping
-; 26-Dec-08: line end is always \n 
-; 26-Dec-08: uncomment
-; ??-Dec-08: interpret menu definitions
-; ??-Dec-08: recently opened
-; ??-Dec-08: make the list of app items that are saved part of app itself.
-; 23-Jan-09: grouped undo/redo
-; 25-Jan-09: make paren highlighting invisible WRT undo/redo
-; 26-Jan-09: (app :change) is a functions that allow currently executing code to change app 
-; 30-Jan-09: move word: stop at "-"
-; 31-Jan-09: Load recent file on startup is now handled by a dedicated plugin
-
-
-; Highlights:
-;
-; - spaces not tabs
-; - comment lines
-; - select and run
-; - undo/redo
-; - self reflection (ecosystem var.)
-; - plugin loading
-; - format code
-; - true paren. matching
-; - syntax coloring
-
 (ns net.sourceforge.waterfront.ide)
 
 
@@ -111,13 +43,6 @@
       (pretty-print (merge {} (sort (assoc (select-keys app (app :keys-to-save))
            :startup (cons 'quote (list (app :startup))) ))))
       file )))
-
-
-
-
-(def show-ecosystem-window)
-
-
 
 
 (defn run-observers [prev next observers]
@@ -229,4 +154,76 @@
     (show-ecosystem-window { :title-prefix ""})
     (catch Throwable t (.printStackTrace t))) ))
 
+
+
+
+
+
+; different thread for execution
+; stop running button
+; click on error -> jump to location
+; ns, line numbers in error messages
+; syntax coloring
+; replace
+; highlight current line
+; scrapbook
+; syntax checking also on selected text
+; fix line numbers when running/syntax checking selected text
+; View menu: show Output window, show Prolbems window
+; jump to matching paren
+; make undo/redo/copy/cut/paste/jump-to-matching enabled only when applicable
+; recent searches drop box
+; incremental search
+; eval just like in REPL
+; solve issues of window focus
+; bug: (count (replicate 100 \a))
+; multi-tab editor
+; reformat source
+; jump to decl.
+; revert
+; indent/unindent block
+; allow show doc (F1) on symbols which are not from the global namespace
+; make load document an observer-driven action triggered by a new :file-name value
+; rename 
+; find unused variables
+; generate overloading
+; extract function
+; stop-and-inspect
+; make window placement inside the frame a dynamic property (DSL specified by app, a-la :menu)
+; change return value of (*app* :change)
+; Status bar
+; Help -> Status shows current plugins
+; Help -> Env show environment
+; Scrapbook file
+; remember position in each file
+; A green/red indicator to show compilation status - syntax 
+
+; 28-Dec-08: plugins (setup function)
+; 28-Dec-08: Bug fix - Exception in dispatch are now caught
+; 28-Dec-08: show doc
+; 28-Dec-08: goto
+; 27-Dec-08: line wrapping
+; 26-Dec-08: line end is always \n 
+; 26-Dec-08: uncomment
+; ??-Dec-08: interpret menu definitions
+; ??-Dec-08: recently opened
+; ??-Dec-08: make the list of app items that are saved part of app itself.
+; 23-Jan-09: grouped undo/redo
+; 25-Jan-09: make paren highlighting invisible WRT undo/redo
+; 26-Jan-09: (app :change) is a functions that allow currently executing code to change app 
+; 30-Jan-09: move word: stop at "-"
+; 31-Jan-09: Load recent file on startup is now handled by a dedicated plugin
+
+
+; Highlights:
+;
+; - spaces not tabs
+; - comment lines
+; - select and run
+; - undo/redo
+; - self reflection (ecosystem var.)
+; - plugin loading
+; - format code
+; - true paren. matching
+; - syntax coloring
 

@@ -115,7 +115,7 @@
 
 (defn update-title [old-app, app]
   (.setTitle (app :frame)
-    (str "Ecosystem " (app :title-prefix) ": "
+    (str "Waterfront " (app :title-prefix) ": "
       (if (unknown-document? app)
         "Unnamed"
         (str (if (is-dirty app) "*" "") (.getName (get-current-document app)) " - " (get-current-document-path app)) )))
@@ -130,4 +130,5 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
 
