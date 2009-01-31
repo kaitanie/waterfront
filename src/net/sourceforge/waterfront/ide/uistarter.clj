@@ -6,7 +6,6 @@
 ; syntax coloring
 ; replace
 ; highlight current line
-; move word: stop at "-"
 ; scrapbook
 ; syntax checking also on selected text
 ; fix line numbers when running/syntax checking selected text
@@ -53,6 +52,7 @@
 ; 23-Jan-09: grouped undo/redo
 ; 25-Jan-09: make paren highlighting invisible WRT undo/redo
 ; 26-Jan-09: (app :change) is a functions that allow currently executing code to change app 
+; 30-Jan-09: move word: stop at "-"
 
 
 ; Highlights:
@@ -308,6 +308,7 @@
     (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
     (show-ecosystem-window { :title-prefix ""})
     (catch Throwable t (.printStackTrace t))) ))
+
 
 
 
