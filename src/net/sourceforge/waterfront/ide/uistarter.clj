@@ -29,7 +29,6 @@
 ; generate overloading
 ; extract function
 ; stop-and-inspect
-; make load last open file a plugin
 ; make window placement inside the frame a dynamic property (DSL specified by app, a-la :menu)
 ; change return value of (*app* :change)
 ; Status bar
@@ -53,6 +52,7 @@
 ; 25-Jan-09: make paren highlighting invisible WRT undo/redo
 ; 26-Jan-09: (app :change) is a functions that allow currently executing code to change app 
 ; 30-Jan-09: move word: stop at "-"
+; 31-Jan-09: Load recent file on startup is now handled by a dedicated plugin
 
 
 ; Highlights:
@@ -155,8 +155,6 @@
 
 ; config
 
-(defn something-to-load? [app]
-  (and (pos? (count (app :recent-files))) (.exists (path-to-file (first (app :recent-files))))) )
 
 (defn read-stored-config []
   (let [dir (path-to-file (. System getProperty "user.home"))
@@ -233,7 +231,10 @@
                                   
             (put-mutable :ecosystem new-app)
             (when (zero? (put-mutable :entracne (dec (get-mutable :entracne))))
-              (put-mutable :ecosystem (run-observers-till-fixpoint old-app new-app)) )
+              (put-mutable :ecosystem (run-observers-till-fixpoint old-app new-app))            
+              (let [x (get-mutable :ecosystem)]
+                (when-not (empty? (x :pending))               
+                  (dispatch (first (x :pending)) "???" (assoc x :pending (rest (x :pending)))) )))
             (get-mutable :ecosystem) )))
                                 
 
@@ -296,9 +297,6 @@
         (.setVisible true))
       (dispatch (fn[x] (apply (eval (app :startup)) (list (get-mutable :ecosystem)))) "bootstrap" {} )
          
-      (when (something-to-load? app)        
-        (dispatch (fn [x] (assoc x :file-name (first (app :recent-files)))) "Loading from config")
-        (dispatch (fn[app] (dispatch ((app :actions) :load-document)))) )
    )))
 
 
@@ -308,8 +306,4 @@
     (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
     (show-ecosystem-window { :title-prefix ""})
     (catch Throwable t (.printStackTrace t))) ))
-
-
-
-
 
