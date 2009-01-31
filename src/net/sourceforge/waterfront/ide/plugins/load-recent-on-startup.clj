@@ -14,15 +14,12 @@
 
 (defn- load-on-startup [old-app new-app]
   (if (and (not (new-app :loaded-on-startup)) (something-to-load? new-app))
-    (assoc new-app 
-      :loaded-on-startup true 
-      :pending (list (fn[x] (load-document (assoc x :file-name (first (x :recent-files)))))) )
+      (assoc ((new-app :enqueue) new-app (fn[x] (load-document (assoc x :file-name (first (x :recent-files))))))
+        :loaded-on-startup true)
     new-app ))
 
 
 (fn [app] 
   (add-observers (load-plugin app "file.clj") load-on-startup))
-
-
 
 

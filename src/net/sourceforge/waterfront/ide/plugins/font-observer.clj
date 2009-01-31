@@ -18,8 +18,3 @@
     (add-observers app update-font) )
 
 
-
-
-
-
-

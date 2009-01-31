@@ -100,57 +100,6 @@
 
 ; custom text-pane
        
-(defn paint-line-numbers [sp tp lnp g] 
-  (if (or (<= (.getWidth tp) 0) (<= (.getHeight tp) 0) (nil? (.modelToView tp 0)))
-    nil
-    (let [start (.viewToModel tp (.. sp (getViewport) (getViewPosition)))   
-          xe (+ (.. sp (getViewport) (getViewPosition) x) (.getWidth tp))
-          ye (+ (.. sp (getViewport) (getViewPosition) y) (.getHeight tp))
-          end (.viewToModel tp (java.awt.Point. xe ye))
-          doc (.getDocument tp)
-          startline (inc (.. doc (getDefaultRootElement) (getElementIndex start)))
-          endline (inc (.. doc (getDefaultRootElement) (getElementIndex end)))
-          fontHeight (.. g (getFontMetrics (.getFont tp)) (getHeight))
-          fontDesc (.. g (getFontMetrics (.getFont tp)) (getDescent))
-          ignore-this-one (.modelToView tp start)
-          ignore-this-two (.toString ignore-this-one)
-          starting_y (+ fontHeight 
-              (- (.. 
-                tp 
-                (modelToView start) 
-                 y) 
-              (.. sp (getViewport) (getViewPosition) y) 
-              fontDesc) )]
-   
-      (.setFont g (.getFont tp))
-      (loop [line startline y starting_y]
-        (when (<= line endline)
-          (.drawString g (str line) 0 y)
-          (recur (inc line) (+ y fontHeight)) ))
-      g )))
-    
-(defn create-line-numbers-components []
-  (let [parts (atom nil)
-        paint-numbers-wrapped (fn [g]
-          (paint-line-numbers (@parts :scroll-pane) (@parts :text-pane) 
-            (@parts :line-number-panel) g))
-        lnp (doto (new-custom-panel paint-numbers-wrapped)
-              (.setMinimumSize (java.awt.Dimension. 50 30))
-              (.setPreferredSize (java.awt.Dimension. 50 30)) )
-
-        scroll-bar-ui (javax.swing.plaf.basic.BasicScrollBarUI.)
-        tp (new-custom-text-pane (fn [g] (.repaint lnp)) )
-        sp (javax.swing.JScrollPane. tp)
-        composite (javax.swing.JPanel.)]
-
-    (swap! parts (fn [x] { :text-pane tp :scroll-pane sp :line-number-panel lnp }))
-    (doto composite
-      (.setLayout (java.awt.BorderLayout.))
-      (.add (@parts :scroll-pane) (java.awt.BorderLayout/CENTER))
-      (.add (@parts :line-number-panel) (java.awt.BorderLayout/WEST)))
-      
-    (assoc @parts :composite composite) )) 
-    
 
 
 ; config
@@ -204,12 +153,8 @@
   put-mutable (fn [key value] (.put state key value) value)
   get-mutable (fn [key] (.get state key))
   frame (new JFrame "Waterfront")
-  lnp-widgets (create-line-numbers-components)
-  area (lnp-widgets :text-pane)
   
-  output-label (new JLabel "(no output yet)")
   output-window (javax.swing.JPanel.)
-  lower-win (javax.swing.JTabbedPane.)
                
         dispatch (fn dispatch
           ([action]
@@ -261,11 +206,9 @@
           
         overriding-config {
           :dispatch dispatch
+          :enqueue (fn [app f] (assoc app :pending (concat (app :pending) (list f))))
           :eval-count 1,
-          :area area, 
           :frame frame, 
-          :output-label output-label,
-          :lower-window lower-win
           :menu [
             { :name "File" :mnemonic KeyEvent/VK_F :children []}
             { :name "Edit" :mnemonic KeyEvent/VK_E :children []}
@@ -283,14 +226,6 @@
       (doto frame
         (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
         (.setLayout (new BorderLayout))
-        (.add (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) (lnp-widgets :composite) 
-                                  (doto (javax.swing.JPanel.)
-                                    (.setLayout (BorderLayout.))
-                                    (.add output-label BorderLayout/NORTH)
-                                    (.add lower-win BorderLayout/CENTER)))       
-            (.setDividerLocation 300)
-            (.setResizeWeight 1.0) )
-          (. BorderLayout CENTER) )
         (.pack)
         (.setSize (app :width0) (app :height0))
         (.setLocation (app :x0) (app :y0))
@@ -306,4 +241,3 @@
     (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
     (show-ecosystem-window { :title-prefix ""})
     (catch Throwable t (.printStackTrace t))) ))
-
