@@ -88,19 +88,6 @@
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
 
-  
-; domain specific 
-
-(defn print-app [app]    
-  (println "--------------------------------------------")
-  (println "Observers:\n" (apply str (map (fn[x] (str "  -" x "\n")) (app :observers))))
-  (println (pretty-print (select-keys app (conj (app :keys-to-save) :file-name :loaded-plugins))))
-  (println "--------------------------------------------")
-  app)
-
-; custom text-pane
-       
-
 
 ; config
 
@@ -114,6 +101,7 @@
 
 (defn get-merged-config [default-config cfg-1 cfg-2]
   (merge default-config (read-stored-config) cfg-1 cfg-2) )
+
 
 (defn save-config [app]
   (let [dir (path-to-file (. System getProperty "user.home"))
@@ -236,8 +224,9 @@
 
 
 (def run-func (fn []
-  (println "tranform=" transform)
   (try 
     (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
     (show-ecosystem-window { :title-prefix ""})
     (catch Throwable t (.printStackTrace t))) ))
+
+

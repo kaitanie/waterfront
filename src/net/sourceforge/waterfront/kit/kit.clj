@@ -236,7 +236,7 @@
               (pretty-print (second e) (inc indent)) 
               )))
         [] 
-        m ))
+        (sort m) ))
     (eol indent) "}" ))
 
 (defn pretty-print-vec 
@@ -290,6 +290,7 @@
 (defn pass [msg x]
    (println msg (pretty-print x))
    x)
+
 
 
 
