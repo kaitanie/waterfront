@@ -71,7 +71,7 @@
                 s (offset-from-pos l-from 1 t) 
                 e (offset-from-pos l-to 1 t)]
             (.setSelectionStart (app :area) s)
-            (.setSelectionEnd (app :area) e) ))
+            (.setSelectionEnd (app :area) (if (= start end) s e)) ))
         (let [copy (or (not line-start) (not= (first src) \space))
               skip (if (and line-start (= (first src) \space))
                       (compute-unindent-amount src)
@@ -87,4 +87,5 @@
       :action (create-undo-transaction (fn [app] 
         (unindent app (.getText (app :area)) (.getSelectionStart (app :area)) (.getSelectionEnd (app :area))) 
         app ))}))
+
 

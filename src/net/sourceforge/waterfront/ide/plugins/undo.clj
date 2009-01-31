@@ -37,7 +37,7 @@
       (.setSticky (app :undo-manager) true)
       (f app)
       (finally
-        (.setSticky (app :undo-manager) true) ))))
+        (.setSticky (app :undo-manager) false) ))))
 
 (fn [app] 
   (add-to-menu (install-undo-manager (load-plugin app "menu-observer.clj" "file.clj")) "Edit" 
@@ -47,5 +47,6 @@
     { :name "Redo" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_Y 
       :action (fn m-redo [app] (when (.canRedo (app :undo-manager)) (.redo (app :undo-manager))) app) }))
   
+
 
 
