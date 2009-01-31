@@ -64,8 +64,10 @@
    :initial-text (if (file-name-exists app)
                    (.replace (slurp (get-current-document-path app)) "\r\n" "\n")
                    ""))]
-   (.setText (new-app :area) (new-app :initial-text))
-   (.scrollRectToVisible (new-app :area) (.modelToView (new-app :area) 0))
+    (.setText (new-app :area) (new-app :initial-text))
+    (later (fn [] 
+      (.scrollRectToVisible (new-app :area) (.modelToView (new-app :area) 0))
+      (.setCaretPosition (new-app :area) 0) ))
    new-app )))
      
 
@@ -128,6 +130,8 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
+
 
 
 
