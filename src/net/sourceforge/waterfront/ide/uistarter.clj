@@ -78,8 +78,6 @@
  
           ([action name old-app]
           (put-mutable :entracne (inc (get-mutable :entracne)))          
-          (when name
-            (println (get-mutable :entracne) "dispatching " name))
             
             (let [candidate-new-app 
                   (try 
@@ -226,4 +224,5 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
