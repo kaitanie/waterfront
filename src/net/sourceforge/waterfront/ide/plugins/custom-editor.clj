@@ -50,7 +50,7 @@
 
   
 (fn [app] 
-  (let [new-app (load-plugin app "layout-observer.clj")]
+  (let [new-app (load-plugin app "layout.clj")]
     (customize-text-pane new-app (new-app :area))
     new-app ))
 
