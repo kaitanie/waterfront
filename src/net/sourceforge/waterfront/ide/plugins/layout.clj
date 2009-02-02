@@ -73,21 +73,32 @@
   
 
 (fn [app] 
-  (let [lower-win (javax.swing.JTabbedPane.)
+  (let [sb (javax.swing.JPanel.)
+        lower-win (javax.swing.JTabbedPane.)
         lnp-widgets (create-line-numbers-components)
         area (lnp-widgets :text-pane)
-        output-label (new javax.swing.JLabel "(no output yet)")
-       ]
+        indicator (javax.swing.JLabel. "    ")
+        output-label (javax.swing.JLabel. "(no output yet)")]
+
+  (.setOpaque indicator true)
+  (.setLayout sb (javax.swing.BoxLayout. sb javax.swing.BoxLayout/LINE_AXIS))
+  (.setBorder sb (javax.swing.BorderFactory/createEmptyBorder 3 3 3 3))
+
+  (.add sb (javax.swing.Box/createRigidArea(java.awt.Dimension. 5 0)))
+  (.add sb indicator)
+  (.add sb (javax.swing.Box/createRigidArea(java.awt.Dimension. 5 0)))
+  (.add sb output-label)
+
   (.add (app :frame) (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) (lnp-widgets :composite) 
                                   (doto (javax.swing.JPanel.)
                                     (.setLayout (BorderLayout.))
-                                    (.add output-label BorderLayout/NORTH)
+                                    (.add sb BorderLayout/NORTH)
                                     (.add lower-win BorderLayout/CENTER)))       
             (.setDividerLocation 300)
             (.setResizeWeight 1.0) )
           (. BorderLayout CENTER) )
 
-    (add-observers (assoc app :area area :output-label output-label :lower-window lower-win) layout-observer) ))
-
+  
+  (add-observers (assoc app :area area :output-label output-label :lower-window lower-win :status-bar sb :indicator indicator) layout-observer) ))
 
 

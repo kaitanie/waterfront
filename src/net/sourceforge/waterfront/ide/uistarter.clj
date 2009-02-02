@@ -195,6 +195,8 @@
 ; Scrapbook file
 ; remember position in each file
 ; A green/red indicator to show compilation status - syntax 
+; make threads daemons
+; document app functions
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -224,5 +226,6 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 

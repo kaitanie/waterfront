@@ -10,31 +10,29 @@
 
 
 
-(defn- show-msg [dispatch msg]
-  (dispatch (fn [app] (assoc app :output-title msg))) )
+(defn- show-msg [dispatch is-ok? indicator msg]
+  (.setBackground indicator (if is-ok? java.awt.Color/GREEN java.awt.Color/RED))
+  (dispatch (fn [app] (assoc app :output-title msg))) 
+)
 
-(defn- run-syntax-check [source-code dispatch]
-  (let [pairs (map (fn[x] (take 2 x)) (compute-paren-matching-pairs source-code))
-        bad-pairs (filter (fn[x] (not= (first x) :match)) pairs)
-        unique (set bad-pairs)]
-    (if (empty? unique) 
-      (try
-        (load-string source-code)
-        (show-msg dispatch "Everything is fine!")
-        (catch Throwable t
-          (show-msg dispatch (.getMessage t)) ))
-      (show-msg dispatch "Found syntax errors ") )))
 
-(defn- check-loop [at dispatch]  
+(defn- run-syntax-check [source-code indicator dispatch]
+  (try
+    (load-string source-code)
+    (show-msg dispatch true indicator "")
+    (catch Throwable t
+      (show-msg dispatch false indicator (.getMessage t)) )))
+ 
+(defn- check-loop [at indicator dispatch]  
   (Thread/sleep 1000)
   (let [x @at]
     (if (not x)
-      (recur at dispatch)
+      (recur at indicator dispatch)
       (if (not (compare-and-set! at x nil)) 
-        (recur at dispatch)
+        (recur at indicator dispatch)
         (do 
-          (run-syntax-check x dispatch)
-          (recur at dispatch) )))))
+          (run-syntax-check x indicator dispatch)
+          (recur at indicator dispatch) )))))
         
 (defn- text-observer [at old-app new-app]
   (when (maps-differ-on old-app new-app :text)
@@ -42,14 +40,12 @@
   new-app )
 
 (fn [app] 
-  (let [at (atom nil)]
-    (.start (Thread. (runnable (partial check-loop at (app :dispatch)))))
-    (add-observers 
-      (load-plugin app "custom-editor.clj") 
-      (partial text-observer at) )))
-
-
-
+  (let [at (atom nil)
+        result (add-observers 
+                  (load-plugin (load-plugin app "custom-editor.clj") "layout.clj")
+                  (partial text-observer at) )]
+    (.start (Thread. (runnable (partial check-loop at (app :indicator) (app :dispatch)))))
+    result ))
 
 
 
