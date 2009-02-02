@@ -9,24 +9,32 @@
 (refer 'net.sourceforge.waterfront.ide.services)
 
 
-(defn- run-syntax-check [source-code]
+
+(defn- show-msg [dispatch msg]
+  (dispatch (fn [app] (assoc app :output-title msg))) )
+
+(defn- run-syntax-check [source-code dispatch]
   (let [pairs (map (fn[x] (take 2 x)) (compute-paren-matching-pairs source-code))
         bad-pairs (filter (fn[x] (not= (first x) :match)) pairs)
         unique (set bad-pairs)]
     (if (empty? unique) 
-      (println "Everything is fine!")
-      (println "Found syntax errors :(") )))
+      (try
+        (load-string source-code)
+        (show-msg dispatch "Everything is fine!")
+        (catch Throwable t
+          (show-msg dispatch (.getMessage t)) ))
+      (show-msg dispatch "Found syntax errors ") )))
 
-(defn- check-loop [at]  
+(defn- check-loop [at dispatch]  
   (Thread/sleep 1000)
   (let [x @at]
     (if (not x)
-      (recur at)
+      (recur at dispatch)
       (if (not (compare-and-set! at x nil)) 
-        (recur at)
+        (recur at dispatch)
         (do 
-          (run-syntax-check x)
-          (recur at) )))))
+          (run-syntax-check x dispatch)
+          (recur at dispatch) )))))
         
 (defn- text-observer [at old-app new-app]
   (when (maps-differ-on old-app new-app :text)
@@ -35,10 +43,12 @@
 
 (fn [app] 
   (let [at (atom nil)]
-    (.start (Thread. (runnable (partial check-loop at))))
+    (.start (Thread. (runnable (partial check-loop at (app :dispatch)))))
     (add-observers 
       (load-plugin app "custom-editor.clj") 
       (partial text-observer at) )))
+
+
 
 
 
