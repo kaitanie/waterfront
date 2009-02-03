@@ -11,7 +11,7 @@
 
 
 (defn- show-msg [dispatch is-ok? indicator msg]
-  (.setBackground indicator (if is-ok? java.awt.Color/GREEN java.awt.Color/RED))
+  (.setBackground indicator (.darker (if is-ok? java.awt.Color/GREEN java.awt.Color/RED)))
   (dispatch (fn [app] (assoc app :output-title msg))) 
 )
 
@@ -46,6 +46,8 @@
                   (partial text-observer at) )]
     (.start (Thread. (runnable (partial check-loop at (app :indicator) (app :dispatch)))))
     result ))
+
+
 
 
 

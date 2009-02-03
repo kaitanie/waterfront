@@ -44,7 +44,7 @@
           (.drawString g (str line) 0 y)
           (recur (inc line) (+ y fontHeight)) ))
       g )))
-    
+
 (defn create-line-numbers-components []
   (let [parts (atom nil)
         paint-numbers-wrapped (fn [g]
@@ -77,10 +77,12 @@
         lower-win (javax.swing.JTabbedPane.)
         lnp-widgets (create-line-numbers-components)
         area (lnp-widgets :text-pane)
-        indicator (javax.swing.JLabel. "    ")
+        indicator (javax.swing.JLabel. "   ")
         output-label (javax.swing.JLabel. "(no output yet)")]
 
-  (.setOpaque indicator true)
+  (doto indicator 
+    (.setOpaque true)
+    (.setBorder (javax.swing.BorderFactory/createLoweredBevelBorder)))
   (.setLayout sb (javax.swing.BoxLayout. sb javax.swing.BoxLayout/LINE_AXIS))
   (.setBorder sb (javax.swing.BorderFactory/createEmptyBorder 3 3 3 3))
 
@@ -96,9 +98,19 @@
                                     (.add lower-win BorderLayout/CENTER)))       
             (.setDividerLocation 300)
             (.setResizeWeight 1.0) )
-          (. BorderLayout CENTER) )
+          (. BorderLayout CENTER) 
 
   
-  (add-observers (assoc app :area area :output-label output-label :lower-window lower-win :status-bar sb :indicator indicator) layout-observer) ))
+  (add-observers (assoc app 
+      :area area 
+      :output-label output-label 
+      :lower-window lower-win 
+      :status-bar sb 
+      :indicator indicator) 
+    layout-observer) )))
+
+
+
+
 
 
