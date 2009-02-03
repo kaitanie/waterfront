@@ -194,9 +194,11 @@
 ; Help -> Env show environment
 ; Scrapbook file
 ; remember position in each file
-; A green/red indicator to show compilation status - syntax 
 ; make threads daemons
 ; document app functions
+; Make syntax problems messages more descriptive
+; Add a "Run tests" option to make on-the-fly checking run tests of functions
+; fix prev next word WRT parenthesis
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -213,7 +215,7 @@
 ; 26-Jan-09: (app :change) is a functions that allow currently executing code to change app 
 ; 30-Jan-09: move word: stop at "-"
 ; 31-Jan-09: Load recent file on startup is now handled by a dedicated plugin
-
+; 03-Feb-09: Green/Red indicator shows load status of the code - updated on the fly
 
 ; Highlights:
 ;
@@ -226,6 +228,5 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
-
 
 
