@@ -95,6 +95,8 @@
           (.dispose (app :frame)) )
          app ))))
 
+(defn- revert [app]
+  (load-document app))
 
 (defn add-file-menu [app]
   (add-to-menu app "File" 
@@ -104,6 +106,7 @@
                                 :file-name :unknown :initial-text "" }))
                               app) }
     { :name "Open" :mnemonic KeyEvent/VK_O :key KeyEvent/VK_O :action open-file }
+    { :name "Revert" :action revert }
     { :name "Save" :mnemonic KeyEvent/VK_S :key KeyEvent/VK_S :action save-now }
     { :name "Save as..." :mnemonic KeyEvent/VK_A :action save-as }
     {}
@@ -130,5 +133,5 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
-
+  
 
