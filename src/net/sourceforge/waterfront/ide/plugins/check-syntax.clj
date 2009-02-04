@@ -11,14 +11,23 @@
 
 (defn- paren-name [c]
   (cond 
-    (or (= \{ c) (= \} c))
-    "braces"
+    (= \{ c)
+    "}"
 
-    (or (= \[ c) (= \] c))
-    "brackets"
+    (= \} c)
+    "{"
 
-    (or (= \( c) (= \) c))
-    "parenthesis"
+    (= \[ c)
+    "]"
+
+    (= \] c)
+    "["
+
+    (= \( c)
+    ")"
+
+    (= \) c)
+    "("
 
     :else
     (println "c=" c)
@@ -43,13 +52,13 @@
         s (str problem)]
     (cond
       (= problem :mismatch)
-      (str where ": " c " cannot match " c-other " from line " line-other " column " col-other \newline)
+      (str where ": '" c "' is mismatched with '" c-other "' from line " line-other " column " col-other \newline)
 
       (= problem :no-open)
-      (str where ": an openning " name " was not found" \newline)
+      (str where ": no matching '" name "' was found" \newline)
 
       (= problem :no-close)
-      (str where ": a closing " name " was not found" \newline)
+      (str where ": no matching '" name "' was found" \newline)
 
       :else
       (println "problem=" problem) )))
@@ -57,8 +66,11 @@
 (defn find-syntax-errors [success-message source-code]
    (let [pairs (compute-paren-matching-pairs source-code)
          bad-pairs (filter (fn[x] (not= (first x) :match)) pairs)
-         unique (set bad-pairs)
-         sorted (sort-by (fn [x] (first x)) unique)
+         temp (filter (fn[x] (or 
+            (not= (first x) :mismatch)
+            (< (second x) (third x)))) bad-pairs)
+         unique (set temp)
+         sorted (sort-by (fn [x] (second x)) unique)
          formatted (map (partial form-msg source-code) sorted)]
      (if (empty? unique) success-message (apply str formatted)) ))
 
@@ -67,6 +79,9 @@
     { :name "Check Syntax" :mnemonic KeyEvent/VK_C  
       :action (fn m-check-syntax [app] 
                 (assoc app :problems (find-syntax-errors "No syntax errors" (.getText (app :area)))))} ))
+
+
+
 
 
 
