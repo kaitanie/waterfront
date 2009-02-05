@@ -187,7 +187,6 @@
 ; stop-and-inspect
 ; make window placement inside the frame a dynamic property (DSL specified by app, a-la :menu)
 ; change return value of (*app* :change)
-; Status bar
 ; Help -> Status shows current plugins
 ; Help -> Env show environment
 ; Scrapbook file
@@ -197,8 +196,9 @@
 ; Add a "Run tests" option to make on-the-fly checking run tests of functions
 ; fix prev next word WRT parenthesis
 ; make deafult .config.clj file loadable from the class-path
-; make TAB indent a selection
 ; Bug: File -> New does not work
+; change the font of the compilation result (upper status bar)
+; when next/prev a word stop if directionality of parenthesis/braces/brackets changes
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -217,6 +217,8 @@
 ; 31-Jan-09: Load recent file on startup is now handled by a dedicated plugin
 ; 03-Feb-09: Green/Red indicator shows load status of the code - updated on the fly
 ; 04-Feb-09: Make syntax problems messages are more descriptive
+; 04-Feb-09 Status bar
+; 05-Feb-09: TAB indents a selection
 
 ; Highlights:
 ;
@@ -229,6 +231,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
