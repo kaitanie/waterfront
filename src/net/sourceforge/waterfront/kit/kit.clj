@@ -24,8 +24,12 @@
   `(assert-eq-aux ~expected ~actual (pr-str '~actual)))
 
 
+(defn inspect-aux [s v]
+  (println (str s "=" v))
+  v)
+
 (defmacro inspect [a]
-  `(println (str '~a "=" ~a)))
+  `(inspect-aux '~a ~a))
 
 ; general purpose utilities
 
@@ -133,15 +137,15 @@
 
 
 (defn start-daemon [f & args]
-  (doto (Thread. (runnable (apply partial f args)))
+  (doto (Thread. (runnable (apply partial (cons f args))))
     (.setDaemon true)
     (.start)))
     
 
 ; swing utlities
 
-(defn later [f]
-  (. javax.swing.SwingUtilities invokeLater (runnable f)) )
+(defn later [f & args]
+  (. javax.swing.SwingUtilities invokeLater (apply runnable (cons f args))) )
 
 
 (defn graphics-wrapper [paint-handler]
@@ -298,6 +302,8 @@
 (defn pass [msg x]
    (println msg (pretty-print x))
    x)
+
+
 
 
 

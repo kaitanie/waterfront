@@ -44,7 +44,6 @@
            :startup (cons 'quote (list (app :startup))) ))))
       file )))
 
-
 (defn run-observers [prev next observers]
   (if (or (nil? observers) (empty? observers))
     next
@@ -60,97 +59,107 @@
       new-next
       (recur next new-next) )))
 
-; main function
-(defn show-ecosystem-window [cfg] (let [
-  state (new java.util.HashMap)
-  put-mutable (fn [key value] (.put state key value) value)
-  get-mutable (fn [key] (.get state key))
-  frame (new JFrame "Waterfront")
+
+
+(defn- atom-assoc [a key value]
+  (swap! a (fn [m] (assoc m key value)))
+   value)
+
+(defn- atom-get [a key]
+  (get @a key) )
+
+
+(defn- dispatcher
+  ([a action]
+  (dispatcher a action "???"))
   
-  output-window (javax.swing.JPanel.)
-               
-        dispatch (fn dispatch
-          ([action]
-          (dispatch action "???"))
-          
-          ([action name]
-          (dispatch action name (get-mutable :ecosystem)))
- 
-          ([action name old-app]
-          (put-mutable :entracne (inc (get-mutable :entracne)))          
-            
-            (let [candidate-new-app 
-                  (try 
-                    (action old-app)        
-                  (catch Exception e (.printStackTrace e) old-app) )
-                new-app (if (nil? candidate-new-app) old-app candidate-new-app)]
-                                  
-            (put-mutable :ecosystem new-app)
-            (when (zero? (put-mutable :entracne (dec (get-mutable :entracne))))
-              (put-mutable :ecosystem (run-observers-till-fixpoint old-app new-app))            
-              (let [x (get-mutable :ecosystem)]
-                (when-not (empty? (x :pending))               
-                  (dispatch (first (x :pending)) "???" (assoc x :pending (rest (x :pending)))) )))
-            (get-mutable :ecosystem) )))
-                                
+  ([a action name]
+  (dispatcher a action name (atom-get a :app)))
+  
+  ([a action name old-app]
+    (atom-assoc a :entrance (inc (atom-get a :entrance)))
+    
+    (let [candidate-new-app 
+          (try 
+            (action old-app)        
+          (catch Exception e (.printStackTrace e) old-app) )
+        new-app (if (nil? candidate-new-app) old-app candidate-new-app)]
+                          
+    (atom-assoc a :app new-app)
+    (when (zero? (atom-assoc a :entrance (dec (atom-get a :entrance))))
+      (atom-assoc a :app (run-observers-till-fixpoint old-app new-app))            
+      (let [x (atom-get a :app)]
+        (when-not (empty? (x :pending))               
+          (dispatcher a (first (x :pending)) "???" (assoc x :pending (rest (x :pending)))) )))
+    (atom-get a :app) )))
 
-        show-popup (fn [popup-menu e] 
-          (when (.isPopupTrigger e)       
-            (. popup-menu show (.getComponent e) (.getX e) (.getY e)) ))
-
-        build-context-menu-listener (fn [popup-menu] 
-          (proxy [java.awt.event.MouseAdapter] []
-            (mousePressed [e] (show-popup popup-menu e))
-            (mouseReleased [e] (show-popup popup-menu e)) ))                              
-       
-        default-config { 
-          :x0 100
-          :y0 50
-          :width0 800
-          :height0 1000
-          :font-size 20
-          :font-name "Courier New"
-          :font-style Font/PLAIN
-          :startup '(fn [app] app)
-          :keys-to-save [:keys-to-save :file-name :last-search :font-size :font-name :font-style]
-          :file-name :unknown }
-          
-        overriding-config {
-          :dispatch dispatch
-          :enqueue (fn [app f] (assoc app :pending (concat (app :pending) (list f))))
-          :eval-count 1,
-          :frame frame, 
-          :menu [
-            { :name "File" :mnemonic KeyEvent/VK_F :children []}
-            { :name "Edit" :mnemonic KeyEvent/VK_E :children []}
-            { :name "View" :mnemonic KeyEvent/VK_V :children []}
-            { :name "Source" :mnemonic KeyEvent/VK_S :children []}
-            { :name "Run" :mnemonic KeyEvent/VK_R :children []} ]
-          :observers []
-          :actions {} }]
-
-    (put-mutable :ecosystem (get-merged-config default-config cfg overriding-config))
-    (put-mutable :entracne 0)
-    (put-mutable :number-of-children 0)
-            
-    (let [app (get-mutable :ecosystem)]
-      (doto frame
-        (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
-        (.setLayout (new BorderLayout))
-        (.pack)
-        (.setSize (app :width0) (app :height0))
-        (.setLocation (app :x0) (app :y0))
-        (.setVisible true))
-      (dispatch (fn[x] (apply (eval (app :startup)) (list (get-mutable :ecosystem)))) "bootstrap" {}) )))
-
-
-(def run-func (fn []
-  (try 
-    (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
-    (show-ecosystem-window { :title-prefix ""})
-    (catch Throwable t (.printStackTrace t))) ))
+(defn- new-dispatcher [initial-app]
+  (let [a (atom {})
+        result (partial dispatcher a) ]
+    (atom-assoc a :app (assoc initial-app :dispatch result))
+    (atom-assoc a :entrance 0)
+    result ))
+    
+; main function
+(defn new-waterfront-window [cfg] 
+  (let [
+    frame (new JFrame "Waterfront")
+    
+    output-window (javax.swing.JPanel.)                                              
+  
+    show-popup (fn [popup-menu e] 
+      (when (.isPopupTrigger e)       
+        (. popup-menu show (.getComponent e) (.getX e) (.getY e)) ))
+  
+    build-context-menu-listener (fn [popup-menu] 
+      (proxy [java.awt.event.MouseAdapter] []
+        (mousePressed [e] (show-popup popup-menu e))
+        (mouseReleased [e] (show-popup popup-menu e)) )) 
+    
+    default-config { 
+      :x0 100
+      :y0 50
+      :width0 800
+      :height0 1000
+      :font-size 20
+      :font-name "Courier New"
+      :font-style Font/PLAIN
+      :startup '(fn [app] app)
+      :keys-to-save [:keys-to-save :file-name :last-search :font-size :font-name :font-style]
+      :file-name :unknown }
+      
+    overriding-config {
+      :enqueue (fn [app f] (assoc app :pending (concat (app :pending) (list f))))
+      :eval-count 1,
+      :frame frame, 
+      :menu [
+        { :name "File" :mnemonic KeyEvent/VK_F :children []}
+        { :name "Edit" :mnemonic KeyEvent/VK_E :children []}
+        { :name "Source" :mnemonic KeyEvent/VK_S :children []}
+        { :name "Run" :mnemonic KeyEvent/VK_R :children []} 
+        { :name "View" :mnemonic KeyEvent/VK_V :children []}]
+      :observers []
+      :actions {} }
+      
+    dispatch (new-dispatcher (get-merged-config default-config cfg overriding-config))
+    app (dispatch identity)]
+  
+    (doto frame
+      (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
+      (.setLayout (new BorderLayout))
+      (.pack)
+      (.setSize (app :width0) (app :height0))
+      (.setLocation (app :x0) (app :y0))
+      (.setVisible true))
+    (dispatch (fn[x] (apply (eval (app :startup)) (list app))) "bootstrap" {}) ))
 
 
+(defn launch-waterfront []
+  (later (fn []
+    (try 
+      (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
+      (new-waterfront-window { :title-prefix ""})
+      (catch Throwable t (.printStackTrace t)) ))))
 
 
 
@@ -191,10 +200,8 @@
 ; Help -> Env show environment
 ; Scrapbook file
 ; remember position in each file
-; make threads daemons
 ; document app functions
 ; Add a "Run tests" option to make on-the-fly checking run tests of functions
-; fix prev next word WRT parenthesis
 ; make deafult .config.clj file loadable from the class-path
 ; change the font of the compilation result (upper status bar)
 
@@ -213,11 +220,12 @@
 ; 26-Jan-09: (app :change) is a functions that allow currently executing code to change app 
 ; 30-Jan-09: move word: stop at "-"
 ; 31-Jan-09: Load recent file on startup is now handled by a dedicated plugin
-; 03-Feb-09: Green/Red indicator shows load status of the code - updated on the fly
+; 03-Feb-09: Green/Red indicator shows evaluation status of the code - updated on the fly
 ; 04-Feb-09: Make syntax problems messages are more descriptive
-; 04-Feb-09 Status bar
+; 04-Feb-09: Status bar
 ; 05-Feb-09: TAB indents a selection
 ; 05-Feb-09: Improve next/prev heuristic in the presence of parenthesis/braces/brackets
+; 05-Feb-09: Threads are now daemons
 
 ; Highlights:
 ;
@@ -230,6 +238,9 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
+
 
 
 

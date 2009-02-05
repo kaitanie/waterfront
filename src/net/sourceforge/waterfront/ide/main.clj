@@ -5,7 +5,10 @@
 (require 'net.sourceforge.waterfront.kit.kit)
 
 
-(net.sourceforge.waterfront.kit/later net.sourceforge.waterfront.ide/run-func)
+(net.sourceforge.waterfront.kit/later net.sourceforge.waterfront.ide/launch-waterfront)
+
+
+
 
 
 

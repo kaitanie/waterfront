@@ -101,7 +101,7 @@
 (defn add-file-menu [app]
   (add-to-menu app "File" 
     { :name "New" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_N :action (fn m-new [app] 
-                              (show-ecosystem-window (merge app {
+                              (new-waterfront-window (merge app {
                                 :title-prefix (app :title-prefix)
                                 :file-name :unknown :initial-text "" }))
                               app) }
