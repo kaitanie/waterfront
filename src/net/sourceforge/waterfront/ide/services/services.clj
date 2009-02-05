@@ -47,6 +47,7 @@
               (assert (= 1 (line-of "abc\n" 0)))
               (assert (= 1 (line-of "abc\n" 3)))
               (assert (= 2 (line-of "abc\n" 4))) )}
+   (assert (not (nil? offset)))
    (reduce (fn [v curr] (if (= curr \newline) (inc v) v)) 1 (take offset (seq s))) )
    
 (test (var line-of))

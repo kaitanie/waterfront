@@ -31,9 +31,9 @@
   (.addDocumentListener (.getDocument area) 
     (proxy [javax.swing.event.DocumentListener] []
       (insertUpdate [evt] 
-         ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil) )
+         ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area))))) )
       (removeUpdate [evt] 
-         ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area)))) nil))
+         ((app :dispatch) (fn [app] (assoc app :text (.getText (app :area))))) )
       (changedUpdate [evt] ()) )) 
 
   (let [aux (fn [offset text]
@@ -48,11 +48,18 @@
   (.. area (getDocument) (putProperty javax.swing.text.DefaultEditorKit/EndOfLineStringProperty "\n")) )
   
 
+
+(defn- update-text-on-new-file-name [old-app new-app]
+  (if (maps-differ-on old-app new-app :file-name)
+    (assoc new-app :text (.getText (new-app :area)))
+    new-app ))
+
   
 (fn [app] 
-  (let [new-app (load-plugin app "layout.clj")]
+  (let [new-app (add-observers (load-plugin app "layout.clj") update-text-on-new-file-name)]
     (customize-text-pane new-app (new-app :area))
     new-app ))
+
 
 
 

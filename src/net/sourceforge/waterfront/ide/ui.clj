@@ -141,9 +141,7 @@
         (.setSize (app :width0) (app :height0))
         (.setLocation (app :x0) (app :y0))
         (.setVisible true))
-      (dispatch (fn[x] (apply (eval (app :startup)) (list (get-mutable :ecosystem)))) "bootstrap" {} )
-         
-   )))
+      (dispatch (fn[x] (apply (eval (app :startup)) (list (get-mutable :ecosystem)))) "bootstrap" {}) )))
 
 
 (def run-func (fn []
@@ -196,7 +194,6 @@
 ; remember position in each file
 ; make threads daemons
 ; document app functions
-; Make syntax problems messages more descriptive
 ; Add a "Run tests" option to make on-the-fly checking run tests of functions
 ; fix prev next word WRT parenthesis
 ; make deafult .config.clj file loadable from the class-path
@@ -217,6 +214,7 @@
 ; 30-Jan-09: move word: stop at "-"
 ; 31-Jan-09: Load recent file on startup is now handled by a dedicated plugin
 ; 03-Feb-09: Green/Red indicator shows load status of the code - updated on the fly
+; 04-Feb-09: Make syntax problems messages are more descriptive
 
 ; Highlights:
 ;
@@ -229,6 +227,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 
