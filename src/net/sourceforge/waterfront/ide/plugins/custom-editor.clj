@@ -50,15 +50,17 @@
 
 
 (defn- update-text-on-new-file-name [old-app new-app]
-  (if (maps-differ-on old-app new-app :file-name)
+  (if (maps-differ-on old-app new-app :file-name :loaded-at)
     (assoc new-app :text (.getText (new-app :area)))
     new-app ))
 
   
 (fn [app] 
-  (let [new-app (add-observers (load-plugin app "layout.clj") update-text-on-new-file-name)]
+  (let [new-app (add-observers (load-plugin app "layout.clj" "file.clj") update-text-on-new-file-name)]
     (customize-text-pane new-app (new-app :area))
     new-app ))
+
+
 
 
 
