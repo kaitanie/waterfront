@@ -43,12 +43,8 @@
         result (add-observers 
                   (load-plugin (load-plugin app "custom-editor.clj") "layout.clj")
                   (partial text-observer at) )]
-    (.start (Thread. (runnable (partial check-loop at (app :indicator) (app :dispatch)))))
+    (start-daemon check-loop at (app :indicator) (app :dispatch))
     result ))
-
-
-
-
 
 
 

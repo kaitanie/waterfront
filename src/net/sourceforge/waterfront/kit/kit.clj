@@ -130,6 +130,13 @@
         (apply f args)
         (catch Throwable t (.printStackTrace t)) ))))
 
+
+(defn start-daemon [f & args]
+  (doto (Thread. (runnable (apply partial f args)))
+    (.setDaemon true)
+    (.start)))
+    
+
 ; swing utlities
 
 (defn later [f]
@@ -290,6 +297,9 @@
 (defn pass [msg x]
    (println msg (pretty-print x))
    x)
+
+
+
 
 
 
