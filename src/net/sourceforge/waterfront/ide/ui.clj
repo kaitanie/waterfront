@@ -196,9 +196,7 @@
 ; Add a "Run tests" option to make on-the-fly checking run tests of functions
 ; fix prev next word WRT parenthesis
 ; make deafult .config.clj file loadable from the class-path
-; Bug: File -> New does not work
 ; change the font of the compilation result (upper status bar)
-; when next/prev a word stop if directionality of parenthesis/braces/brackets changes
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -219,6 +217,7 @@
 ; 04-Feb-09: Make syntax problems messages are more descriptive
 ; 04-Feb-09 Status bar
 ; 05-Feb-09: TAB indents a selection
+; 05-Feb-09: Improve next/prev heuristic in the presence of parenthesis/braces/brackets
 
 ; Highlights:
 ;
@@ -231,6 +230,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
