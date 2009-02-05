@@ -1,7 +1,7 @@
 
 
 (ns net.sourceforge.waterfront.ide)
-(require 'net.sourceforge.waterfront.ide.uistarter)
+(require 'net.sourceforge.waterfront.ide.ui)
 (require 'net.sourceforge.waterfront.kit.kit)
 
 

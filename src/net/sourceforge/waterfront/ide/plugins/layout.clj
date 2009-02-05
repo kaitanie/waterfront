@@ -67,30 +67,30 @@
       
     (assoc @parts :composite composite) )) 
     
-
 (defn layout-observer [old-app new-app]
   new-app )
   
 
 (fn [app] 
   (let [sb (javax.swing.JPanel.)
+        lower-sb (javax.swing.JPanel.)
         lower-win (javax.swing.JTabbedPane.)
         lnp-widgets (create-line-numbers-components)
         area (lnp-widgets :text-pane)
         indicator (javax.swing.JLabel. "    ")
-        output-label (javax.swing.JLabel. "(no output yet)")]
+        output-label (javax.swing.JLabel. "")]
 
   (doto indicator 
     (.setOpaque true)
     (.setBorder (javax.swing.BorderFactory/createLoweredBevelBorder)))
-  (.setLayout sb (javax.swing.BoxLayout. sb javax.swing.BoxLayout/LINE_AXIS))
-  (.setBorder sb (javax.swing.BorderFactory/createEmptyBorder 3 3 3 3))
 
-  (.add sb (javax.swing.Box/createRigidArea(java.awt.Dimension. 5 0)))
+  (.setLayout sb (java.awt.FlowLayout. java.awt.FlowLayout/LEFT 5 3))
   (.add sb indicator)
-  (.add sb (javax.swing.Box/createRigidArea(java.awt.Dimension. 5 0)))
   (.add sb output-label)
 
+  (.setLayout lower-sb (java.awt.FlowLayout. java.awt.FlowLayout/LEFT 5 3))
+  (.add (app :frame) lower-sb BorderLayout/SOUTH)
+  
   (.add (app :frame) (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) (lnp-widgets :composite) 
                                   (doto (javax.swing.JPanel.)
                                     (.setLayout (BorderLayout.))
@@ -101,6 +101,14 @@
           (. BorderLayout CENTER) )
 
   
-  (add-observers (assoc app :area area :output-label output-label :lower-window lower-win :status-bar sb :indicator indicator) layout-observer) ))
+  (add-observers (assoc app 
+      :area area 
+      :output-label output-label 
+      :lower-window lower-win 
+      :status-bar sb 
+      :indicator indicator
+      :lower-status-bar lower-sb) 
+    layout-observer) ))
+
 
 
