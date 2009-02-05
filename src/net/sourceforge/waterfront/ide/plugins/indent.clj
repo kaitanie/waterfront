@@ -54,7 +54,7 @@
       (.length text)
       x) ))
 
-(defn- unindent [app text start end]
+(defn- indentation-engine [app text start end f]
   (let [sb (StringBuilder.)
         from (offset-from-pos (line-of text (min start end)) 1 text)
         a (offset-or-len  (line-of text (max start end)) 1 text)
@@ -64,49 +64,39 @@
           (offset-or-len (inc row-1) 1 text)
           a)
         l-from (line-of text from)
-        l-to (line-of text to)]
-    (loop [ line-start true
-            src (seq (.substring text from to))]
-      (if (empty? src)
-        (do 
-          (.select (app :area) from to)
-          (.replaceSelection (app :area) (str sb)) 
-          (let [t (.getText (app :area)) 
-                s (offset-from-pos l-from 1 t) 
-                e (offset-from-pos l-to 1 t)]
-            (.setSelectionStart (app :area) s)
-            (.setSelectionEnd (app :area) (if (= start end) s e)) ))
-        (let [copy (or (not line-start) (not= (first src) \space))
-              skip (if (and line-start (= (first src) \space))
-                      (compute-unindent-amount src)
-                      1)]
-          (when copy
-            (.append sb (first src)) )
-          (recur (= (first src) \newline) (drop skip src)) )))))
+        l-to (line-of text to)
+        new-text (f (seq (.substring text from to))  sb)]
+    (.select (app :area) from to)
+    (.replaceSelection (app :area) (str sb)) 
+    (let [t (.getText (app :area)) 
+    s (offset-from-pos l-from 1 t) 
+    e (offset-from-pos l-to 1 t)]
+    (.setSelectionStart (app :area) s)
+    (.setSelectionEnd (app :area) (if (= start end) s e)) )))
+    
+(defn- unindent [app text start end]
+  (indentation-engine app text start end 
+    (fn [src0 sb]
+      (loop [ line-start true
+            src src0]
+        (if (empty? src)
+          (str sb)
+          (let [copy (or (not line-start) (not= (first src) \space))
+                skip (if (and line-start (= (first src) \space))
+                        (compute-unindent-amount src)
+                        1)]
+            (when copy
+              (.append sb (first src)) )
+            (recur (= (first src) \newline) (drop skip src)) ))))))
     
 
 (defn- indent [app text start end]
-  (let [sb (StringBuilder.)
-        from (offset-from-pos (line-of text (min start end)) 1 text)
-        a (offset-or-len  (line-of text (max start end)) 1 text)
-        row-1 (line-of text from)
-        row-2 (line-of text a)  
-        to (if (= row-1 row-2)
-          (offset-or-len (inc row-1) 1 text)
-          a)
-        l-from (line-of text from)
-        l-to (line-of text to)]
+  (indentation-engine app text start end 
+    (fn [src0 sb]
     (loop [ line-start true
-            src (seq (.substring text from to))]
+            src src0]
       (if (empty? src)
-        (do 
-          (.select (app :area) from to)
-          (.replaceSelection (app :area) (str sb)) 
-          (let [t (.getText (app :area)) 
-                s (offset-from-pos l-from 1 t) 
-                e (offset-from-pos l-to 1 t)]
-            (.setSelectionStart (app :area) s)
-            (.setSelectionEnd (app :area) (if (= start end) s e)) ))
+        (str sb)
         (let [num-spaces (if line-start (compute-indent-amount src) 0)]
           (cond 
             (= num-spaces 1)
@@ -118,8 +108,7 @@
             :else
             nil)
           (.append sb (first src))
-          (recur (= (first src) \newline) (rest src)) )))))
-    
+          (recur (= (first src) \newline) (rest src)) ))))))    
 
 (fn [app] 
   (let [result (add-to-menu (load-plugin app "undo.clj" "custom-editor.clj") "Source" 
@@ -139,6 +128,9 @@
       ((app :dispatch) (fn [a] (indent a (.getText (a :area)) (.getSelectionStart (a :area)) (.getSelectionEnd (a :area))))) )))
 
     result))
+
+
+
 
 
 
