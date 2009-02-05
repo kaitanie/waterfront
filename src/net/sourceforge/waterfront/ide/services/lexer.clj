@@ -121,9 +121,6 @@
 
 (test (var first-in))
 
-
-
-
 (defn pick 
   { :test (fn []
             (assert-eq {:length 2, :kind :token-symbol, :where 0} (pick 0 (seq "ab"))) 
@@ -521,7 +518,7 @@
         (keyReleased [e] nil) ))
 
 
-    (.start (Thread. (runnable worker text-pane cache styles))) ))
+    (start-daemon worker text-pane cache styles))) 
 
         
 (defn show-frame [] 
@@ -539,7 +536,6 @@
       (.setTitle "Title")
       (.setSize 800 600)
       (.setVisible true) )))
-
 
 
 

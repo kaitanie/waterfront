@@ -24,7 +24,8 @@
   `(assert-eq-aux ~expected ~actual (pr-str '~actual)))
 
 
-
+(defmacro inspect [a]
+  `(println (str '~a "=" ~a)))
 
 ; general purpose utilities
 
@@ -297,6 +298,7 @@
 (defn pass [msg x]
    (println msg (pretty-print x))
    x)
+
 
 
 

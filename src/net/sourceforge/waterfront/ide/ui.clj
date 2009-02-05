@@ -198,6 +198,7 @@
 ; fix prev next word WRT parenthesis
 ; make deafult .config.clj file loadable from the class-path
 ; make TAB indent a selection
+; Bug: File -> New does not work
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -228,6 +229,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 

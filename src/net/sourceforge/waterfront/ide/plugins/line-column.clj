@@ -44,8 +44,9 @@
         label (javax.swing.JLabel.)]
     (.add (app :lower-status-bar) label)
     (.addCaretListener (app :area) (make-listener (app :dispatch)))
-    (.start (Thread. (runnable (partial line-column-thread at label (app :dispatch)))))
+    (start-daemon line-column-thread at label (app :dispatch))
     (add-observers app (partial caret-pos-observer at label)) ))
+
 
 
 
