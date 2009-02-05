@@ -12,8 +12,7 @@
 
 (defn- show-msg [dispatch is-ok? indicator msg]
   (.setBackground indicator (.darker (if is-ok? java.awt.Color/GREEN java.awt.Color/RED)))
-  (dispatch (fn [app] (assoc app :output-title msg))) 
-)
+  (dispatch (fn [app] (assoc app :output-title msg))) )
 
 
 (defn- run-syntax-check [source-code indicator dispatch]
@@ -34,6 +33,7 @@
           (run-syntax-check x indicator dispatch)
           (recur at indicator dispatch) )))))
         
+
 (defn- text-observer [at old-app new-app]
   (when (maps-differ-on old-app new-app :text)
     (swap! at (fn [x] (new-app :text))) )
@@ -46,6 +46,7 @@
                   (partial text-observer at) )]
     (.start (Thread. (runnable (partial check-loop at (app :indicator) (app :dispatch)))))
     result ))
+
 
 
 
