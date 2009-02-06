@@ -9,7 +9,8 @@
             (maps-differ-on old-app new-app :text :caret-dot)
             (new-app :text)
             (new-app :caret-dot))
-    (.setText label (str (line-of (new-app :text) (new-app :caret-dot)) " : " (inc (column-of (new-app :text) (new-app :caret-dot))))) )
+    (.setText label (str (line-of (new-app :text) (new-app :caret-dot)) " : " 
+                      (inc (column-of (new-app :text) (new-app :caret-dot))))) )
   new-app )
 
 (defn- make-listener [dispatch]
@@ -24,6 +25,7 @@
     (.addCaretListener (app :area) (make-listener (app :dispatch))) 
     ((app :register-periodic-observer) 50 (partial caret-pos-observer label)) ) 
     app)
+
 
 
 
