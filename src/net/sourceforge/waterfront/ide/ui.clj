@@ -59,8 +59,6 @@
       new-next
       (recur next new-next) )))
 
-
-
 (defn- atom-assoc [a key value]
   (swap! a (fn [m] (assoc m key value)))
    value)
@@ -93,56 +91,43 @@
           (dispatcher a (first (x :pending)) "???" (assoc x :pending (rest (x :pending)))) )))
     (atom-get a :app) )))
 
+
+(defn- wrapper [ f & args ]
+  (try
+    (apply f args)
+    (catch Throwable t
+      (.printStackTrace t))))
+
+
+
+(defn- register-periodic-observer [disp interval-millis observer]
+  (let [at (atom nil)
+        listener (proxy [java.awt.event.ActionListener] []
+                    (actionPerformed [e] 
+                      (let [new-app (disp (fn [curr-app] 
+                                            (let [temp (observer @at curr-app)]
+                                              (if temp temp curr-app) )))]
+                        (swap! at (fn [x] new-app)) )))
+        t (javax.swing.Timer. interval-millis listener)]
+    (.start t)
+    nil))
+
 (defn- new-dispatcher [initial-app]
   (let [a (atom {})
-        result (partial dispatcher a) ]
-    (atom-assoc a :app (assoc initial-app :dispatch result))
+        result (partial wrapper (partial dispatcher a)) ]
+    (atom-assoc a :app (assoc initial-app 
+                          :dispatch result           
+                          :observers []
+                          :register-periodic-observer (partial register-periodic-observer result) 
+                          :enqueue (fn [app f] (assoc app :pending (concat (app :pending) (list f)))) ))
     (atom-assoc a :entrance 0)
     result ))
     
 ; main function
-(defn new-waterfront-window [cfg] 
-  (let [
-    frame (new JFrame "Waterfront")
-    
-    output-window (javax.swing.JPanel.)                                              
-  
-    show-popup (fn [popup-menu e] 
-      (when (.isPopupTrigger e)       
-        (. popup-menu show (.getComponent e) (.getX e) (.getY e)) ))
-  
-    build-context-menu-listener (fn [popup-menu] 
-      (proxy [java.awt.event.MouseAdapter] []
-        (mousePressed [e] (show-popup popup-menu e))
-        (mouseReleased [e] (show-popup popup-menu e)) )) 
-    
-    default-config { 
-      :x0 100
-      :y0 50
-      :width0 800
-      :height0 1000
-      :font-size 20
-      :font-name "Courier New"
-      :font-style Font/PLAIN
-      :startup '(fn [app] app)
-      :keys-to-save [:keys-to-save :file-name :last-search :font-size :font-name :font-style]
-      :file-name :unknown }
-      
-    overriding-config {
-      :enqueue (fn [app f] (assoc app :pending (concat (app :pending) (list f))))
-      :eval-count 1,
-      :frame frame, 
-      :menu [
-        { :name "File" :mnemonic KeyEvent/VK_F :children []}
-        { :name "Edit" :mnemonic KeyEvent/VK_E :children []}
-        { :name "Source" :mnemonic KeyEvent/VK_S :children []}
-        { :name "Run" :mnemonic KeyEvent/VK_R :children []} 
-        { :name "View" :mnemonic KeyEvent/VK_V :children []}]
-      :observers []
-      :actions {} }
-      
-    dispatch (new-dispatcher (get-merged-config default-config cfg overriding-config))
-    app (dispatch identity)]
+(defn new-waterfront-window [cfg default-config overriding-config] 
+  (let [frame (new JFrame "Waterfront")
+        dispatch (new-dispatcher (assoc (get-merged-config default-config cfg overriding-config) :eval-count 1 :frame frame))
+        app (dispatch identity)]
   
     (doto frame
       (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
@@ -155,11 +140,32 @@
 
 
 (defn launch-waterfront []
-  (later (fn []
-    (try 
-      (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
-      (new-waterfront-window { :title-prefix ""})
-      (catch Throwable t (.printStackTrace t)) ))))
+  (let [default-config { 
+          :x0 100
+          :y0 50
+          :width0 800
+          :height0 1000
+          :font-size 20
+          :font-name "Courier New"
+          :font-style Font/PLAIN
+          :startup '(fn [app] app)
+          :keys-to-save [:keys-to-save :file-name :last-search :font-size :font-name :font-style]
+          :file-name :unknown }
+          
+        overriding-config {
+          :menu [
+            { :name "File" :mnemonic KeyEvent/VK_F :children []}
+            { :name "Edit" :mnemonic KeyEvent/VK_E :children []}
+            { :name "Source" :mnemonic KeyEvent/VK_S :children []}
+            { :name "Run" :mnemonic KeyEvent/VK_R :children []} 
+            { :name "View" :mnemonic KeyEvent/VK_V :children []}]
+          :actions {} }]
+
+    (later (fn []
+      (try 
+        (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
+        (new-waterfront-window { :title-prefix ""} default-config overriding-config)
+        (catch Throwable t (.printStackTrace t)) )))))
 
 
 
@@ -238,13 +244,6 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
-
-
-
-
-
-
-
 
 
 

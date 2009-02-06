@@ -9,42 +9,26 @@
 (refer 'net.sourceforge.waterfront.ide.services)
 
 
-(defn- show-msg [dispatch is-ok? indicator msg]
-  (.setBackground indicator (.darker (if is-ok? java.awt.Color/GREEN java.awt.Color/RED)))
-  (dispatch (fn [app] (assoc app :output-title msg))) )
+(defn- show-msg [app is-ok?  msg]
+  (.setBackground (app :indicator) (.darker (if is-ok? java.awt.Color/GREEN java.awt.Color/RED)))
+  (assoc app :output-title msg) )
 
 
-(defn- run-syntax-check [source-code indicator dispatch]
+(defn- run-syntax-check [app]
   (try
-    (load-string source-code)
-    (show-msg dispatch true indicator "")
+    (load-string (app :text))
+    (show-msg app true "")
     (catch Throwable t
-      (show-msg dispatch false indicator (.getMessage t)) )))
- 
-(defn- check-loop [at indicator dispatch]  
-  (Thread/sleep 1000)
-  (let [x @at]
-    (if (not x)
-      (recur at indicator dispatch)
-      (if (not (compare-and-set! at x nil)) 
-        (recur at indicator dispatch)
-        (do 
-          (run-syntax-check x indicator dispatch)
-          (recur at indicator dispatch) )))))
-        
-
-(defn- text-observer [at old-app new-app]
-  (when (maps-differ-on old-app new-app :text)
-    (swap! at (fn [x] (new-app :text))) )
-  new-app )
+      (show-msg app false (.getMessage t)) )))
+         
+(defn- text-observer [old-app new-app]
+  (if (maps-differ-on old-app new-app :text)
+    (run-syntax-check new-app)
+    new-app ))
 
 (fn [app] 
-  (let [at (atom nil)
-        result (add-observers 
-                  (load-plugin (load-plugin app "custom-editor.clj") "layout.clj")
-                  (partial text-observer at) )]
-    (start-daemon check-loop at (app :indicator) (app :dispatch))
+  (let [result (load-plugin app "custom-editor.clj" "layout.clj")]
+    ((app :register-periodic-observer) 1000 text-observer)
     result ))
-
 
 
