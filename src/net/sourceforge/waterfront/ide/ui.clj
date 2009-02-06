@@ -31,10 +31,6 @@
       {}
       (load-file (.getAbsolutePath file)) )))
 
-(defn get-merged-config [default-config cfg-1 cfg-2]
-  (merge default-config (read-stored-config) cfg-1 cfg-2) )
-
-
 (defn save-config [app]
   (let [dir (path-to-file (. System getProperty "user.home"))
         file (new java.io.File dir ".ecosystem.config.clj")]
@@ -123,23 +119,8 @@
     (atom-assoc a :entrance 0)
     result ))
     
-; main function
-(defn new-waterfront-window [cfg default-config overriding-config] 
-  (let [frame (new JFrame "Waterfront")
-        dispatch (new-dispatcher (assoc (get-merged-config default-config cfg overriding-config) :eval-count 1 :frame frame))
-        app (dispatch identity)]
-  
-    (doto frame
-      (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
-      (.setLayout (new BorderLayout))
-      (.pack)
-      (.setSize (app :width0) (app :height0))
-      (.setLocation (app :x0) (app :y0))
-      (.setVisible true))
-    (dispatch (fn[x] (apply (eval (app :startup)) (list app))) "bootstrap" {}) ))
 
-
-(defn launch-waterfront []
+(defn- build-context [a] 
   (let [default-config { 
           :x0 100
           :y0 50
@@ -159,16 +140,33 @@
             { :name "Source" :mnemonic KeyEvent/VK_S :children []}
             { :name "Run" :mnemonic KeyEvent/VK_R :children []} 
             { :name "View" :mnemonic KeyEvent/VK_V :children []}]
-          :actions {} }]
+          :actions {}
+          :eval-count 1 }]          
+    (merge default-config (read-stored-config) a overriding-config) ))
 
+; main function
+(defn new-waterfront-window [initial-app-context] 
+  (let [frame (new JFrame "Waterfront")
+        dispatch (new-dispatcher (assoc (build-context initial-app-context) :frame frame))
+        app (dispatch identity)]
+
+    (swap! (app :window-counter) inc)  
+    (doto frame
+      (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
+      (.setLayout (new BorderLayout))
+      (.pack)
+      (.setSize (app :width0) (app :height0))
+      (.setLocation (app :x0) (app :y0))
+      (.setVisible true))
+    (dispatch (fn[x] (apply (eval (app :startup)) (list app))) "bootstrap" {}) ))
+  
+
+(defn launch-waterfront []
     (later (fn []
       (try 
         (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
-        (new-waterfront-window { :title-prefix ""} default-config overriding-config)
-        (catch Throwable t (.printStackTrace t)) )))))
-
-
-
+        (new-waterfront-window (build-context { :window-counter (atom 0) :title-prefix ""}))
+        (catch Throwable t (.printStackTrace t)) ))))
 
 ; different thread for execution
 ; stop running button
@@ -210,6 +208,9 @@
 ; Add a "Run tests" option to make on-the-fly checking run tests of functions
 ; make deafult .config.clj file loadable from the class-path
 ; change the font of the compilation result (upper status bar)
+; Make online-syntax-check use a background thread (agent)
+; Exit when all windows are closed
+; Launch the eval on a different class-loader
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -232,6 +233,7 @@
 ; 05-Feb-09: TAB indents a selection
 ; 05-Feb-09: Improve next/prev heuristic in the presence of parenthesis/braces/brackets
 ; 05-Feb-09: Threads are now daemons
+; 06-Feb-09: Shutdown the JVM when last window is closed
 
 ; Highlights:
 ;
@@ -244,6 +246,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

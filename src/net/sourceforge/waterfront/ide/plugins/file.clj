@@ -73,24 +73,29 @@
     app
     (load-document (set-current-document app (.getSelectedFile (app :file-chooser)))) )))
 
-(def exit-application (fn [app] 
+
+(defn- close-main-window [app]
+  (save-config app)
+  (.dispose (app :frame)) 
+  (when (zero? (swap! (app :window-counter) dec))
+    (System/exit 0) )
+  app ) 
+
+
+(defn exit-application [app] 
   (if (not (is-dirty app))
-      (do 
-        (save-config app)
-        (.dispose (app :frame))
-        app)
-      (let [file-name (if (unknown-document? app) 
-                         "Unnamed" 
-                         (.getName (get-current-document app)))
-            reply (. JOptionPane showOptionDialog (app :frame)
-                    (str "'" file-name "' has been modified. Save changes?")
-                    "Save File" (. JOptionPane YES_NO_CANCEL_OPTION) JOptionPane/QUESTION_MESSAGE, nil, (to-array ["Yes" "No" "Cancel"]), "Cancel"  )]
-        (when (= reply 0) ; Save!
-          (save-now app))
-        (when (and (not= reply JOptionPane/CLOSED_OPTION) (not= reply 2)) ; not Cancel!
-          (save-config app)
-          (.dispose (app :frame)) )
-         app ))))
+    (close-main-window app)
+    (let [file-name (if (unknown-document? app) 
+                        "Unnamed" 
+                        (.getName (get-current-document app)))
+          reply (. JOptionPane showOptionDialog (app :frame)
+                  (str "'" file-name "' has been modified. Save changes?")
+                  "Save File" (. JOptionPane YES_NO_CANCEL_OPTION) JOptionPane/QUESTION_MESSAGE, nil, (to-array ["Yes" "No" "Cancel"]), "Cancel"  )]
+      (when (= reply 0) ; Save!
+        (save-now app))
+      (when (and (not= reply JOptionPane/CLOSED_OPTION) (not= reply 2)) ; not Cancel!
+        (close-main-window app) )
+      app )))
 
 (defn- revert [app]
   (load-document app))
@@ -131,3 +136,8 @@
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
   
+
+
+
+
+
