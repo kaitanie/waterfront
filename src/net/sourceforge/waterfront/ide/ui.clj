@@ -26,14 +26,57 @@
 
 (defn read-stored-config []
   (let [dir (path-to-file (. System getProperty "user.home"))
-        file (new java.io.File dir ".ecosystem.config.clj")]   
+        file (new java.io.File dir ".waterfront.config.clj")
+        default-result { 
+          :font-name "Courier New"
+          :font-size 16
+          :font-style 0
+          :ignore []
+          :keys-to-save [
+            :keys-to-save
+            :plugin-path
+            :last-search
+            :font-size
+            :font-name
+            :font-style
+            :plugins
+            :recent-files
+            :ignore]
+          :plugin-path "src/net/sourceforge/waterfront/ide/plugins/"
+          :plugins [ 
+            "custom-editor.clj"
+            "file.clj"
+            "recent-files.clj"
+            "standard-observers.clj"
+            "file-chooser-dir.clj"
+            "output-window.clj"
+            "problem-window.clj"
+            "undo.clj"
+            "basic-editing.clj"
+            "goto.clj"
+            "find.clj"
+            "comments.clj"
+            "show-doc.clj"
+            "check-syntax.clj"
+            "run.clj"
+            "syntax-coloring.clj"
+            "paren-matching.clj"
+            "font-size.clj"
+            "indent.clj"
+            "load-recent-on-startup.clj"
+            "check-syntax-online.clj"
+            "line-column.clj" ]
+          :recent-files []
+          :startup (quote( fn [app] ((load-file "src/net/sourceforge/waterfront/ide/plugins/plugin-loader.clj") app)))} ]   
     (if (not (.exists file))
-      {}
-      (load-file (.getAbsolutePath file)) )))
+      default-result
+      (try
+        (load-file (.getAbsolutePath file)) 
+        (catch Exception e default-result) ))))
 
 (defn save-config [app]
   (let [dir (path-to-file (. System getProperty "user.home"))
-        file (new java.io.File dir ".ecosystem.config.clj")]
+        file (new java.io.File dir ".waterfront.config.clj")]
 
     (write-file 
       (pretty-print (merge {} (sort (assoc (select-keys app (app :keys-to-save))
@@ -206,7 +249,6 @@
 ; remember position in each file
 ; document app functions
 ; Add a "Run tests" option to make on-the-fly checking run tests of functions
-; make deafult .config.clj file loadable from the class-path
 ; change the font of the compilation result (upper status bar)
 ; Make online-syntax-check use a background thread (agent)
 ; Exit when all windows are closed
@@ -234,6 +276,7 @@
 ; 05-Feb-09: Improve next/prev heuristic in the presence of parenthesis/braces/brackets
 ; 05-Feb-09: Threads are now daemons
 ; 06-Feb-09: Shutdown the JVM when last window is closed
+; 06-Feb-09: A default .waterfront.config.clj file is generated if does not exist
 
 ; Highlights:
 ;
@@ -246,6 +289,9 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
+
 
 
 
