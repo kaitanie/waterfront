@@ -1,4 +1,3 @@
-
 (ns net.sourceforge.waterfront.ide)
 
 
@@ -23,56 +22,14 @@
 
 ; config
 
-
-(defn read-stored-config []
+(defn read-stored-config [fallback-context]
   (let [dir (path-to-file (. System getProperty "user.home"))
-        file (new java.io.File dir ".waterfront.config.clj")
-        default-result { 
-          :font-name "Courier New"
-          :font-size 16
-          :font-style 0
-          :ignore []
-          :keys-to-save [
-            :keys-to-save
-            :plugin-path
-            :last-search
-            :font-size
-            :font-name
-            :font-style
-            :plugins
-            :recent-files
-            :ignore]
-          :plugin-path "src/net/sourceforge/waterfront/ide/plugins/"
-          :plugins [ 
-            "custom-editor.clj"
-            "file.clj"
-            "recent-files.clj"
-            "standard-observers.clj"
-            "file-chooser-dir.clj"
-            "output-window.clj"
-            "problem-window.clj"
-            "undo.clj"
-            "basic-editing.clj"
-            "goto.clj"
-            "find.clj"
-            "comments.clj"
-            "show-doc.clj"
-            "check-syntax.clj"
-            "run.clj"
-            "syntax-coloring.clj"
-            "paren-matching.clj"
-            "font-size.clj"
-            "indent.clj"
-            "load-recent-on-startup.clj"
-            "check-syntax-online.clj"
-            "line-column.clj" ]
-          :recent-files []
-          :startup (quote( fn [app] ((load-file "src/net/sourceforge/waterfront/ide/plugins/plugin-loader.clj") app)))} ]   
+        file (new java.io.File dir ".waterfront.config.clj")]
     (if (not (.exists file))
-      default-result
+      fallback-context
       (try
         (load-file (.getAbsolutePath file)) 
-        (catch Exception e default-result) ))))
+        (catch Exception e fallback-context) ))))
 
 (defn save-config [app]
   (let [dir (path-to-file (. System getProperty "user.home"))
@@ -163,7 +120,7 @@
     result ))
     
 
-(defn- build-context [a] 
+(defn- build-context [fallback-context a] 
   (let [default-config { 
           :x0 100
           :y0 50
@@ -185,12 +142,12 @@
             { :name "View" :mnemonic KeyEvent/VK_V :children []}]
           :actions {}
           :eval-count 1 }]          
-    (merge default-config (read-stored-config) a overriding-config) ))
+    (merge default-config (read-stored-config fallback-context) a overriding-config) ))
 
 ; main function
-(defn new-waterfront-window [initial-app-context] 
+(defn new-waterfront-window [fallback-context initial-app-context]
   (let [frame (new JFrame "Waterfront")
-        dispatch (new-dispatcher (assoc (build-context initial-app-context) :frame frame))
+        dispatch (new-dispatcher (assoc (build-context fallback-context initial-app-context) :frame frame))
         app (dispatch identity)]
 
     (swap! (app :window-counter) inc)  
@@ -204,11 +161,11 @@
     (dispatch (fn[x] (apply (eval (app :startup)) (list app))) "bootstrap" {}) ))
   
 
-(defn launch-waterfront []
+(defn launch-waterfront [fallback-context]
     (later (fn []
       (try 
         (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
-        (new-waterfront-window (build-context { :window-counter (atom 0) :title-prefix ""}))
+        (new-waterfront-window fallback-context { :window-counter (atom 0) :title-prefix ""})
         (catch Throwable t (.printStackTrace t)) ))))
 
 ; different thread for execution
@@ -289,13 +246,5 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
-
-
-
-
-
-
-
-
 
 
