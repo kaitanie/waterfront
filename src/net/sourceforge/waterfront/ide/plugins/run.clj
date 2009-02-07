@@ -73,7 +73,7 @@
   (let [a (atom {})
         change-func (fn[key val] (swap! a (fn [curr-app] (assoc curr-app key val))))]
     (add-to-menu (load-plugin app "menu-observer.clj") "Run" 
-      { :name "Run" :key KeyEvent/VK_W :mask ActionEvent/ALT_MASK :action (fn m-run [app] 
+      { :name "Run" :key KeyEvent/VK_W :mask ActionEvent/ALT_MASK  :on-context-menu true :action (fn m-run [app] 
                           (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
                           (let [t0 (. System currentTimeMillis) 
                                 sel-text (get-selected-text app (.getText (app :area)))
@@ -87,6 +87,9 @@
                               :output-text (first output-and-errors)
                               :problems (second output-and-errors)
                               :eval-count (inc (app :eval-count) )))) })))
+
+
+
 
 
 

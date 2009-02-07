@@ -112,11 +112,11 @@
 
 (fn [app] 
   (let [result (add-to-menu (load-plugin app "undo.clj" "custom-editor.clj") "Source" 
-    { :name "Indent"  :key KeyEvent/VK_TAB :mask 0
+    { :name "Indent"  :key KeyEvent/VK_TAB :mask 0 :on-context-menu true
       :action (create-undo-transaction (fn [app] 
         (indent app (.getText (app :area)) (.getSelectionStart (app :area)) (.getSelectionEnd (app :area))) 
         app ))}
-    { :name "Unindent"  :key KeyEvent/VK_TAB :mask java.awt.event.InputEvent/SHIFT_MASK
+    { :name "Unindent"  :key KeyEvent/VK_TAB :mask java.awt.event.InputEvent/SHIFT_MASK :on-context-menu true
       :action (create-undo-transaction (fn [app] 
         (unindent app (.getText (app :area)) (.getSelectionStart (app :area)) (.getSelectionEnd (app :area))) 
         app ))})]
@@ -128,5 +128,6 @@
       ((app :dispatch) (fn [a] (indent a (.getText (a :area)) (.getSelectionStart (a :area)) (.getSelectionEnd (a :area))))) )))
 
     result))
+
 
 

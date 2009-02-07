@@ -23,6 +23,7 @@
   :plugin-path "src/net/sourceforge/waterfront/ide/plugins/"
   :plugins [ 
     "custom-editor.clj"
+    "context-menu.clj"
     "file.clj"
     "recent-files.clj"
     "standard-observers.clj"
@@ -43,7 +44,8 @@
     "indent.clj"
     "load-recent-on-startup.clj"
     "check-syntax-online.clj"
-    "line-column.clj" ]
+    "line-column.clj"
+    "templates.clj"]
   :recent-files []
   :startup (quote( fn [app] ((load-file "src/net/sourceforge/waterfront/ide/plugins/plugin-loader.clj") app)))})   
 

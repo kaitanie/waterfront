@@ -210,6 +210,8 @@
 ; Make online-syntax-check use a background thread (agent)
 ; Exit when all windows are closed
 ; Launch the eval on a different class-loader
+; Bug: (def f 5). Then select only (def f 5) and do "run" (alt-w). then delete it
+; when openning a new window the new window should have the same state (in particulr: recent file list)
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
