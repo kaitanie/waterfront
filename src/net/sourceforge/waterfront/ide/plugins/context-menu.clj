@@ -27,6 +27,9 @@
       (let [res (javax.swing.JMenuItem. (desc :name))]
 ;        (when (desc :mnemonic)
 ;          (.setMnemonic res (desc :mnemonic)) )
+;
+;        (when (desc :key)
+;          (.setAccelerator res (KeyStroke/getKeyStroke (desc :key) (if (desc :mask) (desc :mask) (ActionEvent/CTRL_MASK)))) )
 
         (.addActionListener res (new-action-listener (wrapper-func (desc :action))))
         (.add parent res)
@@ -70,6 +73,10 @@
   (let [result (add-observers (load-plugin app "custom-editor.clj") context-menu-observer)]
     (.addMouseListener (app :area) (build-context-menu-listener (app :dispatch)))
     result ))
+
+
+
+
 
 
 

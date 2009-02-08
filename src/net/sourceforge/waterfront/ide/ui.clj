@@ -76,7 +76,7 @@
     (let [candidate-new-app 
           (try 
             (action old-app)        
-          (catch Exception e (.printStackTrace e) old-app) )
+          (catch Throwable e (.printStackTrace e) old-app) )
         new-app (if (nil? candidate-new-app) old-app candidate-new-app)]
                           
     (atom-assoc a :app new-app)
@@ -212,6 +212,14 @@
 ; Launch the eval on a different class-loader
 ; Bug: (def f 5). Then select only (def f 5) and do "run" (alt-w). then delete it
 ; when openning a new window the new window should have the same state (in particulr: recent file list)
+; Support separators in context menu
+; When indicator is red allow jump to line (by clicking on it)
+; Reimplement context menu: 
+;     integrate with main-menu. 
+;     Let main-menu use actions. 
+;     When building main menu concatenate a list of actions. 
+;     Then filter out non-context actions and put them in a context menu.
+; Use a line-by-line syntax coloring ?!
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -236,6 +244,7 @@
 ; 05-Feb-09: Threads are now daemons
 ; 06-Feb-09: Shutdown the JVM when last window is closed
 ; 06-Feb-09: A default .waterfront.config.clj file is generated if does not exist
+; 07-Feb-09: Context menu
 
 ; Highlights:
 ;
@@ -248,5 +257,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
+
 
 

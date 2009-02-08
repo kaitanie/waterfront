@@ -40,8 +40,9 @@
 
 (fn [app] 
   (add-to-menu (load-plugin app "undo.clj") "Source" 
-    { :name "Toggle Comment" :mnemonic KeyEvent/VK_T :key KeyEvent/VK_SEMICOLON 
+    { :name "Toggle Comment" :mnemonic KeyEvent/VK_T :key KeyEvent/VK_SEMICOLON :on-context-menu true
       :action (create-undo-transaction (fn [app] (toggle-comment app (.getSelectionStart (app :area)) (.getSelectionEnd (app :area))))) }))
+
 
 
 
