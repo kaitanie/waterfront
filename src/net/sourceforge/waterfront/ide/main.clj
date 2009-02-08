@@ -23,12 +23,11 @@
   :plugin-path "src/net/sourceforge/waterfront/ide/plugins/"
   :plugins [ 
     "custom-editor.clj"
+    "output-window.clj"
     "context-menu.clj"
     "file.clj"
     "recent-files.clj"
-    "standard-observers.clj"
     "file-chooser-dir.clj"
-    "output-window.clj"
     "problem-window.clj"
     "undo.clj"
     "basic-editing.clj"
