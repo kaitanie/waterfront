@@ -245,6 +245,7 @@
 ; 06-Feb-09: Shutdown the JVM when last window is closed
 ; 06-Feb-09: A default .waterfront.config.clj file is generated if does not exist
 ; 07-Feb-09: Context menu
+; 08-Feb-09: Auto-complete
 
 ; Highlights:
 ;
@@ -257,6 +258,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 

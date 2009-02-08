@@ -5,7 +5,6 @@
 (refer 'net.sourceforge.waterfront.ide.services)
 
 
-
 (defn- create-context-menu-from-desc [parent wrapper-func desc]
   (cond
 
@@ -25,11 +24,11 @@
       (if (not (desc :on-context-menu))
       parent
       (let [res (javax.swing.JMenuItem. (desc :name))]
-;        (when (desc :mnemonic)
-;          (.setMnemonic res (desc :mnemonic)) )
-;
-;        (when (desc :key)
-;          (.setAccelerator res (KeyStroke/getKeyStroke (desc :key) (if (desc :mask) (desc :mask) (ActionEvent/CTRL_MASK)))) )
+        (when (desc :mnemonic)
+          (.setMnemonic res (desc :mnemonic)) )
+
+        (when (desc :key)
+          (.setAccelerator res (KeyStroke/getKeyStroke (desc :key) (if (desc :mask) (desc :mask) (ActionEvent/CTRL_MASK)))) )
 
         (.addActionListener res (new-action-listener (wrapper-func (desc :action))))
         (.add parent res)
@@ -37,8 +36,8 @@
 
     :else
       (let [res (JMenu. (desc :name))]
-;        (when (desc :mnemonic)
-;          (.setMnemonic res (desc :mnemonic)) )
+        (when (desc :mnemonic)
+          (.setMnemonic res (desc :mnemonic)) )
 
         (create-context-menu-from-desc res wrapper-func (desc :children))
 
@@ -73,23 +72,5 @@
   (let [result (add-observers (load-plugin app "custom-editor.clj") context-menu-observer)]
     (.addMouseListener (app :area) (build-context-menu-listener (app :dispatch)))
     result ))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

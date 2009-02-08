@@ -44,7 +44,8 @@
     "load-recent-on-startup.clj"
     "check-syntax-online.clj"
     "line-column.clj"
-    "templates.clj"]
+    "templates.clj"
+    "auto-complete.clj"]
   :recent-files []
   :startup (quote( fn [app] ((load-file "src/net/sourceforge/waterfront/ide/plugins/plugin-loader.clj") app)))})   
 
