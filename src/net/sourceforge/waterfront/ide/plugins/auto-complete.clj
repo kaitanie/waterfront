@@ -46,12 +46,15 @@
           (.add result mi) ))
       result )))
 
+
+
 (defn- find-suggestions [prefix text tokens]
   (let [prefix-len (count prefix)
-        only-longer-than-prefix (filter (fn [t] (> (t :length) prefix-len)) tokens)
+        only-symbols-or-keywords (filter (fn [t] (or (= (t :kind) :token-keyword) (= (t :kind) :token-symbol))) tokens)
+        only-longer-than-prefix (filter (fn [t] (> (t :length) prefix-len)) only-symbols-or-keywords)
         words (reduce (fn [v c] (cons (c :word) v)) nil (add-actual-words text only-longer-than-prefix))
         filtered (filter (fn [x] (.startsWith x prefix)) words)]
-    (set filtered)))
+    (sort (set filtered))))
 
 (defn- complete-word [app]
   (let [rect (.modelToView (app :area) (app :caret-dot))
@@ -78,5 +81,6 @@
     { :name "Auto complete"
       :key java.awt.event.KeyEvent/VK_SPACE :mnemonic java.awt.event.KeyEvent/VK_D  :on-context-menu true
       :action complete-word }))
+
 
 
