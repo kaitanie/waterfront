@@ -34,6 +34,7 @@
   (.select area (tok :where) (tok :end))
   (.replaceSelection area s))
 
+
 (defn- build-completion-menu [area text offset tok suggestions]  
   (if (or (nil? tok) (empty? suggestions))
     nil
@@ -48,20 +49,27 @@
 
 
 
-(defn- find-suggestions [prefix text tokens]
+(defn- find-suggestions [prefix excluded-word text tokens]
   (let [prefix-len (count prefix)
         only-symbols-or-keywords (filter (fn [t] (or (= (t :kind) :token-keyword) (= (t :kind) :token-symbol))) tokens)
         only-longer-than-prefix (filter (fn [t] (> (t :length) prefix-len)) only-symbols-or-keywords)
         words (reduce (fn [v c] (cons (c :word) v)) nil (add-actual-words text only-longer-than-prefix))
-        filtered (filter (fn [x] (.startsWith x prefix)) words)]
+        after-exlusion words ;;;;; (filter (fn [w] (not= w excluded-word)) words)
+        filtered (filter (fn [x] (.startsWith x prefix)) after-exlusion)]
     (sort (set filtered))))
 
 (defn- complete-word [app]
-  (let [rect (.modelToView (app :area) (app :caret-dot))
+  (let [offset (app :caret-dot)
+        rect (.modelToView (app :area) offset)
         tokens (map (fn [x] (assoc x :end (+ (x :where) (x :length)))) (tokenize (app :text))) 
-        tok (get-prefix tokens (app :caret-dot) (app :text))]
+        tok (get-prefix tokens offset (app :text))
+        prefix (.substring (inspect (tok :word)) 0 
+                  (min 
+                    (count (tok :word))
+                    (inspect (- (inspect offset) (inspect (tok :where))))))]
+    (inspect prefix)
     (when (and tok (pos? (count (tok :word))))
-      (let [suggestions (find-suggestions (tok :word) (app :text) tokens)]
+      (let [suggestions (find-suggestions prefix (tok :word) (app :text) tokens)]
         (cond
           (= 1 (count suggestions))
           (insert-completion (app :area) tok (first suggestions))
@@ -75,12 +83,18 @@
   app)
 
 
-         
+; Issues: 
+;   Select the full token that is being replaced
+;   Discard a suggestion if equal to the full word that I am trying to complete
+;   Do not discard a suggestion if the word appears somewhere elase
+
 (fn [app] 
   (add-to-menu (load-plugin app "menu-observer.clj") "Source"  
     { :name "Auto complete"
       :key java.awt.event.KeyEvent/VK_SPACE :mnemonic java.awt.event.KeyEvent/VK_D  :on-context-menu true
       :action complete-word }))
+
+
 
 
 
