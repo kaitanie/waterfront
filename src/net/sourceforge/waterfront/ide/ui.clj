@@ -213,7 +213,6 @@
 ; Bug: (def f 5). Then select only (def f 5) and do "run" (alt-w). then delete it
 ; when openning a new window the new window should have the same state (in particulr: recent file list)
 ; Support separators in context menu
-; When indicator is red allow jump to line (by clicking on it)
 ; Reimplement context menu: 
 ;     integrate with main-menu. 
 ;     Let main-menu use actions. 
@@ -237,7 +236,7 @@
 ; 30-Jan-09: move word: stop at "-"
 ; 31-Jan-09: Load recent file on startup is now handled by a dedicated plugin
 ; 03-Feb-09: Green/Red indicator shows evaluation status of the code - updated on the fly
-; 04-Feb-09: Make syntax problems messages are more descriptive
+; 04-Feb-09: Make syntax problems messages more descriptive
 ; 04-Feb-09: Status bar
 ; 05-Feb-09: TAB indents a selection
 ; 05-Feb-09: Improve next/prev heuristic in the presence of parenthesis/braces/brackets
@@ -246,6 +245,7 @@
 ; 06-Feb-09: A default .waterfront.config.clj file is generated if does not exist
 ; 07-Feb-09: Context menu
 ; 08-Feb-09: Auto-complete
+; 08-Feb-09: Jump to errorneus line 
 
 ; Highlights:
 ;
@@ -258,9 +258,4 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
-
-
-
-
-
 
