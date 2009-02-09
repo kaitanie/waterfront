@@ -30,18 +30,30 @@
   (when (app :jump-to-line)
     (scroll-to-line app (app :jump-to-line)) ))
 
+(defn- update-doc [darea w old-app new-app]
+  (when (maps-differ-on old-app new-app :doc-text)
+    (.setText darea (new-app :doc-text))
+    (.setSelectedComponent (new-app :lower-window) w) ))
+
 (fn [app] 
   (let [output-area (javax.swing.JTextArea.)
-        scrolled (javax.swing.JScrollPane. output-area)]
+        scrolled (javax.swing.JScrollPane. output-area)
+        darea (javax.swing.JTextArea.)
+        scrolled-darea (javax.swing.JScrollPane. darea)]
 
     (.addMouseListener (app :output-label)
       (proxy [java.awt.event.MouseAdapter] []
         (mouseClicked [e] ((app :dispatch) label-clicked)) ))
+    (.addTab (app :lower-window) "Doc." scrolled-darea)
     (.addTab (app :lower-window) "Output" scrolled)
-    (add-observers (assoc app :output-area output-area) 
+    (add-observers (assoc app :output-area output-area :doc-area darea) 
       update-output-label 
       jump-to-observer 
+      (partial update-doc darea scrolled-darea)
       (partial update-output scrolled)) ))
+
+
+
 
 
 

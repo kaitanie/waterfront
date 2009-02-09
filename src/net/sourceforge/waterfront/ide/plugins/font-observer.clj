@@ -17,7 +17,8 @@
     (println "New font detected:" (select-keys app [:font-name :font-style :font-size]))
     (set-font f (app :problem-window))
     (set-font f (app :output-area))
-    (set-font f (app :area)) ))
+    (set-font f (app :area)) 
+    (set-font f (app :doc-area)) ))
 
  
 (defn update-font [old-app new-app]
@@ -26,20 +27,6 @@
      new-app ))
 
 
-
-
 (fn [app] 
     (add-observers app update-font) )
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -46,6 +46,34 @@
       (recur x (rest coll)))))
 
 
+
+(defn- drop-first-aux [item coll result]
+  (cond
+    (empty? coll)
+    (reverse result)
+
+    (= (first coll) item)
+    (concat (reverse result) (rest coll))
+
+    :else
+    (recur item (rest coll) (cons (first coll) result)) ))
+
+(defn drop-first 
+  { :test (fn []
+      (assert (= nil (drop-first \x nil)))
+      (assert (= '(\a) (drop-first \x [ \a ]))) 
+      (assert (= nil (drop-first \x [ \x ]))) 
+      (assert (= '(\a) (drop-first \x [ \a \x ]))) 
+      (assert (= '(\a) (drop-first \x [ \x \a ]))) 
+      (assert (= '(\a \x) (drop-first \x [ \x \a \x ]))) 
+      (assert (= '(\x \a) (drop-first \x [ \x \x \a ]))) 
+      (assert (= '(\a \b \c) (drop-first \x [ \a \b \x \c]))) 
+      (assert (= '(\a \b \c \d) (drop-first \x [ \a \b \c \d ]))) )}
+  [item coll]
+  (drop-first-aux item coll nil))
+
+(test (var drop-first))
+
 (defn remove-all
   { :test (fn []
     (assert-eq [] (remove-all [] [] [])) 
@@ -105,7 +133,6 @@
     (not= (select-keys m1 keys) (select-keys m2 keys)))
 
 (test (var maps-differ-on))
-
 
     
 (defn get-temp-file []
@@ -302,6 +329,7 @@
 (defn pass [msg x]
    (println msg (pretty-print x))
    x)
+
 
 
 

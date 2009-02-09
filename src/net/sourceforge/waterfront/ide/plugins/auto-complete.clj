@@ -3,27 +3,9 @@
 (refer 'net.sourceforge.waterfront.kit)
 
 (require 'net.sourceforge.waterfront.ide.services.services)
+(require 'net.sourceforge.waterfront.ide.services.selections)
+
 (refer 'net.sourceforge.waterfront.ide.services)
-
-
-(defn- get-prefix [tokens offset text]
-  (let [tok (reduce (fn [so-far curr] 
-                (cond 
-                  so-far
-                  so-far
-              
-                  (< offset (curr :where))
-                  so-far
-              
-                  (> offset (curr :end))
-                  so-far
-              
-                  :else
-                  curr ))     
-                nil tokens)]
-  (if (nil? tok)
-    nil
-    (assoc tok :word (.trim (.substring text (tok :where) (tok :end))) ))))
 
 
 (defn- add-actual-words [text tokens]
@@ -48,27 +30,25 @@
       result )))
 
 
-
 (defn- find-suggestions [prefix excluded-word text tokens]
   (let [prefix-len (count prefix)
         only-symbols-or-keywords (filter (fn [t] (or (= (t :kind) :token-keyword) (= (t :kind) :token-symbol))) tokens)
         only-longer-than-prefix (filter (fn [t] (> (t :length) prefix-len)) only-symbols-or-keywords)
-        words (reduce (fn [v c] (cons (c :word) v)) nil (add-actual-words text only-longer-than-prefix))
-        after-exlusion words ;;;;; (filter (fn [w] (not= w excluded-word)) words)
+        words (reduce (fn [v c] (cons (c :word) v)) () (add-actual-words text only-longer-than-prefix))          
+        after-exlusion (drop-first excluded-word words)
         filtered (filter (fn [x] (.startsWith x prefix)) after-exlusion)]
     (sort (set filtered))))
 
 (defn- complete-word [app]
   (let [offset (app :caret-dot)
         rect (.modelToView (app :area) offset)
-        tokens (map (fn [x] (assoc x :end (+ (x :where) (x :length)))) (tokenize (app :text))) 
-        tok (get-prefix tokens offset (app :text))
-        prefix (.substring (inspect (tok :word)) 0 
+        tokens (get-tokens app)
+        tok (trim-token (get-selected-token app tokens))
+        prefix (.substring (tok :word) 0 
                   (min 
                     (count (tok :word))
-                    (inspect (- (inspect offset) (inspect (tok :where))))))]
-    (inspect prefix)
-    (when (and tok (pos? (count (tok :word))))
+                    (- offset (tok :where))))]
+    (when tok
       (let [suggestions (find-suggestions prefix (tok :word) (app :text) tokens)]
         (cond
           (= 1 (count suggestions))
@@ -85,16 +65,16 @@
 
 ; Issues: 
 ;   Select the full token that is being replaced
+;   Complete the partial token that is being replaced
 ;   Discard a suggestion if equal to the full word that I am trying to complete
 ;   Do not discard a suggestion if the word appears somewhere elase
+;   Auto replace if only one suggestion
 
 (fn [app] 
   (add-to-menu (load-plugin app "menu-observer.clj") "Source"  
     { :name "Auto complete"
       :key java.awt.event.KeyEvent/VK_SPACE :mnemonic java.awt.event.KeyEvent/VK_D  :on-context-menu true
       :action complete-word }))
-
-
 
 
 
