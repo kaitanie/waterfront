@@ -216,6 +216,10 @@
 ;     Then filter out non-context actions and put them in a context menu.
 ; Use a line-by-line syntax coloring ?!
 ; bug: focus jump to other window when searching, with multiple Waterfront windows
+; smart proxy generation (generate names, signatures of methods) + check correct spelling of super-types
+; Find: cyclic, lower-case
+; Replace
+
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -261,5 +265,6 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
