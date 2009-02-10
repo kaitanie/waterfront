@@ -68,10 +68,32 @@
    new-app )))
      
 
-(def open-file (fn [app]
-  (if (not= (. javax.swing.JFileChooser APPROVE_OPTION) (.showOpenDialog (app :file-chooser) (app :frame)))
+(defn save-and-or-do-something [app do-something]
+  (if (not (is-dirty app))
+    (do-something app)
+    (let [file-name (if (unknown-document? app) 
+                          "Unnamed" 
+                          (.getName (get-current-document app)))
+          reply (. JOptionPane showOptionDialog (app :frame)
+                    (str "'" file-name "' has been modified. Save changes?")
+                    "Save File" (. JOptionPane YES_NO_CANCEL_OPTION) JOptionPane/QUESTION_MESSAGE, nil, (to-array ["Yes" "No" "Cancel"]), "Cancel"  )
+          temp (if (= reply 0) ; Save! 
+            (save-now app) 
+            app)]
+      (if (or (= reply JOptionPane/CLOSED_OPTION) (= reply 2)) ; Cancel!
+        temp
+        (do 
+          ((app :later) do-something) 
+          temp )))))
+
+
+(defn- open-now [app]
+  (if (not= javax.swing.JFileChooser/APPROVE_OPTION (.showOpenDialog (app :file-chooser) (app :frame)))
     app
-    (load-document (set-current-document app (.getSelectedFile (app :file-chooser)))) )))
+    (load-document (set-current-document app (.getSelectedFile (app :file-chooser)))) ))
+
+(defn open-file [app]
+  (save-and-or-do-something app open-now) )
 
 
 (defn- close-main-window [app]
@@ -83,19 +105,7 @@
 
 
 (defn exit-application [app] 
-  (if (not (is-dirty app))
-    (close-main-window app)
-    (let [file-name (if (unknown-document? app) 
-                        "Unnamed" 
-                        (.getName (get-current-document app)))
-          reply (. JOptionPane showOptionDialog (app :frame)
-                  (str "'" file-name "' has been modified. Save changes?")
-                  "Save File" (. JOptionPane YES_NO_CANCEL_OPTION) JOptionPane/QUESTION_MESSAGE, nil, (to-array ["Yes" "No" "Cancel"]), "Cancel"  )]
-      (when (= reply 0) ; Save!
-        (save-now app))
-      (when (and (not= reply JOptionPane/CLOSED_OPTION) (not= reply 2)) ; not Cancel!
-        (close-main-window app) )
-      app )))
+  (save-and-or-do-something app close-main-window) )
 
 (defn- revert [app]
   (load-document app))
@@ -126,7 +136,6 @@
         (str (if (is-dirty app) "*" "") (.getName (get-current-document app)) " - " (get-current-document-path app)) )))
    app)
 
-
 (fn [app] 
   (.addWindowListener (app :frame)
     (proxy [java.awt.event.WindowAdapter] []
@@ -135,7 +144,6 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
-  
 
 
 
