@@ -112,7 +112,7 @@
 
 (defn add-file-menu [app]
   (add-to-menu app "File" 
-    { :name "New" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_N :action (fn m-new [app] 
+    { :name "New Window" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_N :action (fn m-new [app] 
                               (new-waterfront-window app (merge app {
                                 :title-prefix (app :title-prefix)
                                 :file-name :unknown :initial-text "" :x0 (+ 40 (app :x0)) :y0 (+ 40 (app :y0)) }))
@@ -144,6 +144,7 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
 
 
 

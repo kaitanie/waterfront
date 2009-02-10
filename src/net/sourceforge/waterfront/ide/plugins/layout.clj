@@ -91,12 +91,15 @@
   (.setLayout lower-sb (java.awt.FlowLayout. java.awt.FlowLayout/LEFT 5 3))
   (.add (app :frame) lower-sb BorderLayout/SOUTH)
   
-  (.add (app :frame) (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) (lnp-widgets :composite) 
+  (.add (app :frame) (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) 
+                                  (lnp-widgets :composite)
+;                                  (doto (lnp-widgets :composite)
+;                                    (.setPreferredSize (java.awt.Dimension. 300 300)))
                                   (doto (javax.swing.JPanel.)
                                     (.setLayout (BorderLayout.))
                                     (.add sb BorderLayout/NORTH)
                                     (.add lower-win BorderLayout/CENTER)))       
-            (.setDividerLocation 300)
+            (.setDividerLocation -1)
             (.setResizeWeight 1.0) )
           (. BorderLayout CENTER) )
 
@@ -109,6 +112,10 @@
       :indicator indicator
       :lower-status-bar lower-sb) 
     layout-observer) ))
+
+
+
+
 
 
 

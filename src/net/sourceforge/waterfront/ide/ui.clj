@@ -125,8 +125,8 @@
   (let [default-config { 
           :x0 100
           :y0 50
-          :width0 800
-          :height0 1000
+          :width0 850
+          :height0 800
           :font-size 20
           :font-name "Courier New"
           :font-style Font/PLAIN
@@ -261,15 +261,5 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
-
-
-
-
-
-
-
-
-
-
 
 

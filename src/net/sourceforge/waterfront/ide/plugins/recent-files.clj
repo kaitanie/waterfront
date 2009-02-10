@@ -39,17 +39,16 @@
       :action (fn [app] (save-and-or-do-something app (fn [app-tag] (load-document (set-current-document app-tag path))))) }))
    
    
-(defn create-history-items [recent-files]
-   (map create-a-history-item (take 9 recent-files) (iterate inc 1)) )
+(defn create-history-items [recent-files exclude]
+   (map create-a-history-item (take 9 (filter (fn [x] (not= x exclude)) recent-files)) (iterate inc 1) ))
 
 
 (defn recent-files-menu-observer [old-app new-app] 
   "Add menu items to open recently opened files"
 
    (when (or 
-            (maps-differ-on old-app new-app :recent-files) 
-            (nil? (new-app :recent-menu-created))
-        )
+            (maps-differ-on old-app new-app :recent-files :file-name) 
+            (nil? (new-app :recent-menu-created)))
     (let [result 
       (transform (assoc new-app :recent-menu-created true) :menu nil 
         (partial 
@@ -59,7 +58,7 @@
             (to-vec 
               (apply conj 
                 (to-vec (filter (fn [x] (not (:is-history-item (meta x)))) items))
-                (to-vec (cons (add-history-tag { }) (create-history-items (new-app :recent-files)))) )))))]
+                (to-vec (cons (add-history-tag {}) (create-history-items (new-app :recent-files) (new-app :file-name)))) )))))]
       result )))
       
             
@@ -81,6 +80,11 @@
             recent-files-observer recent-files-menu-observer)) 
           :recent-menu-created nil)]
       result ))
+
+
+
+
+
 
 
 
