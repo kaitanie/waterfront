@@ -332,6 +332,31 @@
 
 
 
+;(defn inspect-aux [s v]
+;  (println (str s "=" v))
+;  v)
+;
+;(defmacro inspect [a]
+;  `(inspect-aux '~a ~a))
+
+
+(defn- show-dlg [a b & xs]
+  (let [sb (StringBuffer.)]
+    (.append sb (str a ": " b))
+    (doseq [x xs]
+      (.append (.append sb (pretty-print x)) \newline))
+    (javax.swing.JOptionPane/showMessageDialog nil (str sb)) )
+    (if (empty? xs)
+      nil
+      (first xs)))
+
+    
+
+(defmacro break [a]
+  `(do
+      (show-dlg "before" '~a)
+      (show-dlg "after " '~a ~a)))
+
 
 
 

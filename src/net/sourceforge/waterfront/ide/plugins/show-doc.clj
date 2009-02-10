@@ -8,22 +8,32 @@
 (refer 'net.sourceforge.waterfront.ide.services)
 
 
+
+(defn- get-selected-text-trimmed [app]
+  (let [s (.getSelectionStart (app :area))
+        e (.getSelectionEnd (app :area))
+        from (min s e)
+        to (max s e)]
+    (if (>= from to)
+      nil
+      (let [res (.trim (.substring (app :text) from to))]
+        (if (pos? (count res))
+          res
+          nil )))))        
+        
 (fn [app] 
   (add-to-menu (load-plugin app "menu-observer.clj" "output-window.clj" "font-observer.clj") "Source"  
     { :name "(doc <selection>)"
       :key java.awt.event.KeyEvent/VK_F1 :mask 0 :mnemonic java.awt.event.KeyEvent/VK_D  :on-context-menu true
       :action (fn[app] 
-        (let [tok (trim-token (get-selected-token app))
-              t (tok :word)]
+        (let [s (get-selected-text-trimmed app)
+              tok (trim-token (get-selected-token app))
+              t (if s s (tok :word))]
           (when t
             (assoc app :doc-text
               (if (resolve (symbol t))
                 (with-out-str (eval (cons 'doc (list (symbol t)))))
                 (str "I didn't find a definition for '" t "'") )))))}))
-
-
-
-
 
 
 

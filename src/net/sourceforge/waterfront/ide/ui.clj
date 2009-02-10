@@ -141,8 +141,9 @@
             { :name "Run" :mnemonic KeyEvent/VK_R :children []} 
             { :name "View" :mnemonic KeyEvent/VK_V :children []}]
           :actions {}
-          :eval-count 1 }]          
-    (merge default-config (read-stored-config fallback-context) a overriding-config) ))
+          :eval-count 1 }
+        result (merge default-config (read-stored-config fallback-context) a overriding-config) ]
+      result ))
 
 ; main function
 (defn new-waterfront-window [fallback-context initial-app-context]
@@ -152,7 +153,7 @@
 
     (swap! (app :window-counter) inc)  
     (doto frame
-      (.setDefaultCloseOperation (. JFrame DO_NOTHING_ON_CLOSE))
+      (.setDefaultCloseOperation JFrame/DO_NOTHING_ON_CLOSE)
       (.setLayout (new BorderLayout))
       (.pack)
       (.setSize (app :width0) (app :height0))
@@ -211,7 +212,6 @@
 ; Exit when all windows are closed
 ; Launch the eval on a different class-loader
 ; Bug: (def f 5). Then select only (def f 5) and do "run" (alt-w). then delete it
-; when openning a new window the new window should have the same state (in particulr: recent file list)
 ; Support separators in context menu
 ; Reimplement context menu: 
 ;     integrate with main-menu. 
@@ -246,6 +246,8 @@
 ; 07-Feb-09: Context menu
 ; 08-Feb-09: Auto-complete
 ; 08-Feb-09: Jump to errorneus line 
+; 10-Feb-09: Bug fix: list of recently opened files in a new window
+
 
 ; Highlights:
 ;
@@ -258,4 +260,12 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
+
+
+
+
+
+
 

@@ -13,19 +13,23 @@
 (defn add-history-tag [x]
   (with-meta x { :is-history-item true }) )
 
+(defn- add-recent-to-file-menu [new-app]
+  (transform new-app :recent-files [] 
+    (fn [fs] 
+      (to-vec 
+        (take     ; Limit history size 
+          10 
+          (cons   ; Remove the current file name from the list and push it on front
+            (new-app :file-name)
+            (filter (fn [x] (not= x (new-app :file-name))) fs) ))))))
+
+
 (defn recent-files-observer 
   "Maintain a history of opened files" 
   [old-app new-app]  
   
   (when (maps-differ-on old-app new-app :file-name)
-    (transform new-app :recent-files [] 
-      (fn [fs] 
-        (to-vec 
-          (take     ; Limit history size 
-            10 
-            (cons   ; Remove the file name from the list and push it on front
-              (new-app :file-name)
-              (filter (fn [x] (not= x (new-app :file-name))) fs) )))))))
+    (add-recent-to-file-menu new-app) ))
 
               
 
@@ -75,13 +79,12 @@
                               ks
                               (conj ks :recent-files) ))))
 
-      result (add-save-key          
-          (add-observers 
-            (load-plugin app "menu-observer.clj") 
-            recent-files-observer recent-files-menu-observer) 
-          )
-]
-
+      result (assoc (add-save-key          
+          (add-observers (load-plugin app "menu-observer.clj") 
+            recent-files-observer recent-files-menu-observer)) 
+          :recent-menu-created nil)]
       result ))
+
+
 
 
