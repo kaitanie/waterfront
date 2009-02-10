@@ -43,5 +43,10 @@
       (assoc t :word w) )))
 
 
+(defn select-and-scroll-to [area offset length]
+  (.setCaretPosition area offset)
+  (.moveCaretPosition area (+ offset length)) 
+  (.scrollRectToVisible area (.modelToView area offset)) )
+
 
 

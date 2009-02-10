@@ -18,15 +18,28 @@
     (set-font f (app :problem-window))
     (set-font f (app :output-area))
     (set-font f (app :area)) 
-    (set-font f (app :doc-area)) ))
+    (set-font f (app :doc-area))
+    (assoc app :active-font f) ))
 
  
+(defn- check-active-font [app]
+  (let [f (.getFont (app :area))]
+    (when (and (app :active-font) (not= f (app :active-font)))
+      (set-font (app :active-font) (app :area))
+      (println "         $$$$$$$$$  That's it $$$$$$$$$$$$$$$") )
+    app ))
+
+      
 (defn update-font [old-app new-app]
-  (if (or (not (new-app :font-assigned)) (maps-differ-on old-app new-app :font-size :font-name :font-style :area))
-    (assoc ((new-app :enqueue) new-app set-fonts) :font-assigned true)
-     new-app ))
+  (if (or 
+        (not (new-app :font-assigned)) 
+        (maps-differ-on old-app new-app :font-size :font-name :font-style :area))
+      (assoc ((new-app :enqueue) new-app set-fonts) :font-assigned true)
+      (check-active-font new-app )))
 
 
 (fn [app] 
     (add-observers app update-font) )
+
+
 

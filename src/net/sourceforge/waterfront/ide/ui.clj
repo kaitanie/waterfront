@@ -114,6 +114,7 @@
     (atom-assoc a :app (assoc initial-app 
                           :dispatch result           
                           :observers []
+                          :later (fn [f] (later (fn [] (result f))))
                           :register-periodic-observer (partial register-periodic-observer result) 
                           :enqueue (fn [app f] (assoc app :pending (concat (app :pending) (list f)))) ))
     (atom-assoc a :entrance 0)
@@ -220,6 +221,7 @@
 ;     Then filter out non-context actions and put them in a context menu.
 ; Use a line-by-line syntax coloring ?!
 
+
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
 ; 28-Dec-08: show doc
@@ -247,6 +249,7 @@
 ; 08-Feb-09: Auto-complete
 ; 08-Feb-09: Jump to errorneus line 
 ; 10-Feb-09: Bug fix: list of recently opened files in a new window
+; 10-Feb-09: Bug fix: Updating of the Line-Col indicator in response to searching/jumping to an error
 
 
 ; Highlights:
@@ -260,6 +263,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 
