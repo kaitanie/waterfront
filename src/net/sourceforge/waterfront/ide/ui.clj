@@ -186,18 +186,14 @@
 ; recent searches drop box
 ; incremental search
 ; eval just like in REPL
-; solve issues of window focus
 ; bug: (count (replicate 100 \a))
 ; multi-tab editor
 ; reformat source
 ; jump to decl.
-; revert
-; indent/unindent block
 ; allow show doc (F1) on symbols which are not from the global namespace
 ; make load document an observer-driven action triggered by a new :file-name value
 ; rename 
 ; find unused variables
-; generate overloading
 ; extract function
 ; stop-and-inspect
 ; make window placement inside the frame a dynamic property (DSL specified by app, a-la :menu)
@@ -210,7 +206,6 @@
 ; Add a "Run tests" option to make on-the-fly checking run tests of functions
 ; change the font of the compilation result (upper status bar)
 ; Make online-syntax-check use a background thread (agent)
-; Exit when all windows are closed
 ; Launch the eval on a different class-loader
 ; Bug: (def f 5). Then select only (def f 5) and do "run" (alt-w). then delete it
 ; Support separators in context menu
@@ -220,7 +215,7 @@
 ;     When building main menu concatenate a list of actions. 
 ;     Then filter out non-context actions and put them in a context menu.
 ; Use a line-by-line syntax coloring ?!
-
+; bug: focus jump to other window when searching, with multiple Waterfront windows
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -237,6 +232,7 @@
 ; 26-Jan-09: (app :change) is a functions that allow currently executing code to change app 
 ; 30-Jan-09: move word: stop at "-"
 ; 31-Jan-09: Load recent file on startup is now handled by a dedicated plugin
+; ??-Feb-09: File -> Revert
 ; 03-Feb-09: Green/Red indicator shows evaluation status of the code - updated on the fly
 ; 04-Feb-09: Make syntax problems messages more descriptive
 ; 04-Feb-09: Status bar
@@ -244,12 +240,14 @@
 ; 05-Feb-09: Improve next/prev heuristic in the presence of parenthesis/braces/brackets
 ; 05-Feb-09: Threads are now daemons
 ; 06-Feb-09: Shutdown the JVM when last window is closed
+; 06-Feb-09: Source -> Generate: Proxy, Overloading, Try-Catch
 ; 06-Feb-09: A default .waterfront.config.clj file is generated if does not exist
 ; 07-Feb-09: Context menu
 ; 08-Feb-09: Auto-complete
 ; 08-Feb-09: Jump to errorneus line 
 ; 10-Feb-09: Bug fix: list of recently opened files in a new window
 ; 10-Feb-09: Bug fix: Updating of the Line-Col indicator in response to searching/jumping to an error
+; 10-Feb-09: Asks whether to Save a dirty file before openning a file
 
 
 ; Highlights:
@@ -263,6 +261,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 

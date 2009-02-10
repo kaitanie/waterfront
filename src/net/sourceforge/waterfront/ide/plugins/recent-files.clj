@@ -30,16 +30,13 @@
   
   (when (maps-differ-on old-app new-app :file-name)
     (add-recent-to-file-menu new-app) ))
-
-              
-
-
+             
 
 (defn create-a-history-item [path ordinal]
   (add-history-tag
     { :name (str ordinal " " path)
       :mnemonic (+ ordinal java.awt.event.KeyEvent/VK_0)
-      :action (fn [app] (load-document (set-current-document app path))) }))
+      :action (fn [app] (save-and-or-do-something app (fn [app-tag] (load-document (set-current-document app-tag path))))) }))
    
    
 (defn create-history-items [recent-files]
@@ -84,6 +81,7 @@
             recent-files-observer recent-files-menu-observer)) 
           :recent-menu-created nil)]
       result ))
+
 
 
 
