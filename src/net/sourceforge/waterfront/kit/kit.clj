@@ -358,7 +358,161 @@
       (show-dlg "after " '~a ~a)))
 
 
+; UI - Form
 
+
+(defn- new-grid-constraints 
+  ([gridx gridy fill-x?]
+  (new-grid-constraints gridx gridy 1 1 fill-x? false))
+  
+  ([gridx gridy col-span row-span fill-x? fill-y?]
+  (let [result (java.awt.GridBagConstraints. )]
+    (set! (. result gridx) gridx)
+    (set! (. result gridy) gridy)
+    (set! (. result gridwidth) col-span)
+    (set! (. result gridheight) row-span)
+    (set! (. result weightx) (if fill-x? 1 0))
+    (set! (. result weighty) (if fill-y? 1 0))
+    (set! (. result insets) (java.awt.Insets. 10 10 10 10))
+    (set! (. result anchor) java.awt.GridBagConstraints/LINE_START)
+    (set! (. result fill) 
+      (cond 
+        (and fill-x? fill-y?)
+        java.awt.GridBagConstraints/BOTH
+
+        (and fill-x? (not fill-y?))
+        java.awt.GridBagConstraints/HORIZONTAL
+
+        (and (not fill-x?) fill-y?)
+        java.awt.GridBagConstraints/VERTICAL
+
+        :else
+        java.awt.GridBagConstraints/NONE))
+    result )))
+
+
+(defn- add-input-area [p gy name default-value checker]
+  (let [in (javax.swing.JTextField. default-value)
+        label (javax.swing.JLabel. name)]
+    (.add p label (new-grid-constraints 0 gy false))
+;    (.setLabelFor label in)
+;    (.setAlignmentX label 0)
+    (.add p in (new-grid-constraints 1 gy true))
+    in ))
+        
+(defn- new-button [title action]
+  (let [result (javax.swing.JButton. title)]
+    (.addActionListener result 
+      (proxy [java.awt.event.ActionListener] []
+        (actionPerformed [e] (action)) ))
+    result ))
+
+
+
+(defn show-input-form 
+  "Display a modal dialog where the user can fill in fields (name-value pairs). Returns nil if the form's
+   cancel button was clicked. Otherwise, returns a map which maps field names to their values
+   owner - Owner widget. Must be a JFrame
+   title - Dialog's title
+   heading-widget - A widget to be placed at the dialog's upper part
+   ok-condition - a function taking a map (in the same structure as the return value) describing the 
+      form's current state. Should return nil if all form values are legal, at which case, the OK 
+      button is enabled. Otherwise, should returns an error message (string) which will be displayed
+      on the form. This function is evaluated only if all validators (see description-maps, below) pass
+   & description-maps - a sequence of maps describing the form's fields. Each map should have these associations:
+      :name - Field name
+      :value - Field's initial value
+      :validator - a function taking a single string representing the field's value. Should return nil if 
+        the value is legal. Otherwise, should return an error message (string) which will be displayed on the form
+
+   Example
+    (show-input-form 
+        nil                   
+        \"Personal Details\"    
+        (javax.swing.JLabel. \"Fill in your first and last name\")
+        (fn [model] (if (and (= (get model \"First name\") \"John\") (= (get model \"Last name\") \"Doe\")) \"This name is not allowed\" nil)) 
+        { :name \"First name\" :value \"[first name here]\" :validator (fn [x] (if (zero? (count x)) \"too short\" nil)) }
+        { :name \"Last name\" :value \"[last name here]\" :validator (fn [x] (if (zero? (count x)) \"too short\" nil)) }) ))"
+      
+  [#^javax.swing.JFrame owner title heading-widget ok-condition & description-maps]
+  (let [cancelled? (atom true)
+        d (javax.swing.JDialog. owner title true)
+        upper-panel (javax.swing.JPanel.)
+        button-panel (javax.swing.JPanel.)
+        p (javax.swing.JPanel.)
+        msg (javax.swing.JLabel.)
+        checker (fn [name validator text]
+          (if (not validator)
+            true
+            (let [x (validator text)]
+              (.setText msg (if x (str name ": " x) "") ))))]
+
+    (.setLayout p (java.awt.GridBagLayout.))
+    (.add p heading-widget (new-grid-constraints 1 0 1 1 true false))
+
+    (.add p 
+      (doto (javax.swing.JLabel.) (.setPreferredSize (java.awt.Dimension. 10 30)))
+      (new-grid-constraints 0 1 1 1 false false))
+    (.add p msg (new-grid-constraints 1 1 1 1 true false))
+
+    (.add d button-panel java.awt.BorderLayout/SOUTH)
+
+    (let [model (map 
+                  (fn[x y] 
+                    (let [fld (add-input-area p y (x :name) "" nil)]
+                      (assoc x :row y :field fld) )) 
+                  description-maps 
+                  (iterate inc 2))
+          ok-button (new-button "Ok" (fn [] (swap! cancelled?(fn [x] false)) (.dispose d)))
+          cancel-button (new-button "Cancel" (fn [] (.dispose d)))
+          aux (fn [prefix s]
+            (if s (str prefix s) nil))
+          checker (fn []
+            (let [err-msg (reduce 
+                            (fn [v c] (if v v (if (c :validator) (aux (str (c :name) ": ") ((c :validator) (.getText (c :field)))) nil)))
+                            nil
+                            model)
+                  fail-msg (if err-msg nil (ok-condition (reduce (fn [v c] (assoc v (c :name) (.getText (c :field)))) {} model)))]
+              (.setText msg (if err-msg err-msg (if fail-msg fail-msg "")))
+              (.setEnabled ok-button (and (not err-msg) (not fail-msg))) ))]
+            
+      (.add button-panel cancel-button)
+      (.add button-panel ok-button)
+      (doseq [each model]
+        (.addDocumentListener (.getDocument (each :field))
+          (proxy [javax.swing.event.DocumentListener] []
+            (changedUpdate [e] (checker))
+            (insertUpdate [e] (checker))
+            (removeUpdate [e] (checker)) )))
+        
+      (.add d p java.awt.BorderLayout/CENTER)
+
+      (doseq [each model] (.setText (each :field) (each :value)))
+
+      (.pack d)
+      (.setSize d 500 300)
+      (.show d true)
+      (if @cancelled?
+        nil
+        (reduce (fn [v c] (assoc v (c :name) (.getText (c :field)))) {} model) ))))
+
+
+(defn main []
+  (let [fr (javax.swing.JFrame.)]
+    (.setSize fr 300 500)
+    (.setVisible fr true)
+ 
+    (show-input-form 
+        nil                   
+        "Personal Details"    
+        (javax.swing.JLabel. "Fill in your first and last name")
+        (fn [model] (if (and (= (get model "First name") "John") (= (get model "Last name") "Doe")) "This name is not allowed" nil)) 
+        { :name "First name" :value "[first name here]" :validator (fn [x] (if (zero? (count x)) "too short" nil)) }
+        { :name "Last name" :value "[last name here]" :validator (fn [x] (if (zero? (count x)) "too short" nil)) }) ))
+
+
+
+; (net.sourceforge.waterfront.kit/main)
 
 
 
