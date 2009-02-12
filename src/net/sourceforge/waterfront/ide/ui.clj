@@ -219,7 +219,11 @@
 ; smart proxy generation (generate names, signatures of methods) + check correct spelling of super-types
 ; Find: cyclic, lower-case
 ; Replace
-
+; menu items should be disabled (undo, redo) when action is not applicable
+; surround with try catch
+; gen. overloading: ask arities, generate forwarding
+; proxy: gen method names
+; input-form: ESCAPE => Cancel, Return => OK
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -265,6 +269,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 

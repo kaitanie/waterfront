@@ -26,14 +26,26 @@
           (select-and-scroll-to (app :area) offset (count x)) )))
   app ))
 
+
 (defn find-in-document [app] 
   (let [current-selection (get-selected-text app nil)
-        search-string (.  JOptionPane showInputDialog "Search for: " 
-                            (if (nil? current-selection) 
-                              (if (nil? (app :last-search)) 
-                                "" 
-                                (app :last-search) )  
-                              current-selection ))
+
+        default-search-string (if current-selection
+                                current-selection
+                                (if (app :last-search)
+                                  (app :last-search) 
+                                  "" ))  
+  
+        search-settings (show-input-form 
+            nil                   
+            "Search"    
+            (javax.swing.JLabel. " ")
+            (fn [model] nil)
+            { :name "Find:" :value default-search-string :validator (fn [x] (if (zero? (count x)) :bad nil)) }
+            { :name "Case sensitive" :value false } 
+            { :name "Wrap search" :value false }
+            { :name "Whole word" :value false })
+        search-string (if search-settings (get search-settings "Find:") nil)
         new-app (assoc app :last-search search-string)]
     (find-next new-app) ))
 
@@ -42,14 +54,6 @@
     {}
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } ))
-
-
-
-
-
-
-
-
 
 
 
