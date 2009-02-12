@@ -427,21 +427,32 @@
     result ))
 
 
+(defn- add-escape-handler [d escape-handler]
+  (let [rootPane (.getRootPane d)
+        stroke (javax.swing.KeyStroke/getKeyStroke "ESCAPE")
+        actionListener (proxy [javax.swing.AbstractAction] []
+          (actionPerformed [e] (escape-handler d)) )
+        inputMap (.getInputMap rootPane javax.swing.JComponent/WHEN_IN_FOCUSED_WINDOW)]
+
+    (.put inputMap stroke, "ESCAPE")
+    (.. rootPane (getActionMap) (put "ESCAPE" actionListener)) )
+  d )
+
 
 (defn show-input-form 
   "Display a modal dialog where the user can fill in fields (name-value pairs). Returns nil if the form's
    cancel button was clicked. Otherwise, returns a map which maps field names to their values.
-   The initial value of each field (as specified by the descriptions argument) determines the widget
+   The initial value of each field (as specified by the fields argument) determines the widget
    that will be used to render this field: a check box for a boolean values, a combox box for a collection,
-   and a text field for a string.
+   a text field for a string.
    owner - Owner widget. Must be a JFrame
    title - Dialog's title
    heading-widget - A widget to be placed at the dialog's upper part
    ok-condition - a function taking a map (in the same structure as the return value) describing the 
       form's current state. Should return nil if all form values are legal, at which case, the OK 
       button is enabled. Otherwise, should returns an error message (string) which will be displayed
-      on the form. This function is evaluated only if all validators (see descriptions, below) pass
-   & descriptions - a sequence of maps describing the form's fields. Each map should have these associations:
+      on the form. This function is evaluated only if all validators (see fields, below) pass
+   & fields - a sequence of maps describing the form's fields. Each map should have these associations:
       :name - Field name
       :value - Field's initial value
       :validator - a function taking a single argument representing the field's value. Should return nil if 
@@ -465,7 +476,7 @@
         button-panel (javax.swing.JPanel.)
         p (javax.swing.JPanel.)
         msg (javax.swing.JLabel. " ")]
-
+    
     (.setLayout p (java.awt.GridBagLayout.))
     (.add p heading-widget (new-grid-constraints 1 0 1 1 true false))
 
@@ -485,7 +496,7 @@
                             nil
                             @model-atom)
                   fail-msg (if err-msg err-msg (ok-condition (reduce (fn [v c] (assoc v (c :name) ((c :reader)))) {} @model-atom)))]
-              (.setText msg (if err-msg err-msg (if fail-msg fail-msg " ")))
+              (.setText msg (if fail-msg fail-msg " "))
               (.setEnabled ok-button (and (not err-msg) (not fail-msg))) )) 
          model (doall (map 
                   (fn[x y] 
@@ -493,10 +504,14 @@
                       (assoc x :row y :reader rdr) )) 
                   descriptions 
                   (iterate inc 2)))]
+      (add-escape-handler d (fn [d] (.doClick cancel-button)))
+
       (swap! model-atom (fn [x] model))            
       (.add button-panel cancel-button)
       (.add button-panel ok-button)
       (.add d p java.awt.BorderLayout/CENTER)
+
+      (.. d (getRootPane) (setDefaultButton ok-button))
 
       (.pack d)
       (.setSize d 500 300)
@@ -524,6 +539,8 @@
 
 
 ; (net.sourceforge.waterfront.kit/main)
+
+
 
 
 
