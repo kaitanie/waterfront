@@ -72,7 +72,7 @@
 (fn [app] 
   (let [a (atom {})
         change-func (fn[key val] (swap! a (fn [curr-app] (assoc curr-app key val))))]
-    (add-to-menu (load-plugin app "menu-observer.clj") "Run" 
+    (add-to-menu (load-plugin app "menu-observer.clj" "check-syntax.clj") "Run" 
       { :name "Eval" :key KeyEvent/VK_E  :on-context-menu true :action (fn m-run [app] 
                           (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
                           (let [t0 (. System currentTimeMillis) 

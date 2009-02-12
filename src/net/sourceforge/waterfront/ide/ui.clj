@@ -224,6 +224,8 @@
 ; gen. overloading: ask arities, generate forwarding
 ; proxy: gen method names
 ; input-form: ESCAPE => Cancel, Return => OK
+; Show a "search phrase not found" message
+; run.clj depends on get-selected-text as a library function from another plugin. refactor into kit.clj
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -256,7 +258,7 @@
 ; 10-Feb-09: Bug fix: list of recently opened files in a new window
 ; 10-Feb-09: Bug fix: Updating of the Line-Col indicator in response to searching/jumping to an error
 ; 10-Feb-09: Asks whether to Save a dirty file before openning a file
-
+; 12-Feb-09: New search options: cyclic, case sensitive
 
 ; Highlights:
 ;
@@ -269,6 +271,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

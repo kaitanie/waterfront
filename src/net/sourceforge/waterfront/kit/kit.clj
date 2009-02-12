@@ -23,9 +23,8 @@
   [expected, actual]
   `(assert-eq-aux ~expected ~actual (pr-str '~actual)))
 
-
 (defn inspect-aux [s v]
-  (println (str s "=" v))
+  (println (str s "=" (if v v "nil")))
   v)
 
 (defmacro inspect [a]
@@ -244,7 +243,7 @@
 
 
 
-; inspection
+; Pretty printing
 
    
 
@@ -304,6 +303,9 @@
    
    ([x indent] 
    (cond 
+      (nil? x)
+      "nil"
+
       (and (map? x) (empty? x))
       "{}"
 
@@ -329,15 +331,6 @@
 (defn pass [msg x]
    (println msg (pretty-print x))
    x)
-
-
-
-;(defn inspect-aux [s v]
-;  (println (str s "=" v))
-;  v)
-;
-;(defmacro inspect [a]
-;  `(inspect-aux '~a ~a))
 
 
 (defn- show-dlg [a b & xs]
@@ -399,6 +392,7 @@
       (.add p label (new-grid-constraints 0 gy false))
       (.add p result (new-grid-constraints 1 gy true))
       (.setEditable result true)
+      (.. result (getEditor) (selectAll))
       (fn [] (.getSelectedItem result)) )
 
     (string? default-value)
@@ -411,12 +405,13 @@
           (changedUpdate [e] (checker))
           (insertUpdate [e] (checker))
           (removeUpdate [e] (checker)) ))
+      (.selectAll result)
       (fn [] (.getText result)) )
 
     :else
     (let [result (javax.swing.JCheckBox. name)]
       (.add p result (new-grid-constraints 1 gy true))
-      (.setSelected result default-value)
+      (.setSelected result (if default-value true false))
       (fn [] (.isSelected result)) )))
         
 (defn- new-button [title action]
@@ -425,6 +420,7 @@
       (proxy [java.awt.event.ActionListener] []
         (actionPerformed [e] (action)) ))
     result ))
+
 
 
 (defn- add-escape-handler [d escape-handler]
@@ -446,8 +442,11 @@
    that will be used to render this field: a check box for a boolean values, a combox box for a collection,
    a text field for a string.
    owner - Owner widget. Must be a JFrame
-   title - Dialog's title
-   heading-widget - A widget to be placed at the dialog's upper part
+   user-props - Various properties of the form. Supported keys (with defaults): 
+                  :title - Dialog's title (\"\")
+                  :ok - Text of the OK button (\"Ok\")
+                  :cancel - Text of the cancel button (\"Cancel\")
+   heading-widget - A widget to be placed at the dialog's upper part. May be nil.
    ok-condition - a function taking a map (in the same structure as the return value) describing the 
       form's current state. Should return nil if all form values are legal, at which case, the OK 
       button is enabled. Otherwise, should returns an error message (string) which will be displayed
@@ -461,7 +460,7 @@
    Example
     (show-input-form 
         nil                   
-        \"Personal Details\"    
+        { :title \"Personal Details\" :cancel \"Close\" }    
         (javax.swing.JLabel. \"Fill in your first and last name\")
         (fn [model] (if (and (= (get model \"First name\") \"John\") (= (get model \"Last name\") \"Doe\")) \"This name is not allowed\" nil)) 
         { :name \"First name\" :value \"[first name here]\" :validator (fn [x] (if (zero? (count x)) \"too short\" nil)) }
@@ -469,30 +468,37 @@
         { :name \"Favorite Color\" :value [ \"Red\" \"Green\" \"Blue\" ] }
         { :name \"Has cats?\" :value false } )))"
       
-  [#^javax.swing.JFrame owner title heading-widget ok-condition & descriptions]
-  (let [cancelled? (atom true)
-        d (javax.swing.JDialog. owner title true)
+  [#^javax.swing.JFrame owner user-props heading-widget ok-condition & fields]
+  (let [props (merge { :title "" :ok "Ok" :cancel "Cancel" } user-props)
+        cancelled? (atom true)
+        d (javax.swing.JDialog. owner true)
         upper-panel (javax.swing.JPanel.)
-        button-panel (javax.swing.JPanel.)
+        button-panel (javax.swing.JPanel. (java.awt.FlowLayout. java.awt.FlowLayout/TRAILING))
         p (javax.swing.JPanel.)
-        msg (javax.swing.JLabel. " ")]
+        msg (javax.swing.JLabel. " ")
+        first-row (if heading-widget 2 1)]
     
+    (.setTitle d (props :title))
     (.setLayout p (java.awt.GridBagLayout.))
-    (.add p heading-widget (new-grid-constraints 1 0 1 1 true false))
+    (when heading-widget
+      (.add p heading-widget (new-grid-constraints 1 0 1 1 true false)) )
 
-    (.add p msg (new-grid-constraints 1 1 1 1 true false))
-    (.add p (javax.swing.JLabel.) (new-grid-constraints 0 (+ 2 (count descriptions)) 2 1 true true))
+    (.add p msg (new-grid-constraints 1 (dec first-row) 1 1 true false))
+    (.add p (javax.swing.JLabel.) (new-grid-constraints 0 (+ first-row (count fields)) 2 1 true true))
 
     (.add d button-panel java.awt.BorderLayout/SOUTH)
 
+
     (let [model-atom (atom nil)
-          ok-button (new-button "Ok" (fn [] (swap! cancelled? (fn [x] false)) (.dispose d)))
-          cancel-button (new-button "Cancel" (fn [] (.dispose d))) 
+          ok-button (new-button (props :ok) (fn [] (swap! cancelled? (fn [x] false)) (.dispose d)))
+          cancel-button (new-button (props :cancel) (fn [] (.dispose d))) 
           aux (fn [prefix s]
             (if (= :bad s) " " (if s (str prefix s) nil)))
           checker (fn []
             (let [err-msg (reduce 
-                            (fn [v c] (if v v (if (c :validator) (aux (str (c :name) ": ") ((c :validator) ((c :reader)))) nil)))
+                            (fn [v c] (if v 
+                              v 
+                              (aux (str (c :name) ": ") ((c :validator) ((c :reader))))))
                             nil
                             @model-atom)
                   fail-msg (if err-msg err-msg (ok-condition (reduce (fn [v c] (assoc v (c :name) ((c :reader)))) {} @model-atom)))]
@@ -501,16 +507,16 @@
          model (doall (map 
                   (fn[x y] 
                     (let [rdr (add-input-area checker p y (x :name) (x :value))]
-                      (assoc x :row y :reader rdr) )) 
-                  descriptions 
-                  (iterate inc 2)))]
-      (add-escape-handler d (fn [d] (.doClick cancel-button)))
+                      (merge { :validator (fn [x] nil) } (assoc x :row y :reader rdr)) )) 
+                  fields 
+                  (iterate inc first-row)))]
 
       (swap! model-atom (fn [x] model))            
       (.add button-panel cancel-button)
       (.add button-panel ok-button)
       (.add d p java.awt.BorderLayout/CENTER)
 
+      (add-escape-handler d (fn [d] (.doClick cancel-button)))
       (.. d (getRootPane) (setDefaultButton ok-button))
 
       (.pack d)
@@ -528,7 +534,7 @@
  
     (show-input-form 
         nil                   
-        "Personal Details"    
+        { :title "Personal Details" :cancel "Close" }    
         (javax.swing.JLabel. "Fill in your first and last name")
         (fn [model] (if (and (= (get model "First name") "John") (= (get model "Last name") "Doe")) "This name is not allowed" nil)) 
         { :name "First name" :value "[first name here]" :validator (fn [x] (if (zero? (count x)) "too short" nil)) }
@@ -539,14 +545,6 @@
 
 
 ; (net.sourceforge.waterfront.kit/main)
-
-
-
-
-
-
-
-
 
 
 
