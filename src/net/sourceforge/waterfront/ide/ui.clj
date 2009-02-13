@@ -226,6 +226,7 @@
 ; input-form: ESCAPE => Cancel, Return => OK
 ; Show a "search phrase not found" message
 ; run.clj depends on get-selected-text as a library function from another plugin. refactor into kit.clj
+; uncomment does not trigger on line evaluation
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -271,6 +272,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
