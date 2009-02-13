@@ -196,7 +196,9 @@
             (javax.swing.JLabel. "\n\n")
             (fn [model] nil)
             { :name "Find:" :value searches :validator (fn [x] (if (zero? (count x)) " " nil)) }
-            { :name "Replace with:" :value replacements :validator (fn [x] nil) })]
+            { :name "Replace with:" :value replacements :validator (fn [x] nil) }
+            { :name "Case sensitive" :value (get old-settings "Case sensitive") } 
+            { :name "Wrap search" :value (get old-settings "Wrap search") })]
         (if (not search-settings)
           nil
           (let [find-what (get search-settings "Find:")
@@ -217,6 +219,7 @@
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } 
     { :name "Replace" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_R :action replace-in-document  }))
+
 
 
 
