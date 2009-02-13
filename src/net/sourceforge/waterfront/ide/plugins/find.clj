@@ -67,10 +67,10 @@
         searches (if current-selection (new-recent-search-list app current-selection) (app :last-search))  
         search-settings (show-input-form 
             nil                   
-            { :title "Search" :ok "Find" :cancel "Close" }
+            { :title "Search" :ok "Find" :cancel "Close" :msg nil :width (old-settings :width) :height (old-settings :height) }
             nil   
             (fn [model] nil)
-            { :name "Find:" :value searches :validator (fn [x] (if (zero? (count x)) :bad nil)) }
+            { :name "Find:" :value searches :validator (fn [x] (if (zero? (count x)) "too short" nil)) }
             { :name "Case sensitive" :value (get old-settings "Case sensitive") } 
             { :name "Wrap search" :value (get old-settings "Wrap search") })
         search-result (if search-settings (get search-settings "Find:") nil)
@@ -90,5 +90,7 @@
     {}
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } ))
+
+
 
 

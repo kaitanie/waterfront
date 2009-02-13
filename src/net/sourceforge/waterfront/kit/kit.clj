@@ -33,9 +33,9 @@
 ; general purpose utilities
 
 (defn defaults-to [a b]
-  (if (nil? a)
-    b
-    a))
+  (if a
+    a
+    b))
 
 (defn includes [x coll]
   (if (or (nil? coll) (empty? coll))
@@ -259,6 +259,10 @@
          (* 2 nesting-level) 
          \space ))))
    
+(def str-compare
+  (proxy [java.util.Comparator] []
+    (compare [a b] (compare (str a) (str b))) ))
+
 (defn pretty-print-map 
   [m indent]  
   (str "{ "
@@ -274,7 +278,7 @@
               (pretty-print (second e) (inc indent)) 
               )))
         [] 
-        (sort m) ))
+        (sort str-compare m) ))
     (eol indent) "}" ))
 
 (defn pretty-print-vec 
@@ -366,7 +370,7 @@
     (set! (. result gridheight) row-span)
     (set! (. result weightx) (if fill-x? 1 0))
     (set! (. result weighty) (if fill-y? 1 0))
-    (set! (. result insets) (java.awt.Insets. 10 10 10 10))
+    (set! (. result insets) (java.awt.Insets. 3 10 3 15))
     (set! (. result anchor) java.awt.GridBagConstraints/LINE_START)
     (set! (. result fill) 
       (cond 
@@ -389,11 +393,20 @@
     (coll? default-value)
     (let [result (javax.swing.JComboBox. (into-array default-value))
           label (javax.swing.JLabel. name)]
+      (.setEditor result (javax.swing.plaf.basic.BasicComboBoxEditor.))
       (.add p label (new-grid-constraints 0 gy false))
       (.add p result (new-grid-constraints 1 gy true))
       (.setEditable result true)
+      (.addActionListener result 
+        (proxy [java.awt.event.ActionListener] []
+          (actionPerformed [e] (checker)) ))
+      (.. result (getEditor) (getEditorComponent) (getDocument) (addDocumentListener  
+        (proxy [javax.swing.event.DocumentListener] []
+          (changedUpdate [e] (checker))
+          (insertUpdate [e] (checker))
+          (removeUpdate [e] (checker)) )))
       (.. result (getEditor) (selectAll))
-      (fn [] (.getSelectedItem result)) )
+      (fn [] (.. result (getEditor) (getEditorComponent) (getText))) )
 
     (string? default-value)
     (let [result (javax.swing.JTextField. default-value)
@@ -435,9 +448,11 @@
   d )
 
 
+
 (defn show-input-form 
   "Display a modal dialog where the user can fill in fields (name-value pairs). Returns nil if the form's
    cancel button was clicked. Otherwise, returns a map which maps field names to their values.
+   The returned map also maps :width and :height to the form's width and height (respectively, in pixels).
    The initial value of each field (as specified by the fields argument) determines the widget
    that will be used to render this field: a check box for a boolean values, a combox box for a collection,
    a text field for a string.
@@ -446,6 +461,10 @@
                   :title - Dialog's title (\"\")
                   :ok - Text of the OK button (\"Ok\")
                   :cancel - Text of the cancel button (\"Cancel\")
+                  :msg - A widget on which status messages will be shown, or a nil. (JLabel)
+                  :width - Preferred width in pixel (200)
+                  :height - Preferred height in pixel (150)
+
    heading-widget - A widget to be placed at the dialog's upper part. May be nil.
    ok-condition - a function taking a map (in the same structure as the return value) describing the 
       form's current state. Should return nil if all form values are legal, at which case, the OK 
@@ -469,21 +488,23 @@
         { :name \"Has cats?\" :value false } )))"
       
   [#^javax.swing.JFrame owner user-props heading-widget ok-condition & fields]
-  (let [props (merge { :title "" :ok "Ok" :cancel "Cancel" } user-props)
+  (let [props (merge { :title "" :ok "Ok" :cancel "Cancel" :msg (javax.swing.JLabel.)} user-props)
         cancelled? (atom true)
         d (javax.swing.JDialog. owner true)
         upper-panel (javax.swing.JPanel.)
         button-panel (javax.swing.JPanel. (java.awt.FlowLayout. java.awt.FlowLayout/TRAILING))
         p (javax.swing.JPanel.)
-        msg (javax.swing.JLabel. " ")
-        first-row (if heading-widget 2 1)]
+        first-row (+ (if (props :msg) 1 0) (if heading-widget 1 0))]
     
     (.setTitle d (props :title))
     (.setLayout p (java.awt.GridBagLayout.))
     (when heading-widget
       (.add p heading-widget (new-grid-constraints 1 0 1 1 true false)) )
 
-    (.add p msg (new-grid-constraints 1 (dec first-row) 1 1 true false))
+    (when (props :msg)
+      (.add p (javax.swing.JLabel. " ") (new-grid-constraints 0 (dec first-row) 1 1 false false))
+      (.add p (props :msg) (new-grid-constraints 1 (dec first-row) 1 1 true false)))
+
     (.add p (javax.swing.JLabel.) (new-grid-constraints 0 (+ first-row (count fields)) 2 1 true true))
 
     (.add d button-panel java.awt.BorderLayout/SOUTH)
@@ -493,7 +514,7 @@
           ok-button (new-button (props :ok) (fn [] (swap! cancelled? (fn [x] false)) (.dispose d)))
           cancel-button (new-button (props :cancel) (fn [] (.dispose d))) 
           aux (fn [prefix s]
-            (if (= :bad s) " " (if s (str prefix s) nil)))
+            (if s " " (if s (str prefix s) nil)))
           checker (fn []
             (let [err-msg (reduce 
                             (fn [v c] (if v 
@@ -502,8 +523,9 @@
                             nil
                             @model-atom)
                   fail-msg (if err-msg err-msg (ok-condition (reduce (fn [v c] (assoc v (c :name) ((c :reader)))) {} @model-atom)))]
-              (.setText msg (if fail-msg fail-msg " "))
-              (.setEnabled ok-button (and (not err-msg) (not fail-msg))) )) 
+              (when (props :msg)
+                (.setText (props :msg) (if fail-msg fail-msg " ")) ) 
+              (.setEnabled ok-button (not fail-msg)) ))
          model (doall (map 
                   (fn[x y] 
                     (let [rdr (add-input-area checker p y (x :name) (x :value))]
@@ -519,12 +541,14 @@
       (add-escape-handler d (fn [d] (.doClick cancel-button)))
       (.. d (getRootPane) (setDefaultButton ok-button))
 
+      (when (or (props :width) (props :height))
+        (.setPreferredSize d (java.awt.Dimension. (defaults-to (props :width) 200) (defaults-to (props :height) 150))))
+
       (.pack d)
-      (.setSize d 500 300)
       (.show d true)
       (if @cancelled?
         nil
-        (reduce (fn [v c] (assoc v (c :name) ((c :reader)))) {} model) ))))
+        (reduce (fn [v c] (assoc v (c :name) ((c :reader)))) { :width (.getWidth d) :height (.getHeight d)} model) ))))
 
 
 (defn main []
@@ -534,17 +558,26 @@
  
     (show-input-form 
         nil                   
-        { :title "Personal Details" :cancel "Close" }    
+        { :title "Personal Details" :cancel "Close" }  
         (javax.swing.JLabel. "Fill in your first and last name")
         (fn [model] (if (and (= (get model "First name") "John") (= (get model "Last name") "Doe")) "This name is not allowed" nil)) 
+        { :name "Favorite Color" :value [ "Red" "Green" "Blue" ] :validator (fn [x] (if (zero? (count x)) "too short" nil)) }
         { :name "First name" :value "[first name here]" :validator (fn [x] (if (zero? (count x)) "too short" nil)) }
         { :name "Last name" :value "[last name here]" :validator (fn [x] (if (zero? (count x)) "too short" nil)) } 
-        { :name "Favorite Color" :value [ "Red" "Green" "Blue" ] }
         { :name "Has cats?" :value false } )))
 
 
 
 ; (net.sourceforge.waterfront.kit/main)
+
+
+
+
+
+
+
+
+
 
 
 
