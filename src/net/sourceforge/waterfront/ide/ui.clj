@@ -227,6 +227,10 @@
 ; Show a "search phrase not found" message
 ; run.clj depends on get-selected-text as a library function from another plugin. refactor into kit.clj
 ; uncomment does not trigger on line evaluation
+; revert should check if the current file is dirty
+; undo after replace-all erases the document and the pastes
+; undo after replace erases and then pastes
+; make undo less agressive
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -272,10 +276,6 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
-
-
-
-
 
 
 
