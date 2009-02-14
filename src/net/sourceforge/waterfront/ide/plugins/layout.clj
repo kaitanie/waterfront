@@ -88,7 +88,9 @@
   (.add sb indicator)
   (.add sb output-label)
 
-  (.setLayout lower-sb (java.awt.FlowLayout. java.awt.FlowLayout/LEFT 5 3))
+;  (.setLayout lower-sb (java.awt.FlowLayout. java.awt.FlowLayout/LEFT 5 0))
+  (.setLayout lower-sb (javax.swing.BoxLayout. lower-sb javax.swing.BoxLayout/LINE_AXIS))
+
   (.add (app :frame) lower-sb BorderLayout/SOUTH)
   
   (.add (app :frame) (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) 
@@ -112,6 +114,7 @@
       :indicator indicator
       :lower-status-bar lower-sb) 
     layout-observer) ))
+
 
 
 

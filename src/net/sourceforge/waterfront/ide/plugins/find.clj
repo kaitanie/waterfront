@@ -9,6 +9,9 @@
 (refer 'net.sourceforge.waterfront.ide.services)
 
 
+(defn- set-find-status [app found?]
+  (assoc app :find-status (if found? "" "String not found")) )
+
 (defn get-selected-text [app result-if-selection-empty]
   (test (not (nil? app))) 
   (let [t (.getSelectedText (app :area))]
@@ -68,10 +71,10 @@
 
 (defn- scroll-to [app offset-length]
   (if (nil? offset-length)
-    app
+    (set-find-status app false)
     (do 
       (select-and-scroll-to (app :area) (first offset-length) (second offset-length))
-      app )))
+      (set-find-status app true) )))
 
 (defn find-next [app]      
   (scroll-to app (find-next-offset app)) )
@@ -141,7 +144,6 @@
       (.setText (app :area) (str sb)) )))
       
     
-  
  
 (defn- replace-loop 
   ([app]
@@ -157,7 +159,7 @@
   (let [reinvoke (fn [] ((app :later) (fn [app] (replace-loop app finder fix-case find-what replace-with))))
         offset-length (finder app (.getSelectionEnd (app :area)))]
       (if (nil? offset-length)
-        app
+        (set-find-status app false)
         (do
           (scroll-to app offset-length)
           (let [replace-with (get (app :search-settings) "Replace with:")
@@ -213,12 +215,15 @@
   (add-to-menu 
     (load-plugin 
       (assoc app :keys-to-save  (apply vector (distinct (cons :last-replace-with (cons :search-settings (app :keys-to-save))))))
-      "menu-observer.clj") 
+      "menu-observer.clj" "find-indicator.clj") 
     "Edit" 
     {}
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } 
     { :name "Replace" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_R :action replace-in-document  }))
+
+
+
 
 
 

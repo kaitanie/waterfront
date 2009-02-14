@@ -32,6 +32,7 @@
     "undo.clj"
     "basic-editing.clj"
     "goto.clj"
+    "line-column.clj"
     "find.clj"
     "comments.clj"
     "show-doc.clj"
@@ -43,7 +44,6 @@
     "indent.clj"
     "load-recent-on-startup.clj"
     "check-syntax-online.clj"
-    "line-column.clj"
     "templates.clj"
     "auto-complete.clj"]
   :recent-files []
