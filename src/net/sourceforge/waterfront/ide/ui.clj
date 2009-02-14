@@ -172,21 +172,16 @@
 
 ; different thread for execution
 ; stop running button
-; click on error -> jump to location
 ; ns, line numbers in error messages
 ; syntax coloring
-; replace
 ; highlight current line
 ; scrapbook
 ; syntax checking also on selected text
 ; fix line numbers when running/syntax checking selected text
 ; View menu: show Output window, show Prolbems window
 ; jump to matching paren
-; make undo/redo/copy/cut/paste/jump-to-matching enabled only when applicable
-; recent searches drop box
 ; incremental search
 ; eval just like in REPL
-; bug: (count (replicate 100 \a))
 ; multi-tab editor
 ; reformat source
 ; jump to decl.
@@ -216,21 +211,26 @@
 ;     Then filter out non-context actions and put them in a context menu.
 ; Use a line-by-line syntax coloring ?!
 ; bug: focus jump to other window when searching, with multiple Waterfront windows
-; smart proxy generation (generate names, signatures of methods) + check correct spelling of super-types
-; Find: cyclic, lower-case
-; Replace
-; menu items should be disabled (undo, redo) when action is not applicable
-; surround with try catch
-; gen. overloading: ask arities, generate forwarding
-; proxy: gen method names
-; input-form: ESCAPE => Cancel, Return => OK
-; Show a "search phrase not found" message
 ; run.clj depends on get-selected-text as a library function from another plugin. refactor into kit.clj
-; uncomment does not trigger on line evaluation
-; revert should check if the current file is dirty
-; undo after replace-all erases the document and the pastes
-; undo after replace erases and then pastes
-; make undo less agressive
+
+
+; Least important -->
+;
+; (13) uncomment does not trigger on line evaluation
+; (12) surround with try catch
+; (11) gen. overloading: ask arities, generate forwarding
+; (10) Red marker on the errorneus line (line-number pane)
+;  (9) Red markers on syntax errors
+;  (8) Allow the user to disable on-line evaluation
+;  (7) menu items should be disabled (undo, redo) when action is not applicable
+;  (6) undo after replace-all erases the document and the pastes
+;  (5) undo after replace erases and then pastes
+;  (4) proxy: gen method names
+;  (3) click on error -> jump to location
+;  (2) make undo less agressive
+;  (1) Mnemonics on buttons of forms
+;
+; <-- Most important
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -264,6 +264,11 @@
 ; 10-Feb-09: Bug fix: Updating of the Line-Col indicator in response to searching/jumping to an error
 ; 10-Feb-09: Asks whether to Save a dirty file before openning a file
 ; 12-Feb-09: New search options: cyclic, case sensitive
+; 12-Feb-09: Input-form: ESCAPE => Cancel, Return => OK
+; 13-Feb-09: Search box shows a combo-box with search history
+; 14-Feb-09: Replace
+; 14-Feb-09: Show a "phrase not found" message
+; 14-Feb-09: Opens a "Discard changes?" dialog when reverting a dirty file
 
 ; Highlights:
 ;
@@ -276,6 +281,10 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
+
+
 
 
 

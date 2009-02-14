@@ -68,15 +68,17 @@
    new-app )))
      
 
+
+
 (defn save-and-or-do-something [app do-something]
   (if (not (is-dirty app))
     (do-something app)
     (let [file-name (if (unknown-document? app) 
                           "Unnamed" 
                           (.getName (get-current-document app)))
-          reply (. JOptionPane showOptionDialog (app :frame)
+          reply (JOptionPane/showOptionDialog (app :frame)
                     (str "'" file-name "' has been modified. Save changes?")
-                    "Save File" (. JOptionPane YES_NO_CANCEL_OPTION) JOptionPane/QUESTION_MESSAGE, nil, (to-array ["Yes" "No" "Cancel"]), "Cancel"  )
+                    "Save File" JOptionPane/YES_NO_CANCEL_OPTION JOptionPane/QUESTION_MESSAGE, nil, (to-array ["Yes" "No" "Cancel"]), "Cancel"  )
           temp (if (= reply 0) ; Save! 
             (save-now app) 
             app)]
@@ -108,7 +110,24 @@
   (save-and-or-do-something app close-main-window) )
 
 (defn- revert [app]
-  (load-document app))
+  (if (not (is-dirty app))
+    (load-document app)
+    (let [file-name (if (unknown-document? app) 
+                          "Unnamed" 
+                          (.getName (get-current-document app)))
+          reply (javax.swing.JOptionPane/showOptionDialog 
+                  nil
+                  "You have unsaved changes. Do you want to discard them?" 
+                  "Revert File" 
+                  javax.swing.JOptionPane/YES_NO_OPTION 
+                  javax.swing.JOptionPane/QUESTION_MESSAGE
+                  nil 
+                  (to-array ["Discard changes" "Cancel"]) 
+                  "Cancel"  )]
+          (if (= reply 0) ; Discard! 
+            (load-document app)
+            app ))))
+
 
 (defn add-file-menu [app]
   (add-to-menu app "File" 
@@ -144,6 +163,8 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
+
 
 
 
