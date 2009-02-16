@@ -119,7 +119,6 @@
     (atom-assoc a :entrance 0)
     result ))
     
-
 (defn- build-context [fallback-context a] 
   (let [default-config { 
           :x0 100
@@ -142,7 +141,8 @@
             { :name "View" :mnemonic KeyEvent/VK_V :children []}]
           :actions {}
           :eval-count 1 }
-        result (merge default-config (read-stored-config fallback-context) a overriding-config) ]
+        temp (merge default-config (read-stored-config fallback-context) a overriding-config) 
+        result temp]
       result ))
 
 ; main function
@@ -162,6 +162,11 @@
     (dispatch (fn[x] (apply (eval (app :startup)) (list app))) "bootstrap" {}) ))
   
 
+(defn- new-log-file []
+  (let [t (java.io.File/createTempFile "wfr" ".log")]
+    (.deleteOnExit t)
+    (java.io.PrintWriter. (java.io.FileWriter. t) true) ))
+
 (defn launch-waterfront [argv fallback-context]
     (later (fn []
       (try 
@@ -179,7 +184,7 @@
               m (if file-to-load 
                   { :file-name-to-load (.getAbsolutePath file-to-load) }
                   {} )]
-          (new-waterfront-window fallback-context (merge { :window-counter (atom 0) :title-prefix "" } m)))
+          (new-waterfront-window fallback-context (merge { :window-counter (atom 0) :log (new-log-file) :title-prefix "" } m)))
         (catch Throwable t (.printStackTrace t)) ))))
 
 ; different thread for execution
@@ -238,7 +243,7 @@
 ;   (9) Red markers on syntax errors
 ;   (6) undo after replace-all erases the document and the pastes
 ;   (5) undo after replace erases and then pastes
-;  (14) Write to log
+; +(14) Write to log
 ; +(16) Command line args
 ;   (8) Allow the user to disable on-line evaluation
 ;   (7) menu items should be disabled (undo, redo) when action is not applicable
@@ -292,6 +297,7 @@
 ; 16-Feb-09: Syntax error (problem window) are now double-clickable: jumps to corresponding line
 ; 16-Feb-09: File chooser uses *.clj by default
 ; 16-Feb-09: Loads a file from the command line (if specified)
+; 16-Feb-09: Diagnostic messages are written to (app :log)
 
 ; Highlights:
 ;
@@ -304,6 +310,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

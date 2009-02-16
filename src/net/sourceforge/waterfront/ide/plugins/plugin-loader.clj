@@ -13,7 +13,7 @@
   (if (includes curr-plugin-name (app :loaded-plugins))
     app
     (let [depth (if (app :loading-depth) (app :loading-depth) 0)]
-      (println (str (apply str (replicate (* 3 depth) \space)) "- " curr-plugin-name))
+      (.println (app :log) (print-str (str (apply str (replicate (* 3 depth) \space)) "- " curr-plugin-name)))
       (let [
           temp-app (assoc app :loading-depth (inc depth) :loaded-plugins (conj (app :loaded-plugins) curr-plugin-name))
           curr-plugin-path (str (temp-app :plugin-path) curr-plugin-name)
@@ -24,7 +24,7 @@
 (defn plugin-observer [old-app new-app] 
   (let [to-load (remove-all (new-app :plugins) (new-app :loaded-plugins) [])]
     (when (pos? (count to-load))
-      (println "Loading plugins:") )
+      (.println (new-app :log) "Loading plugins:") )
     (reduce 
       (fn [curr-app curr-plugin-name] (load-plugin-impl curr-app curr-plugin-name))
       new-app 
@@ -33,6 +33,7 @@
 (fn [app] 
   (transform (assoc app :loaded-plugins [] :load-plugin load-plugin-impl) :observers []
     (fn[observers] (cons plugin-observer observers)) ))
+
 
 
 

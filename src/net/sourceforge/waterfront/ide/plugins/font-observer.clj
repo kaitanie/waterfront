@@ -6,18 +6,18 @@
 
 
 
-(defn- set-font [f widget]
+(defn- set-font [app f widget]
   (try 
-    (println "Setting font of " (class widget) " to " (.getName f))
+    (.println (app :log) (print-str "Setting font of " (class widget) " to " (.getName f)))
     (.setFont widget f)
     (catch Throwable e (.printStackTrace e))))
 
 (defn- set-fonts [app]
   (let [f (java.awt.Font. (app :font-name) (app :font-style) (app :font-size))]
-    (println "New font detected:" (select-keys app [:font-name :font-style :font-size]))
-    (set-font f (app :output-area))
-    (set-font f (app :area))
-    (set-font f (app :doc-area))
+    (.println (app :log) (print-str "New font detected:" (select-keys app [:font-name :font-style :font-size])))
+    (set-font app f (app :output-area))
+    (set-font app f (app :area))
+    (set-font app f (app :doc-area))
     (let [sas (javax.swing.text.SimpleAttributeSet.)
           is-on (fn [a b] (if (zero? (bit-and a b)) false true))]
       (javax.swing.text.StyleConstants/setFontFamily sas (app :font-name))
@@ -36,5 +36,6 @@
 
 (fn [app] 
     (add-observers app update-font) )
+
 
 

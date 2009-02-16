@@ -41,7 +41,7 @@
 (def save-directly (fn [app]
  (let [text (.getText (app :area))]                          
    (assert (not (unknown-document? app)))
-   (println "saving to" (get-current-document app))
+   (.println (app :log) (print-str "saving to" (get-current-document app)))
    (write-file text (get-current-document app))
    (assoc app :initial-text text) )))
  
@@ -102,6 +102,8 @@
   (save-config app)
   (.dispose (app :frame)) 
   (when (zero? (swap! (app :window-counter) dec))
+    (try (.close (app :log))
+      (catch Throwable t )) ; ignore failures in shutdown
     (System/exit 0) )
   app ) 
 
@@ -167,6 +169,9 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
+
+
 
 
 
