@@ -1,6 +1,5 @@
 (ns net.sourceforge.waterfront.ide)
 
-
 (import 
   '(javax.swing JFrame JLabel JScrollPane JTextField JButton JTextArea UIManager JMenuItem JMenu JMenuBar)
   '(javax.swing JPopupMenu KeyStroke JSplitPane JOptionPane)
@@ -213,9 +212,11 @@
 ; bug: focus jump to other window when searching, with multiple Waterfront windows
 ; run.clj depends on get-selected-text as a library function from another plugin. refactor into kit.clj
 
+; Add "run expression" history to the run menu
+; In proxy generation dialog: no need to proivde at least one interface (if a class is specified)
 
 ; Least important -->
-;
+; (14) Write to log
 ; (13) uncomment does not trigger on line evaluation
 ; (12) surround with try catch
 ; (11) gen. overloading: ask arities, generate forwarding
@@ -229,7 +230,7 @@
 ;  (3) click on error -> jump to location
 ;  (2) make undo less agressive
 ;  (1) Mnemonics on buttons of forms
-;
+;  (0) Font issue
 ; <-- Most important
 
 ; 28-Dec-08: plugins (setup function)
@@ -269,6 +270,7 @@
 ; 14-Feb-09: Replace
 ; 14-Feb-09: Show a "phrase not found" message
 ; 14-Feb-09: Opens a "Discard changes?" dialog when reverting a dirty file
+; 15-Feb-09: Smart proxy generation (generates methods signatures based on user-supplied super types)
 
 ; Highlights:
 ;
@@ -281,6 +283,10 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
+
+
 
 
 

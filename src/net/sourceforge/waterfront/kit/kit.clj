@@ -37,6 +37,54 @@
     a
     b))
 
+
+(defn get-num-occurences
+  { :test (fn []
+      (assert-eq 0 (get-num-occurences \a [\b]))
+      (assert-eq 1 (get-num-occurences \a [\a]))
+      (assert-eq 1 (get-num-occurences \a [\a \b]))
+      (assert-eq 1 (get-num-occurences \b [\a \b]))
+      (assert-eq 1 (get-num-occurences \b [\a \a \b]))
+      (assert-eq 2 (get-num-occurences \a [\a \a \b]))
+      (assert-eq 0 (get-num-occurences \a []))
+      (assert-eq 0 (get-num-occurences \a nil)) )}
+  ([element coll]
+  (get-num-occurences element coll 0))
+  
+  ([element coll result]
+  (cond
+    (empty? coll)
+    result
+
+    (= (first coll) element)
+    (recur element (rest coll) (inc result))
+
+    :else
+    (recur element (rest coll) result) )))
+
+(test (var get-num-occurences))
+
+
+(defn get-duplicates
+  { :test (fn []
+      (assert-eq [\b \a] (get-duplicates [\c \b \a \a \b]))
+      (assert-eq [\a \b] (get-duplicates [\c \a \b \a \b]))
+      (assert-eq [\a \b] (get-duplicates [\a \b \c \a \b]))
+      (assert-eq [\b] (get-duplicates [\a \b \b]))
+      (assert-eq [\a] (get-duplicates [\a \b \a]))
+      (assert-eq nil (get-duplicates [\a \b]))
+      (assert-eq nil (get-duplicates [\a]))
+      (assert-eq nil (get-duplicates [])) 
+)}
+  [coll]
+  (if (empty? coll)
+    nil
+    (distinct(filter (fn [x] (> (get-num-occurences x coll) 1)) coll)) ))
+
+
+
+(test (var get-duplicates))
+
 (defn includes [x coll]
   (if (or (nil? coll) (empty? coll))
     false 
@@ -391,41 +439,44 @@
 (defn- add-input-area [checker p gy name default-value]
   (cond
     (coll? default-value)
-    (let [result (javax.swing.JComboBox. (into-array default-value))
+    (let [widget (javax.swing.JComboBox. (into-array default-value))
+          result (fn [] (.. widget (getEditor) (getEditorComponent) (getText)))
           label (javax.swing.JLabel. name)]
-      (.setEditor result (javax.swing.plaf.basic.BasicComboBoxEditor.))
+      (.setEditor widget (javax.swing.plaf.basic.BasicComboBoxEditor.))
       (.add p label (new-grid-constraints 0 gy false))
-      (.add p result (new-grid-constraints 1 gy true))
-      (.setEditable result true)
-      (.addActionListener result 
+      (.add p widget (new-grid-constraints 1 gy true))
+      (.setEditable widget true)
+      (.addActionListener widget 
         (proxy [java.awt.event.ActionListener] []
           (actionPerformed [e] (checker)) ))
-      (.. result (getEditor) (getEditorComponent) (getDocument) (addDocumentListener  
+      (.. widget (getEditor) (getEditorComponent) (getDocument) (addDocumentListener  
         (proxy [javax.swing.event.DocumentListener] []
           (changedUpdate [e] (checker))
           (insertUpdate [e] (checker))
           (removeUpdate [e] (checker)) )))
-      (.. result (getEditor) (selectAll))
-      (fn [] (.. result (getEditor) (getEditorComponent) (getText))) )
+      (.. widget (getEditor) (selectAll))
+      result )
 
     (string? default-value)
-    (let [result (javax.swing.JTextField. default-value)
+    (let [widget (javax.swing.JTextField. default-value)
+          result (fn [] (.getText widget))
           label (javax.swing.JLabel. name)]
       (.add p label (new-grid-constraints 0 gy false))
-      (.add p result (new-grid-constraints 1 gy true))
-      (.addDocumentListener (.getDocument result)
+      (.add p widget (new-grid-constraints 1 gy true))
+      (.addDocumentListener (.getDocument widget)
         (proxy [javax.swing.event.DocumentListener] []
           (changedUpdate [e] (checker))
           (insertUpdate [e] (checker))
           (removeUpdate [e] (checker)) ))
-      (.selectAll result)
-      (fn [] (.getText result)) )
+      (.selectAll widget)
+      result )
 
     :else
-    (let [result (javax.swing.JCheckBox. name)]
-      (.add p result (new-grid-constraints 1 gy true))
-      (.setSelected result (if default-value true false))
-      (fn [] (.isSelected result)) )))
+    (let [widget (javax.swing.JCheckBox. name)
+          result (fn [] (.isSelected widget))]
+      (.add p widget (new-grid-constraints 1 gy true))
+      (.setSelected widget (if default-value true false))
+      result )))
         
 (defn- new-button [title action]
   (let [result (javax.swing.JButton. title)]
@@ -514,7 +565,7 @@
           ok-button (new-button (props :ok) (fn [] (swap! cancelled? (fn [x] false)) (.dispose d)))
           cancel-button (new-button (props :cancel) (fn [] (.dispose d))) 
           aux (fn [prefix s]
-            (if s " " (if s (str prefix s) nil)))
+            (if s (str prefix s) nil))
           checker (fn []
             (let [err-msg (reduce 
                             (fn [v c] (if v 
@@ -526,10 +577,12 @@
               (when (props :msg)
                 (.setText (props :msg) (if fail-msg fail-msg " ")) ) 
               (.setEnabled ok-button (not fail-msg)) ))
-         model (doall (map 
+         
+          model (doall (map 
                   (fn[x y] 
-                    (let [rdr (add-input-area checker p y (x :name) (x :value))]
-                      (merge { :validator (fn [x] nil) } (assoc x :row y :reader rdr)) )) 
+                    (let [v (defaults-to (x :validator) (fn [arg] nil))
+                          rdr (add-input-area checker p y (x :name) (x :value))]
+                      (assoc x :row y :reader rdr :validator v)) ) 
                   fields 
                   (iterate inc first-row)))]
 
@@ -544,6 +597,7 @@
       (when (or (props :width) (props :height))
         (.setPreferredSize d (java.awt.Dimension. (defaults-to (props :width) 200) (defaults-to (props :height) 150))))
 
+      (checker)
       (.pack d)
       (.show d true)
       (if @cancelled?
@@ -559,7 +613,7 @@
     (show-input-form 
         nil                   
         { :title "Personal Details" :cancel "Close" }  
-        (javax.swing.JLabel. "Fill in your first and last name")
+        (javax.swing.JLabel. "Fill in your personal details")
         (fn [model] (if (and (= (get model "First name") "John") (= (get model "Last name") "Doe")) "This name is not allowed" nil)) 
         { :name "Favorite Color" :value [ "Red" "Green" "Blue" ] :validator (fn [x] (if (zero? (count x)) "too short" nil)) }
         { :name "First name" :value "[first name here]" :validator (fn [x] (if (zero? (count x)) "too short" nil)) }
@@ -569,15 +623,4 @@
 
 
 ; (net.sourceforge.waterfront.kit/main)
-
-
-
-
-
-
-
-
-
-
-
 
