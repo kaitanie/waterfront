@@ -228,7 +228,7 @@
 ;   (5) undo after replace erases and then pastes
 ; + (4) proxy: gen method names
 ;   (3) click on error -> jump to location
-;   (2) make undo less agressive
+; + (2) make undo less agressive
 ; + (1) Mnemonics on buttons of forms
 ; ? (0) Font issue
 ; <-- Most important
@@ -285,6 +285,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
