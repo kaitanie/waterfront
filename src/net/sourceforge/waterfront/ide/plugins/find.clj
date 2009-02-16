@@ -97,7 +97,7 @@
 
         searches (new-recent-list app :last-search current-selection)
         search-settings (show-input-form 
-            nil                   
+            (app :frame)                   
             { :title "Find" :ok "Find" :cancel "Close" :msg nil :width (old-settings :width) :height (old-settings :height) }
             (javax.swing.JLabel. "\n\n")
             (fn [model] nil)
@@ -193,7 +193,7 @@
         searches (new-recent-list app :last-search current-selection)
         replacements (new-recent-list app :last-replace-with nil)
         search-settings (show-input-form 
-            nil                   
+            (app :frame)                   
             { :title "Replace" :ok "Replace..." :cancel "Close" :width (old-settings :width) :height (old-settings :height) }
             (javax.swing.JLabel. "\n\n")
             (fn [model] nil)
@@ -221,6 +221,7 @@
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } 
     { :name "Replace" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_R :action replace-in-document  }))
+
 
 
 

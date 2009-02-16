@@ -598,6 +598,7 @@
         (.setPreferredSize d (java.awt.Dimension. (defaults-to (props :width) 200) (defaults-to (props :height) 150))))
 
       (checker)
+      (.setLocationRelativeTo d owner)
       (.pack d)
       (.show d true)
       (if @cancelled?
@@ -623,4 +624,5 @@
 
 
 ; (net.sourceforge.waterfront.kit/main)
+
 

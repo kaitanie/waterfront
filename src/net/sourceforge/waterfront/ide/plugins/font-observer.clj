@@ -17,29 +17,24 @@
     (println "New font detected:" (select-keys app [:font-name :font-style :font-size]))
     (set-font f (app :problem-window))
     (set-font f (app :output-area))
-    (set-font f (app :area)) 
+    (set-font f (app :area))
     (set-font f (app :doc-area))
+    (let [sas (javax.swing.text.SimpleAttributeSet.)
+          is-on (fn [a b] (if (zero? (bit-and a b)) false true))]
+      (javax.swing.text.StyleConstants/setFontFamily sas (app :font-name))
+      (javax.swing.text.StyleConstants/setFontSize sas (app :font-size))
+      (javax.swing.text.StyleConstants/setBold sas (is-on java.awt.Font/BOLD (app :font-style)))
+      (javax.swing.text.StyleConstants/setItalic sas (is-on java.awt.Font/ITALIC (app :font-style)))
+      (.setParagraphAttributes (app :area) sas true))
     (assoc app :active-font f) ))
 
  
-(defn- check-active-font [app]
-  (let [f (.getFont (app :area))]
-    (when (and (app :active-font) (not= f (app :active-font)))
-      (set-font (app :active-font) (app :area))
-      (println "         $$$$$$$$$  That's it $$$$$$$$$$$$$$$") )
-    app ))
-
-      
-(defn update-font [old-app new-app]
+(defn- update-font [old-app new-app]
   (if (or 
         (not (new-app :font-assigned)) 
         (maps-differ-on old-app new-app :font-size :font-name :font-style :area))
-      (assoc ((new-app :enqueue) new-app set-fonts) :font-assigned true)
-      (check-active-font new-app )))
-
+      (assoc ((new-app :enqueue) new-app set-fonts) :font-assigned true) ))
 
 (fn [app] 
     (add-observers app update-font) )
-
-
 

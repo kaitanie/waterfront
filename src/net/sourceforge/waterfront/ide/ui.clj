@@ -216,21 +216,21 @@
 ; In proxy generation dialog: no need to proivde at least one interface (if a class is specified)
 
 ; Least important -->
-; (14) Write to log
-; (13) uncomment does not trigger on line evaluation
-; (12) surround with try catch
-; (11) gen. overloading: ask arities, generate forwarding
-; (10) Red marker on the errorneus line (line-number pane)
-;  (9) Red markers on syntax errors
-;  (8) Allow the user to disable on-line evaluation
-;  (7) menu items should be disabled (undo, redo) when action is not applicable
-;  (6) undo after replace-all erases the document and the pastes
-;  (5) undo after replace erases and then pastes
-;  (4) proxy: gen method names
-;  (3) click on error -> jump to location
-;  (2) make undo less agressive
-;  (1) Mnemonics on buttons of forms
-;  (0) Font issue
+;  (14) Write to log
+;  (13) uncomment does not trigger on line evaluation
+;  (12) surround with try catch
+;  (11) gen. overloading: ask arities, generate forwarding
+;  (10) Red marker on the errorneus line (line-number pane)
+;   (9) Red markers on syntax errors
+;   (8) Allow the user to disable on-line evaluation
+;   (7) menu items should be disabled (undo, redo) when action is not applicable
+;   (6) undo after replace-all erases the document and the pastes
+;   (5) undo after replace erases and then pastes
+; + (4) proxy: gen method names
+;   (3) click on error -> jump to location
+;   (2) make undo less agressive
+;   (1) Mnemonics on buttons of forms
+; ? (0) Font issue
 ; <-- Most important
 
 ; 28-Dec-08: plugins (setup function)
@@ -271,6 +271,8 @@
 ; 14-Feb-09: Show a "phrase not found" message
 ; 14-Feb-09: Opens a "Discard changes?" dialog when reverting a dirty file
 ; 15-Feb-09: Smart proxy generation (generates methods signatures based on user-supplied super types)
+; 16-Feb-09: A form dialog (e.g.: Find dialog) is now placed relative its owner
+; 16-Feb-09: Uses setParagraphAttributes for setting the font of the editor pane
 
 ; Highlights:
 ;
@@ -283,6 +285,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
