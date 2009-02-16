@@ -214,10 +214,11 @@
 
 ; Add "run expression" history to the run menu
 ; In proxy generation dialog: no need to proivde at least one interface (if a class is specified)
+; New proxy wizard: choose which ctor (of super-class) to call. Choose which methods you want to override
 
 ; Least important -->
 ;  (16) Command line args
-;  (15) File chooser should show *.clj files by default
+; +(15) File chooser should show *.clj files by default
 ;  (14) Write to log
 ;  (13) uncomment does not trigger on line evaluation
 ;  (12) surround with try catch
@@ -276,6 +277,7 @@
 ; 16-Feb-09: A form dialog (e.g.: Find dialog) is now placed relative its owner
 ; 16-Feb-09: Uses setParagraphAttributes for setting the font of the editor pane
 ; 16-Feb-09: Syntax error (problem window) are now double-clickable: jumps to corresponding line
+; 16-Feb-09: File chooser uses *.clj by default
 
 ; Highlights:
 ;
@@ -288,6 +290,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 

@@ -143,9 +143,13 @@
     {}
     { :name "Exit" :mnemonic KeyEvent/VK_X :action exit-application } ))
 
-
 (defn add-chooser [app]
-  (assoc app :file-chooser (javax.swing.JFileChooser. (. System getProperty "user.dir"))) )
+  (let [chooser (javax.swing.JFileChooser. (. System getProperty "user.dir"))
+        filter (proxy [javax.swing.filechooser.FileFilter] []
+                  (accept [#^java.io.File f] (and f (or (.isDirectory f) (.. f (getName) (toLowerCase) (endsWith ".clj")))))
+                  (getDescription [] "Clojure (*.clj)"))]
+    (.setFileFilter chooser filter) 
+    (assoc app :file-chooser chooser) ))
 
 (defn update-title [old-app, app]
   (.setTitle (app :frame)
@@ -163,6 +167,9 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
+
+
 
 
 
