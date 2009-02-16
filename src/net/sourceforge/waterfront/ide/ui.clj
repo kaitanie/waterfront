@@ -162,11 +162,24 @@
     (dispatch (fn[x] (apply (eval (app :startup)) (list app))) "bootstrap" {}) ))
   
 
-(defn launch-waterfront [fallback-context]
+(defn launch-waterfront [argv fallback-context]
     (later (fn []
       (try 
-        (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
-        (new-waterfront-window fallback-context { :window-counter (atom 0) :title-prefix ""})
+
+        (try (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
+          (catch Exception e nil) ) ;Intentionally ignore look & feel failure
+
+        (let [file-to-load 
+                (if (empty? argv)
+                      nil
+                      (let [f (.getAbsoluteFile (java.io.File. (first argv)))]
+                        (if (.exists f)
+                          f
+                          nil)))
+              m (if file-to-load 
+                  { :file-name-to-load (.getAbsolutePath file-to-load) }
+                  {} )]
+          (new-waterfront-window fallback-context (merge { :window-counter (atom 0) :title-prefix "" } m)))
         (catch Throwable t (.printStackTrace t)) ))))
 
 ; different thread for execution
@@ -217,18 +230,18 @@
 ; New proxy wizard: choose which ctor (of super-class) to call. Choose which methods you want to override
 
 ; Least important -->
-;  (16) Command line args
-; +(15) File chooser should show *.clj files by default
-;  (14) Write to log
-;  (13) uncomment does not trigger on line evaluation
 ;  (12) surround with try catch
 ;  (11) gen. overloading: ask arities, generate forwarding
+; +(15) File chooser should show *.clj files by default
+;  (13) uncomment does not trigger on line evaluation
 ;  (10) Red marker on the errorneus line (line-number pane)
 ;   (9) Red markers on syntax errors
-;   (8) Allow the user to disable on-line evaluation
-;   (7) menu items should be disabled (undo, redo) when action is not applicable
 ;   (6) undo after replace-all erases the document and the pastes
 ;   (5) undo after replace erases and then pastes
+;  (14) Write to log
+; +(16) Command line args
+;   (8) Allow the user to disable on-line evaluation
+;   (7) menu items should be disabled (undo, redo) when action is not applicable
 ; + (4) proxy: gen method names
 ; + (3) click on error -> jump to location
 ; + (2) make undo less agressive
@@ -278,6 +291,7 @@
 ; 16-Feb-09: Uses setParagraphAttributes for setting the font of the editor pane
 ; 16-Feb-09: Syntax error (problem window) are now double-clickable: jumps to corresponding line
 ; 16-Feb-09: File chooser uses *.clj by default
+; 16-Feb-09: Loads a file from the command line (if specified)
 
 ; Highlights:
 ;
@@ -290,19 +304,6 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

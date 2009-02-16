@@ -5,7 +5,7 @@
 (require 'net.sourceforge.waterfront.kit.kit)
 
 
-(net.sourceforge.waterfront.kit/later net.sourceforge.waterfront.ide/launch-waterfront { 
+(net.sourceforge.waterfront.kit/later net.sourceforge.waterfront.ide/launch-waterfront *command-line-args* { 
   :font-name "Courier New"
   :font-size 16
   :font-style 0
