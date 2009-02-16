@@ -9,7 +9,7 @@
   :font-name "Courier New"
   :font-size 16
   :font-style 0
-  :ignore []
+  :ignore ["syntax-coloring.clj"]
   :keys-to-save [
     :keys-to-save
     :plugin-path
@@ -38,7 +38,6 @@
     "show-doc.clj"
     "check-syntax.clj"
     "run.clj"
-    "syntax-coloring.clj"
     "paren-matching.clj"
     "font-size.clj"
     "indent.clj"

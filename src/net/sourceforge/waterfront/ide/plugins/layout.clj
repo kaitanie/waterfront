@@ -88,15 +88,12 @@
   (.add sb indicator)
   (.add sb output-label)
 
-;  (.setLayout lower-sb (java.awt.FlowLayout. java.awt.FlowLayout/LEFT 5 0))
   (.setLayout lower-sb (javax.swing.BoxLayout. lower-sb javax.swing.BoxLayout/LINE_AXIS))
 
   (.add (app :frame) lower-sb BorderLayout/SOUTH)
   
   (.add (app :frame) (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) 
                                   (lnp-widgets :composite)
-;                                  (doto (lnp-widgets :composite)
-;                                    (.setPreferredSize (java.awt.Dimension. 300 300)))
                                   (doto (javax.swing.JPanel.)
                                     (.setLayout (BorderLayout.))
                                     (.add sb BorderLayout/NORTH)
@@ -114,6 +111,7 @@
       :indicator indicator
       :lower-status-bar lower-sb) 
     layout-observer) ))
+
 
 
 

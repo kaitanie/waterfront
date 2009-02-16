@@ -15,7 +15,6 @@
 (defn- set-fonts [app]
   (let [f (java.awt.Font. (app :font-name) (app :font-style) (app :font-size))]
     (println "New font detected:" (select-keys app [:font-name :font-style :font-size]))
-    (set-font f (app :problem-window))
     (set-font f (app :output-area))
     (set-font f (app :area))
     (set-font f (app :doc-area))
@@ -37,4 +36,5 @@
 
 (fn [app] 
     (add-observers app update-font) )
+
 

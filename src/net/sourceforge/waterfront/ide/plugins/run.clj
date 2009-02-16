@@ -1,4 +1,5 @@
 
+
 (def *app* {})
 
 (ns net.sourceforge.waterfront.ide.plugins)
@@ -61,13 +62,18 @@
                     clojure.lang.Compiler/SOURCE_PATH (.getAbsolutePath src-file),
                     clojure.lang.RT/CURRENT_NS (.get clojure.lang.RT/CURRENT_NS) })
                 (eval-objects app (read-objects-from-file (.getAbsolutePath src-file))) 
-                (list (str stream) nil)
+                (str stream)
                 (catch Exception e 
                   (println e) 
-                  (list (str stream) e) )
+                  (.printStackTrace e print-writer)
+                  (str stream) )
                 (finally (.delete src-file) (. clojure.lang.Var popThreadBindings))  )))))
 
 
+(defn- add-output [output app]
+  (if output
+    (assoc app :output-text output)
+    app ))
 
 (fn [app] 
   (let [a (atom {})
@@ -77,16 +83,16 @@
                           (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
                           (let [t0 (. System currentTimeMillis) 
                                 sel-text (get-selected-text app (.getText (app :area)))
-                                syntax-problems (find-syntax-errors "" sel-text)
-                                output-and-errors 
-                                  (if (empty? syntax-problems) 
-                                    (run-program (assoc app :change change-func) sel-text) 
-                                    (list "" syntax-problems))]
-                            (assoc (merge app @a)
+                                output (run-program (assoc app :change change-func) sel-text)]
+                            (add-output output (assoc (merge app @a)
                               :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
-                              :output-text (first output-and-errors)
-                              :problems (second output-and-errors)
-                              :eval-count (inc (app :eval-count) )))) })))
+                              :output output 
+                              :eval-count (inc (app :eval-count) ))))) })))
+
+
+
+
+
 
 
 

@@ -12,7 +12,7 @@
 
 
 (defn- update-output [w old-app new-app]
-  (when (maps-differ-on old-app new-app :output-text)
+  (when (maps-differ-on old-app new-app :output-text :eval-count)
     (.setText (new-app :output-area) (new-app :output-text)) 
     (.setSelectedComponent (new-app :lower-window) w) )
   new-app)
@@ -29,6 +29,7 @@
 (defn- label-clicked [app]
   (when (app :jump-to-line)
     (scroll-to-line app (app :jump-to-line)) ))
+
 
 (defn- update-doc [darea w old-app new-app]
   (when (maps-differ-on old-app new-app :doc-text)
@@ -51,6 +52,8 @@
       jump-to-observer 
       (partial update-doc darea scrolled-darea)
       (partial update-output scrolled)) ))
+
+
 
 
 

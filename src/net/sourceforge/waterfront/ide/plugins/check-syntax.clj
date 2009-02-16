@@ -48,20 +48,20 @@
         name-other (paren-name c-other)
         c (.charAt source-code offset)
         name (paren-name c)
-        where (str "Line " line " column " col)
+        where { :line line :column col }
         s (str problem)]
     (cond
       (= problem :mismatch)
-      (str where ": '" c "' is mismatched with '" c-other "' from line " line-other " column " col-other \newline)
+      (merge where { :msg (str "'" c "' is mismatched with '" c-other "' from line " line-other " column " col-other \newline)})
 
       (= problem :no-open)
-      (str where ": no matching '" name "' was found" \newline)
+      (merge where { :msg (str "No matching '" name "' was found" \newline)})
 
       (= problem :no-close)
-      (str where ": no matching '" name "' was found" \newline)
+      (merge where { :msg (str "no matching '" name "' was found" \newline)})
 
       :else
-      (println "problem=" problem) )))
+      (assert false) )))
 
 (defn find-syntax-errors [success-message source-code]
    (let [pairs (compute-paren-matching-pairs source-code)
@@ -72,24 +72,13 @@
          unique (set temp)
          sorted (sort-by (fn [x] (second x)) unique)
          formatted (map (partial form-msg source-code) sorted)]
-     (if (empty? unique) success-message (apply str formatted)) ))
+     (if (empty? unique) success-message formatted) ))
 
 (fn [app] 
   (add-to-menu app "Source"
-    { :name "Check Syntax" :mnemonic KeyEvent/VK_C  
+    { :name "Check Syntax" :mnemonic KeyEvent/VK_C :key KeyEvent/VK_F4 :mask 0
       :action (fn m-check-syntax [app] 
-                (assoc app :problems (find-syntax-errors "No syntax errors" (.getText (app :area)))))} ))
-
-
-
-
-
-
-
-
-
-
-
+                (assoc app :problems (find-syntax-errors [] (.getText (app :area)))))} ))
 
 
 

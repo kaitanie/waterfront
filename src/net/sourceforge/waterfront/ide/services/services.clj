@@ -214,15 +214,25 @@
 (test (var line-to-offset))
 
 
-(defn scroll-to-line [app ln]
+(defn scroll-to-line 
+  ([app ln]
+  (scroll-to-line app ln 1 1))
+
+  ([app ln col]
+  (scroll-to-line app ln col (inc col)))
+
+  ([app ln from-col to-col]
   (let [line-count (reduce (fn [v c] (if (= c \newline) (inc v) v)) 1 (.getText (app :area)))]
     (if (and (pos? ln) (<= ln line-count))        
       (let [offset (line-to-offset (seq (.getText (app :area))) 0 (dec ln))]
         (when-not (neg? offset)
+          (.requestFocusInWindow (app :area))   
           (.scrollRectToVisible (app :area) (.modelToView (app :area) offset))
-          (.select (app :area) offset offset)    
+          (.select (app :area) (dec (+ offset from-col)) (dec (+ offset to-col)))
+          (println "offset=" offset)
           (assoc app :last-goto ln) ))
-      (println "Bad value " ln) )))
+      (println "Bad value " ln) ))))
+
 
 
 

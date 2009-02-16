@@ -216,6 +216,8 @@
 ; In proxy generation dialog: no need to proivde at least one interface (if a class is specified)
 
 ; Least important -->
+;  (16) Command line args
+;  (15) File chooser should show *.clj files by default
 ;  (14) Write to log
 ;  (13) uncomment does not trigger on line evaluation
 ;  (12) surround with try catch
@@ -227,7 +229,7 @@
 ;   (6) undo after replace-all erases the document and the pastes
 ;   (5) undo after replace erases and then pastes
 ; + (4) proxy: gen method names
-;   (3) click on error -> jump to location
+; + (3) click on error -> jump to location
 ; + (2) make undo less agressive
 ; + (1) Mnemonics on buttons of forms
 ; ? (0) Font issue
@@ -273,6 +275,7 @@
 ; 15-Feb-09: Smart proxy generation (generates methods signatures based on user-supplied super types)
 ; 16-Feb-09: A form dialog (e.g.: Find dialog) is now placed relative its owner
 ; 16-Feb-09: Uses setParagraphAttributes for setting the font of the editor pane
+; 16-Feb-09: Syntax error (problem window) are now double-clickable: jumps to corresponding line
 
 ; Highlights:
 ;
@@ -285,6 +288,9 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
+
 
 
 
