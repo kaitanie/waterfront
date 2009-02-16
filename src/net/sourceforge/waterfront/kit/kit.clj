@@ -500,6 +500,26 @@
 
 
 
+(defn- set-mnemonics [buttons]
+  (loop [bs buttons used-letters nil] 
+    (when-not (empty? bs)
+      (let [s (seq (.getText (first bs))) 
+            letter (reduce (fn [v c] 
+                              (cond      
+                                v
+                                v
+  
+                                (includes c used-letters)
+                                nil
+  
+                                :else
+                                c )) nil s)]
+        (when letter
+          (.setMnemonic (first bs) (char letter)))
+        (recur (rest bs) (cons letter used-letters)) ))))
+
+
+
 (defn show-input-form 
   "Display a modal dialog where the user can fill in fields (name-value pairs). Returns nil if the form's
    cancel button was clicked. Otherwise, returns a map which maps field names to their values.
@@ -586,6 +606,7 @@
                   fields 
                   (iterate inc first-row)))]
 
+      (set-mnemonics [ok-button cancel-button])
       (swap! model-atom (fn [x] model))            
       (.add button-panel cancel-button)
       (.add button-panel ok-button)
@@ -624,5 +645,7 @@
 
 
 ; (net.sourceforge.waterfront.kit/main)
+
+
 
 
