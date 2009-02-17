@@ -245,8 +245,8 @@
 ;  (13) uncomment does not trigger on line evaluation
 ;  (10) Red marker on the errorneus line (line-number pane)
 ;   (9) Red markers on syntax errors
-;   (6) undo after replace-all erases the document and the pastes
-;   (5) undo after replace erases and then pastes
+; + (6) undo after replace-all erases the document and the pastes
+; + (5) undo after replace erases and then pastes
 ; +(14) Write to log
 ; +(16) Command line args
 ; + (8) Allow the user to disable on-line evaluation
@@ -317,6 +317,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

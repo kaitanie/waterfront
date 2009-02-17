@@ -113,8 +113,8 @@
 
 (defn- replace-once [app replace-with reinvoke]
   (assert replace-with)
-  (.replaceSelection (app :area) replace-with)
-  (reinvoke)
+  ((app :dispatch) (create-undo-transaction (fn [app] (.replaceSelection (app :area) replace-with) app)))
+  (reinvoke) 
   app )
  
 
@@ -141,7 +141,9 @@
         sb (StringBuilder.)]
     (when-not (empty? offsets)
       (copy-fragments sb (.getText (app :area)) 0 offsets find-what replace-with)
-      (.setText (app :area) (str sb)) )))
+      ((app :later) (create-undo-transaction (fn [app-tag] 
+                                                (.setText (app-tag :area) (str sb))
+                                                (.setCaretPosition (app-tag :area) (app :caret-dot)) ))))))
       
     
  
@@ -184,7 +186,6 @@
     
               :else
               app )))))))
-
     
 (defn replace-in-document [app] 
   (let [current-selection (get-selected-text app nil)
@@ -221,12 +222,6 @@
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } 
     { :name "Replace" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_R :action replace-in-document  }))
-
-
-
-
-
-
 
 
 
