@@ -167,15 +167,79 @@
 
 
 (defn add-to-menu [app parent-menu-name & new-items]
-  (transform app :menu { }
-    (partial change-menu parent-menu-name (fn [existing-items] (conj existing-items 
-      (apply vector new-items)))) ))
+  (transform app :menu {}
+    (partial change-menu parent-menu-name (fn [existing-items] (apply vector (concat existing-items new-items)))) ))
 
 (defn triggered-by [f & keys]
   (fn [old-app new-app]
     (if (maps-differ-on old-app new-app keys)
       (f old-app new-app)
       new-app )))
+
+
+(defn- menu-get [m & keys]
+  (cond
+    (empty? m)
+    nil
+
+    (empty? keys)
+    m
+
+    (map? m)
+    (recur (m :children) keys)
+
+    :else
+    (recur (first (filter (fn [x] (= (first keys) (x :name))) m)) (rest keys)) ))
+
+
+
+(defn map-first-not-nil
+  { :test (fn []
+      (assert-eq '(1 2 3 -5) (map-first-not-nil (fn [x] (if (neg? x) (dec x) nil)) [1 2 3 -4]))
+      (assert-eq '(1 2 -4 4) (map-first-not-nil (fn [x] (if (neg? x) (dec x) nil)) [1 2 -3 4]))
+      (assert-eq '(1 2 -4 -4) (map-first-not-nil (fn [x] (if (neg? x) (dec x) nil)) [1 2 -3 -4]))
+      (assert-eq '(1 -3 -3 4) (map-first-not-nil (fn [x] (if (neg? x) (dec x) nil)) [1 -2 -3 4]))
+      (assert-eq '(2 2 3) (map-first-not-nil inc [1 2 3]))
+      (assert-eq '(1 2 3) (map-first-not-nil (fn[x] nil) [1 2 3]))
+      (assert-eq nil (map-first-not-nil (fn[x] nil) nil)) )}
+  ([f coll]
+  (reverse (second (reduce (fn [v c] 
+    (if (first v) 
+      [true (cons c (second v))]
+      (let [x (f c)]
+        [x (cons (if x x c) (second v))] ))) 
+    [nil nil] 
+    coll )))))
+
+
+(test (var map-first-not-nil))
+
+
+
+(defn- menu-replace-impl [m path kvs]
+  (cond
+    (empty? m)
+    m
+
+    (empty? path)
+    (apply assoc m kvs)
+
+    (map? m)
+    (merge m { :children (menu-replace-impl (m :children) path kvs) })
+
+    :else
+    (apply vector (map-first-not-nil (fn [x]
+      (if (= (first path) (x :name)) 
+        (menu-replace-impl x (rest path) kvs)
+        nil ))
+      m ))))
+
+(defn menu-assoc
+  "Mutate a menu description. path is a sequence of menu names forming a path
+  in the menu specified by m. kvs is a sequence of key value, k1 v1 k2 v2, etc.
+  that is applied to the selected menu item by means of (assoc)"
+  [m path & kvs]
+  (menu-replace-impl m path kvs) )
 
 
 
@@ -231,14 +295,5 @@
           (.select (app :area) (dec (+ offset from-col)) (dec (+ offset to-col)))
           (assoc app :last-goto ln) ))
       (println "Bad value " ln) ))))
-
-
-
-
-
-
-
-
-
 
 

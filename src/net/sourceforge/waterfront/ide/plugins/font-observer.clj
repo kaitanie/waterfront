@@ -24,7 +24,7 @@
       (javax.swing.text.StyleConstants/setFontSize sas (app :font-size))
       (javax.swing.text.StyleConstants/setBold sas (is-on java.awt.Font/BOLD (app :font-style)))
       (javax.swing.text.StyleConstants/setItalic sas (is-on java.awt.Font/ITALIC (app :font-style)))
-      (.setParagraphAttributes (app :area) sas true))
+      (.setParagraphAttributes (.getDocument (app :area)) 0 (count (.getText (app :area))) sas true))
     (assoc app :active-font f) ))
 
  
@@ -36,6 +36,7 @@
 
 (fn [app] 
     (add-observers app update-font) )
+
 
 
 

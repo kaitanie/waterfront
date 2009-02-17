@@ -74,30 +74,23 @@
     (assoc app :output-text output)
     app ))
 
+
+(defn- eval-file-or-selection [a change-func app] 
+  (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
+  (let [t0 (. System currentTimeMillis) 
+        sel-text (get-selected-text app (.getText (app :area)))
+        output (run-program (assoc app :change change-func) sel-text)]
+    (add-output output (assoc (merge app @a)
+      :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
+      :output output 
+      :eval-count (inc (app :eval-count) )))))
+
+
 (fn [app] 
   (let [a (atom {})
         change-func (fn[key val] (swap! a (fn [curr-app] (assoc curr-app key val))))]
     (add-to-menu (load-plugin app "menu-observer.clj" "check-syntax.clj") "Run" 
-      { :name "Eval" :key KeyEvent/VK_E  :on-context-menu true :action (fn m-run [app] 
-                          (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
-                          (let [t0 (. System currentTimeMillis) 
-                                sel-text (get-selected-text app (.getText (app :area)))
-                                output (run-program (assoc app :change change-func) sel-text)]
-                            (add-output output (assoc (merge app @a)
-                              :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
-                              :output output 
-                              :eval-count (inc (app :eval-count) ))))) })))
-
-
-
-
-
-
-
-
-
-
-
+      { :name "Eval" :key KeyEvent/VK_E  :on-context-menu true :action (partial eval-file-or-selection a change-func) })))
 
 
 

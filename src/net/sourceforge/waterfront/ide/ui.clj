@@ -233,8 +233,12 @@
 ; Add "run expression" history to the run menu
 ; In proxy generation dialog: no need to proivde at least one interface (if a class is specified)
 ; New proxy wizard: choose which ctor (of super-class) to call. Choose which methods you want to override
+; 
 
 ; Least important -->
+;  (19) Eliminate auto-completion if too many completions
+;  (18) Line:col indicator should not jump
+;  (17) Make sure the chooser adds *.clj
 ;  (12) surround with try catch
 ;  (11) gen. overloading: ask arities, generate forwarding
 ; +(15) File chooser should show *.clj files by default
@@ -310,6 +314,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

@@ -246,63 +246,6 @@
   (proxy [ActionListener] []
     (actionPerformed [e] (f e)) ))
 
-;;;; menu DSL
-
-(defn change-menu [menu-name items-func menu-bar]
-  (vec (map (fn[menu]
-    (if (not= (menu :name) menu-name)
-      menu
-      (transform menu :children [] items-func)))
-    menu-bar)))
-    
-(defn create-menu-from-desc 
-
-  ([wrapper-func desc]
-  (create-menu-from-desc (JMenuBar.) wrapper-func desc) )
-
-  ([parent wrapper-func desc]
-  (cond
-
-    (or (nil? desc) (empty? desc))
-    (do
-      (when (pos? (.getItemCount parent))
-        (.addSeparator parent) )
-      parent)
-
-    (vector? desc)
-    (do 
-      (doseq [curr desc]
-        (create-menu-from-desc parent wrapper-func curr)) 
-      parent)
-
-    :else
-    (do
-      (let [is-bool (not= :not-there (get desc :boolean-value :not-there))
-            res (cond 
-                  is-bool
-                  (JCheckBoxMenuItem. (desc :name) (desc :boolean-value))
-
-                  (desc :action) 
-                  (JMenuItem. (desc :name)) 
-
-                  :else
-                  (JMenu. (desc :name)))]
-
-        (when (desc :mnemonic)
-          (.setMnemonic res (desc :mnemonic)) )
-
-        (when (desc :key)
-          (.setAccelerator res (KeyStroke/getKeyStroke (desc :key) (if (desc :mask) (desc :mask) (ActionEvent/CTRL_MASK)))) )
-
-        (if (desc :action)
-          (if is-bool
-            (.addActionListener res (new-action-listener (wrapper-func (fn [app] ((desc :action) app (.getState res))))))
-            (.addActionListener res (new-action-listener (wrapper-func (desc :action)))) )
-          (create-menu-from-desc res wrapper-func (desc :children)) )
-        (.add parent res) 
-        parent )))))
-
-
 
 ; Pretty printing
 
@@ -391,6 +334,69 @@
       
       :else
       (pr-str x))))
+
+
+;;;; menu DSL
+
+(defn change-menu [menu-name items-func menu-bar]
+  (vec (map (fn[menu]
+    (if (not= (menu :name) menu-name)
+      menu
+      (transform menu :children [] items-func)))
+    menu-bar)))
+    
+(defn create-menu-from-desc 
+
+  ([wrapper-func desc]
+  (create-menu-from-desc (JMenuBar.) wrapper-func desc) )
+
+  ([parent wrapper-func desc]
+  (cond
+
+    (or (nil? desc) (empty? desc))
+    (do
+      (when (pos? (.getItemCount parent))
+        (.addSeparator parent) )
+      parent)
+
+    (vector? desc)
+    (do 
+      (doseq [curr desc]
+        (create-menu-from-desc parent wrapper-func curr)) 
+      parent)
+
+    :else
+    (do
+      (let [is-bool (not= :not-there (get desc :boolean-value :not-there))
+            res (cond 
+            
+                  is-bool
+                  (JCheckBoxMenuItem. (desc :name) (desc :boolean-value))
+
+                  (desc :action)
+                  (JMenuItem. (desc :name)) 
+
+                  :else
+                  (JMenu. (desc :name)))]
+
+
+        (.setEnabled res (if (= (desc :status) :disabled) false true))
+
+        (when (desc :mnemonic)
+          (.setMnemonic res (desc :mnemonic)) )
+
+        (when (desc :key)
+          (.setAccelerator res (KeyStroke/getKeyStroke (desc :key) (if (desc :mask) (desc :mask) (ActionEvent/CTRL_MASK)))) )
+
+        (if (desc :action)
+          (if is-bool
+            (.addActionListener res (new-action-listener (wrapper-func (fn [app] ((desc :action) app (.getState res))))))
+            (.addActionListener res (new-action-listener (wrapper-func (desc :action)))) )
+          (create-menu-from-desc res wrapper-func (desc :children)) )
+        (.add parent res) 
+        parent )))))
+
+
 
 
 (defn pass [msg x]
@@ -658,5 +664,12 @@
 
 
 ; (net.sourceforge.waterfront.kit/main)
+
+
+
+
+
+
+
 
 
