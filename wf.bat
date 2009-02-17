@@ -1,1 +1,5 @@
-@java -cp src;..\lab\bin\;c:\tools\clojure\clojure.jar clojure.lang.Repl src\net\sourceforge\waterfront\ide\main.clj 
+@echo off
+java -cp src;..\lab\bin\;c:\tools\clojure\clojure.jar clojure.main src/net/sourceforge/waterfront/ide/main.clj %*
+
+
+

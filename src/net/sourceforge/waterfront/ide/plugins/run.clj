@@ -64,7 +64,6 @@
                 (eval-objects app (read-objects-from-file (.getAbsolutePath src-file))) 
                 (str stream)
                 (catch Exception e 
-                  (println e) 
                   (.printStackTrace e print-writer)
                   (str stream) )
                 (finally (.delete src-file) (. clojure.lang.Var popThreadBindings))  )))))
@@ -88,6 +87,7 @@
                               :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
                               :output output 
                               :eval-count (inc (app :eval-count) ))))) })))
+
 
 
 

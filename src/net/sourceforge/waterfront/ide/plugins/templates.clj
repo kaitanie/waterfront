@@ -65,7 +65,6 @@
       
 
 (defn- generate-method-stub [sb m]
-  (println "processing " m)
   (.append sb "  (")
   (.append sb (.getName m))
   (.append sb " [")
@@ -156,4 +155,5 @@
               "  expr-1\n"
               "  expr-2\n"
               "  expr-3))" ))}]}))
+
 

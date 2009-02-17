@@ -229,9 +229,9 @@
           (.requestFocusInWindow (app :area))   
           (.scrollRectToVisible (app :area) (.modelToView (app :area) offset))
           (.select (app :area) (dec (+ offset from-col)) (dec (+ offset to-col)))
-          (println "offset=" offset)
           (assoc app :last-goto ln) ))
       (println "Bad value " ln) ))))
+
 
 
 

@@ -16,7 +16,7 @@
     (try
       (let [ln (Integer/parseInt s)]
         (scroll-to-line app ln))
-      (catch Exception e (println "Non number: " s)) )))
+      (catch Exception e) )))
 
 
 
@@ -24,6 +24,7 @@
   (add-to-menu app "Edit" {}
       { :name "Goto" :key java.awt.event.KeyEvent/VK_G :mnemonic java.awt.event.KeyEvent/VK_G  
         :action (fn[app] (goto-line app)) }))
+
 
 
 

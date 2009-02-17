@@ -434,12 +434,6 @@
         pos (min (dec len) (dec (.getCaretPosition text-pane)))]
     (swap! cache (fn[x] (assoc x :new-pos pos))) ))
     
-
-
-(defn- show [msg v]
-  (println msg v)
-  v)
-
 ; runs on the non-GUI thread
 (defn- text-changed [text-pane cache]
   (let [snapshot @cache 
@@ -536,6 +530,7 @@
       (.setTitle "Title")
       (.setSize 800 600)
       (.setVisible true) )))
+
 
 
 

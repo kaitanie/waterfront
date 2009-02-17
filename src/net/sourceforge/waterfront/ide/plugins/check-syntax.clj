@@ -30,7 +30,6 @@
     "("
 
     :else
-    (println "c=" c)
     (assert false) ))
 
     
