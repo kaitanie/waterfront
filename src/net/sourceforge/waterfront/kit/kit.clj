@@ -2,7 +2,7 @@
 
 
 (import 
-  '(javax.swing JFrame JLabel JScrollPane JTextField JButton JTextArea UIManager JMenuItem JMenu JMenuBar)
+  '(javax.swing JFrame JLabel JScrollPane JTextField JButton JTextArea UIManager JMenuItem JMenu JMenuBar JCheckBoxMenuItem)
   '(javax.swing JPopupMenu KeyStroke JSplitPane JOptionPane)
   '(javax.swing.event CaretEvent CaretListener)
   '(javax.swing.text DefaultStyledDocument StyleConstants StyleConstants$CharacterConstants SimpleAttributeSet)
@@ -277,14 +277,27 @@
 
     :else
     (do
-      (let [res (if (desc :action) (JMenuItem. (desc :name)) (JMenu. (desc :name)))]
+      (let [is-bool (not= :not-there (get desc :boolean-value :not-there))
+            res (cond 
+                  is-bool
+                  (JCheckBoxMenuItem. (desc :name) (desc :boolean-value))
+
+                  (desc :action) 
+                  (JMenuItem. (desc :name)) 
+
+                  :else
+                  (JMenu. (desc :name)))]
+
         (when (desc :mnemonic)
           (.setMnemonic res (desc :mnemonic)) )
+
         (when (desc :key)
           (.setAccelerator res (KeyStroke/getKeyStroke (desc :key) (if (desc :mask) (desc :mask) (ActionEvent/CTRL_MASK)))) )
 
         (if (desc :action)
-          (.addActionListener res (new-action-listener (wrapper-func (desc :action))))
+          (if is-bool
+            (.addActionListener res (new-action-listener (wrapper-func (fn [app] ((desc :action) app (.getState res))))))
+            (.addActionListener res (new-action-listener (wrapper-func (desc :action)))) )
           (create-menu-from-desc res wrapper-func (desc :children)) )
         (.add parent res) 
         parent )))))
@@ -645,6 +658,7 @@
 
 
 ; (net.sourceforge.waterfront.kit/main)
+
 
 
 

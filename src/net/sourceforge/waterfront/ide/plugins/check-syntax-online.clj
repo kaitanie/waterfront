@@ -33,10 +33,6 @@
       :else
       x ))
 
-
-
-        
-
 (defn- show-msg [app is-ok?  msg]
   (.setBackground (app :indicator) (.darker (if is-ok? java.awt.Color/GREEN java.awt.Color/RED)))
   (assoc app :output-title msg :jump-to-line (zero-to-nil (get-line msg))) )
@@ -49,20 +45,29 @@
     (catch Throwable t     
       (show-msg app false (.getMessage t)) )))
          
+(defn- eval-disabled-observer [old-app new-app]
+  (if (maps-differ-on old-app new-app :eval-as-you-type)
+    (if (new-app :eval-as-you-type)
+      new-app
+      (do
+        (.setBackground (new-app :indicator) java.awt.Color/GRAY)
+        (assoc new-app :output-title "" :jump-to-line nil) ))
+    new-app ))
+
 (defn- text-observer [old-app new-app]
-  (if (maps-differ-on old-app new-app :text)
+  (if (and
+         (new-app :eval-as-you-type)
+         (maps-differ-on old-app new-app :text :eval-as-you-type) )
     (run-syntax-check new-app)
     new-app ))
 
 (fn [app] 
-  (let [result (load-plugin app "custom-editor.clj" "layout.clj")]
+  (let [after-menu-change (add-to-menu (merge { :eval-as-you-type true } app)  "Run"
+    { :name "Eval as You Type" :mnemonic KeyEvent/VK_T :boolean-value (app :eval-as-you-type)
+      :action (fn [app b] 
+                (assoc app :eval-as-you-type b)) })
+        result (load-plugin (assoc after-menu-change :eval-as-you-type true) "custom-editor.clj" "layout.clj")]
     ((app :register-periodic-observer) 1000 text-observer)
-    result ))
-
-
-
-
-
-
+    (add-observers result eval-disabled-observer) ))
 
 

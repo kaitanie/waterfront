@@ -245,7 +245,7 @@
 ;   (5) undo after replace erases and then pastes
 ; +(14) Write to log
 ; +(16) Command line args
-;   (8) Allow the user to disable on-line evaluation
+; + (8) Allow the user to disable on-line evaluation
 ;   (7) menu items should be disabled (undo, redo) when action is not applicable
 ; + (4) proxy: gen method names
 ; + (3) click on error -> jump to location
@@ -298,7 +298,7 @@
 ; 16-Feb-09: File chooser uses *.clj by default
 ; 16-Feb-09: Loads a file from the command line (if specified)
 ; 16-Feb-09: Diagnostic messages are written to (app :log)
-
+; 16-Feb-09: Eval as you type can be disabled (Run -> Eval as you type)
 ; Highlights:
 ;
 ; - spaces not tabs
@@ -310,6 +310,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
