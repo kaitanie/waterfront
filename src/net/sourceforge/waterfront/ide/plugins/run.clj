@@ -75,6 +75,19 @@
     app ))
 
 
+(defn- abs-val [x]
+  (if (pos? x)
+    x
+    (- x)))
+
+
+(defn- eval-menu-observer [old-app new-app]
+  (if (maps-differ-on old-app new-app :caret-dot :caret-mark)
+    (let [len (abs-val (- (new-app :caret-dot) (new-app :caret-mark)))
+          item-name (if (zero? len) "Eval File" "Eval Selection")]
+      (assoc new-app :menu (menu-assoc (new-app :menu) ["Run" :eval] :name item-name)) ))) 
+
+
 (defn- eval-file-or-selection [a change-func app] 
   (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
   (let [t0 (. System currentTimeMillis) 
@@ -89,8 +102,12 @@
 (fn [app] 
   (let [a (atom {})
         change-func (fn[key val] (swap! a (fn [curr-app] (assoc curr-app key val))))]
-    (add-to-menu (load-plugin app "menu-observer.clj" "check-syntax.clj") "Run" 
-      { :name "Eval" :key KeyEvent/VK_E  :on-context-menu true :action (partial eval-file-or-selection a change-func) })))
+    (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
+      { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
+        :action (partial eval-file-or-selection a change-func) })))
+
+
+
 
 
 

@@ -233,7 +233,7 @@
 ; Add "run expression" history to the run menu
 ; In proxy generation dialog: no need to proivde at least one interface (if a class is specified)
 ; New proxy wizard: choose which ctor (of super-class) to call. Choose which methods you want to override
-; 
+; Highlight full width of current line
 
 ; Least important -->
 ;  (19) Eliminate auto-completion if too many completions
@@ -250,7 +250,7 @@
 ; +(14) Write to log
 ; +(16) Command line args
 ; + (8) Allow the user to disable on-line evaluation
-;   (7) menu items should be disabled (undo, redo) when action is not applicable
+; + (7) menu items should be disabled (undo, redo) when action is not applicable
 ; + (4) proxy: gen method names
 ; + (3) click on error -> jump to location
 ; + (2) make undo less agressive
@@ -303,6 +303,9 @@
 ; 16-Feb-09: Loads a file from the command line (if specified)
 ; 16-Feb-09: Diagnostic messages are written to (app :log)
 ; 16-Feb-09: Eval as you type can be disabled (Run -> Eval as you type)
+; 17-Feb-09: Disabling of menu items (undo, redo, increase/decrease font)
+; 17-Feb-09: Eval menu item is now either "Eval File" or "Eval Selection"
+ 
 ; Highlights:
 ;
 ; - spaces not tabs
@@ -314,6 +317,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

@@ -9,10 +9,7 @@
   (cond
 
     (or (nil? desc) (empty? desc))
-    (do
-;      (when (pos? (alength (.getSubElements parent)))
-;        (.addSeparator parent) )
-      parent)
+    parent
 
     (vector? desc)
     (do 
@@ -72,5 +69,6 @@
   (let [result (add-observers (load-plugin app "custom-editor.clj") context-menu-observer)]
     (.addMouseListener (app :area) (build-context-menu-listener (app :dispatch)))
     result ))
+
 
 

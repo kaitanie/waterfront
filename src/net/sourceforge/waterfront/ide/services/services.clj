@@ -87,7 +87,6 @@
 
 (test (var get-line-end))
 
-
 (defn- offset-from-pos-seq [line column seq result l c]
   (cond 
     (> l line)
@@ -217,26 +216,27 @@
 
 
 (defn- menu-replace-impl [m path kvs]
-  (cond
-    (empty? m)
-    m
-
-    (empty? path)
-    (apply assoc m kvs)
-
-    (map? m)
-    (merge m { :children (menu-replace-impl (m :children) path kvs) })
-
-    :else
-    (apply vector (map-first-not-nil (fn [x]
-      (if (= (first path) (x :name)) 
-        (menu-replace-impl x (rest path) kvs)
-        nil ))
-      m ))))
+  (let [name-is (fn [n x] (or (= n (x :id)) (= n (x :name))))]    
+    (cond
+      (empty? m)
+      m
+  
+      (empty? path)
+      (apply assoc m kvs)
+  
+      (map? m)
+      (merge m { :children (menu-replace-impl (m :children) path kvs) })
+  
+      :else
+      (apply vector (map-first-not-nil (fn [x]
+        (if (name-is (first path) x) 
+          (menu-replace-impl x (rest path) kvs)
+          nil ))
+        m )))))
 
 (defn menu-assoc
   "Mutate a menu description. path is a sequence of menu names forming a path
-  in the menu specified by m. kvs is a sequence of key value, k1 v1 k2 v2, etc.
+  in the tree of menu items rooted at m. kvs is a sequence of key value, k1 v1 k2 v2, etc.
   that is applied to the selected menu item by means of (assoc)"
   [m path & kvs]
   (menu-replace-impl m path kvs) )
@@ -295,5 +295,6 @@
           (.select (app :area) (dec (+ offset from-col)) (dec (+ offset to-col)))
           (assoc app :last-goto ln) ))
       (println "Bad value " ln) ))))
+
 
 
