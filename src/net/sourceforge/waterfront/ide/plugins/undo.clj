@@ -39,14 +39,40 @@
       (finally
         (.setSticky (app :undo-manager) false) ))))
 
+
+(defn- set-undo [um old-app new-app]
+  (let [c (.canUndo um)]
+    (if (= c (old-app :can-undo))
+      new-app
+      (assoc new-app :can-undo c) )))
+
+(defn- set-redo [um old-app new-app]
+  (let [c (.canRedo um)]
+    (if (= c (old-app :can-redo))
+      new-app
+      (assoc new-app :can-redo c) )))
+
+(defn- can-undo-redo-observer [old-app new-app]
+  (let [um (new-app :undo-manager)]
+    (set-undo um old-app (set-redo um old-app new-app)) ))
+
+(defn undo-redo-stauts-observer [old-app new-app]
+  (if (not (maps-differ-on old-app new-app :can-redo :can-undo))
+    new-app
+    (let
+      [temp (assoc new-app :menu (menu-assoc (new-app :menu) ["Edit" "Undo"] :status (if (new-app :can-undo) :enabled :disabled)))]
+      (assoc temp :menu (menu-assoc (temp :menu) ["Edit" "Redo"] :status (if (temp :can-redo) :enabled :disabled))) )))
+
+
 (fn [app] 
-  (add-to-menu (install-undo-manager (load-plugin app "menu-observer.clj" "file.clj")) "Edit" 
+  (add-to-menu (install-undo-manager (load-plugin (add-observers app undo-redo-stauts-observer can-undo-redo-observer) "menu-observer.clj" "file.clj")) "Edit" 
     {}
     { :name "Undo" :mnemonic KeyEvent/VK_U :key KeyEvent/VK_Z 
       :action (fn m-undo [app] (when (.canUndo (app :undo-manager)) (.undo (app :undo-manager))) app) }
     { :name "Redo" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_Y 
       :action (fn m-redo [app] (when (.canRedo (app :undo-manager)) (.redo (app :undo-manager))) app) }))
   
+
 
 
 
