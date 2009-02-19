@@ -24,6 +24,13 @@
    (proxy [javax.swing.text.StyledEditorKit] []
       (getViewFactory [] custom-vf)) ))
 
+
+(defn- periodic-text-updater [old-app new-app]
+  (let [s (.getText (new-app :area))]
+    (if (= s (old-app :text))
+      new-app
+      (assoc new-app :text s) )))
+
 (defn customize-text-pane [app area]
   (.setSelectedTextColor area java.awt.Color/WHITE)
   (.setSelectionColor area (java.awt.Color. 49 106 197)) 
@@ -56,9 +63,11 @@
 
   
 (fn [app] 
+  ((app :register-periodic-observer) 250 periodic-text-updater)
   (let [new-app (add-observers (load-plugin app "layout.clj" "file.clj") update-text-on-new-file-name)]
     (customize-text-pane new-app (new-app :area))
     new-app ))
+
 
 
 
