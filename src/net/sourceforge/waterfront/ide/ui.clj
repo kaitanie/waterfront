@@ -235,16 +235,17 @@
 ; New proxy wizard: choose which ctor (of super-class) to call. Choose which methods you want to override
 ; Highlight full width of current line
 
+
 ; Least important -->
 ;  (12) surround with try catch
 ;  (11) gen. overloading: ask arities, generate forwarding
 ;  (21) Run syntax as part of eval as you type
-;  (13) uncomment does not trigger on line evaluation
-;  (20) Make status bar a little bit taller than its contents
-;  (19) Eliminate auto-completion if too many completions
-;  (18) Line:col indicator should not jump
 ;  (10) Red marker on the errorneus line (line-number pane)
 ;   (9) Red markers on syntax errors
+;  (20) Make status bar a little bit taller than its contents
+;  (18) Line:col indicator should not jump
+;  (13) uncomment does not trigger on line evaluation
+; +(19) Eliminate auto-completion if too many completions
 ; +(17) Make sure the chooser adds *.clj
 ; +(15) File chooser should show *.clj files by default
 ; + (6) undo after replace-all erases the document and the pastes
@@ -319,6 +320,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

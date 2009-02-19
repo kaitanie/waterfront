@@ -214,14 +214,15 @@
 
 (fn [app] 
   (add-to-menu 
-    (load-plugin 
-      (assoc app :keys-to-save  (apply vector (distinct (cons :last-replace-with (cons :search-settings (app :keys-to-save))))))
-      "menu-observer.clj" "find-indicator.clj") 
+    (load-plugin (add-to-keys-to-save app :search-settings) "menu-observer.clj" "find-indicator.clj") 
     "Edit" 
     {}
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } 
     { :name "Replace" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_R :action replace-in-document  }))
+
+
+
 
 
 

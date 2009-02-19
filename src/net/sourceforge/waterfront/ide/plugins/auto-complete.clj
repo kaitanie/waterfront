@@ -17,11 +17,16 @@
   (.replaceSelection area s))
 
 
-(defn- build-completion-menu [area text offset tok suggestions]  
+(defn- build-completion-menu [area text offset tok suggestions max-suggestions]  
   (if (or (nil? tok) (empty? suggestions))
     nil
     (let [result (javax.swing.JPopupMenu.)]
-      (doseq [curr suggestions]
+      (when (> (count suggestions) max-suggestions)
+        (.add result (doto (javax.swing.JMenuItem. 
+                              (str "Showing first " max-suggestions " (out of " (count suggestions) ")"))
+                        (.setEnabled false) ))
+        (.addSeparator result))
+      (doseq [curr (take max-suggestions suggestions)]
         (let [mi (javax.swing.JMenuItem. curr)]
           (.addActionListener mi 
             (proxy [java.awt.event.ActionListener] []
@@ -55,7 +60,7 @@
           (insert-completion (app :area) tok (first suggestions))
 
           (> (count suggestions) 1)
-          (.show (build-completion-menu (app :area) (app :text) (app :caret-dot) tok suggestions) 
+          (.show (build-completion-menu (app :area) (app :text) (app :caret-dot) tok suggestions (app :max-suggestions)) 
             (app :area) (.x rect) (.y rect) )
 
           :else
@@ -71,10 +76,13 @@
 ;   Auto replace if only one suggestion
 
 (fn [app] 
-  (add-to-menu (load-plugin app "menu-observer.clj") "Source"  
+  (add-to-menu (load-plugin (merge {:max-suggestions 20} (add-to-keys-to-save app :max-suggestions)) "menu-observer.clj") "Source"  
     { :name "Auto complete"
       :key java.awt.event.KeyEvent/VK_SPACE :mnemonic java.awt.event.KeyEvent/VK_D  :on-context-menu true
       :action complete-word }))
+
+
+
 
 
 

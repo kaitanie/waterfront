@@ -164,6 +164,8 @@
     (fn [observers] 
       (apply vector (concat observers (apply vector new-observers)))) ))
 
+(defn add-to-keys-to-save [app key]
+   (assoc app :keys-to-save  (apply vector (distinct (cons :last-replace-with (cons key (app :keys-to-save)))))) )
 
 (defn add-to-menu [app parent-menu-name & new-items]
   (transform app :menu {}
@@ -295,6 +297,7 @@
           (.select (app :area) (dec (+ offset from-col)) (dec (+ offset to-col)))
           (assoc app :last-goto ln) ))
       (println "Bad value " ln) ))))
+
 
 
 
