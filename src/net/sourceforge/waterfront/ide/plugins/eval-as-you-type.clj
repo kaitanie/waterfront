@@ -33,15 +33,20 @@
       :else
       x ))
 
+
+
 (defn- show-msg [app is-ok?  msg]
   (.setBackground (app :indicator) (.darker (if is-ok? java.awt.Color/GREEN java.awt.Color/RED)))
-  (assoc app :output-title msg :jump-to-line (zero-to-nil (get-line msg))) )
+  (let [ln (zero-to-nil (get-line msg))
+        new-markers (if ln (cons ln (app :markers)) (app :markers))
+        new-problems (if is-ok? [] [{:line ln :column 0 :msg msg }]) ]
+    (assoc app :output-title msg :jump-to-line ln :markers new-markers :problems new-problems) ))
 
 
 (defn- eval-file [app]
   (let [temp (detect-syntax-errors app)]
     (if-not (empty? (temp :problems))
-      (show-msg temp true "")
+      (show-msg temp false "")
       (try
         (load-string (temp :text))
         (show-msg temp true "")
@@ -73,6 +78,11 @@
         result (load-plugin (assoc after-menu-change :eval-as-you-type true) "custom-editor.clj" "layout.clj" "check-syntax.clj")]
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
+
+
+
+
+
 
 
 

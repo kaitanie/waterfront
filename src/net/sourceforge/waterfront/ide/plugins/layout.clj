@@ -15,8 +15,19 @@
   '(java.io File))
 
 
+(defn- paint-line-numbers [tp lnp g startline endline starting_y fontHeight fontDesc fontAscent markers]
+  (.setFont g (.getFont tp))
+  (loop [line startline y starting_y]
+    (when (<= line endline)
+        (when (includes line markers)
+          (.setColor g java.awt.Color/RED)
+          (.fillRect g 0 (- y fontAscent) (.getWidth lnp) fontHeight) )
+        (.setColor g java.awt.Color/BLACK)
+      (.drawString g (str line) 0 y)
+      (recur (inc line) (+ y fontHeight)) )))
 
-(defn paint-line-numbers [sp tp lnp g] 
+
+(defn- paint-line-numbers-panel [sp tp lnp g dispatch] 
   (if (or (<= (.getWidth tp) 0) (<= (.getHeight tp) 0) (nil? (.modelToView tp 0)))
     nil
     (let [start (.viewToModel tp (.. sp (getViewport) (getViewPosition)))   
@@ -28,6 +39,7 @@
           endline (inc (.. doc (getDefaultRootElement) (getElementIndex end)))
           fontHeight (.. g (getFontMetrics (.getFont tp)) (getHeight))
           fontDesc (.. g (getFontMetrics (.getFont tp)) (getDescent))
+          fontAscent (.. g (getFontMetrics (.getFont tp)) (getAscent))
           ignore-this-one (.modelToView tp start)
           ignore-this-two (.toString ignore-this-one)
           starting_y (+ fontHeight 
@@ -36,23 +48,22 @@
                 (modelToView start) 
                  y) 
               (.. sp (getViewport) (getViewPosition) y) 
-              fontDesc) )]
-   
-      (.setFont g (.getFont tp))
-      (loop [line startline y starting_y]
-        (when (<= line endline)
-          (.drawString g (str line) 0 y)
-          (recur (inc line) (+ y fontHeight)) ))
+             fontDesc) )]
+      (dispatch (fn[app]
+        (paint-line-numbers tp lnp g startline endline starting_y fontHeight fontDesc fontAscent (sort (app :markers)))))
       g )))
     
-(defn create-line-numbers-components []
+(defn create-line-numbers-components [app]
   (let [parts (atom nil)
         paint-numbers-wrapped (fn [g]
-          (paint-line-numbers (@parts :scroll-pane) (@parts :text-pane) 
-            (@parts :line-number-panel) g))
+          (let [new-g (.create g)]
+            (try
+              (paint-line-numbers-panel (@parts :scroll-pane) (@parts :text-pane) 
+                (@parts :line-number-panel) new-g (app :dispatch))
+              (finally (.dispose new-g) ))))
         lnp (doto (new-custom-panel paint-numbers-wrapped)
-              (.setMinimumSize (java.awt.Dimension. 50 30))
-              (.setPreferredSize (java.awt.Dimension. 50 30)) )
+              (.setMinimumSize (java.awt.Dimension. 40 30))
+              (.setPreferredSize (java.awt.Dimension. 40 30)) )
 
         scroll-bar-ui (javax.swing.plaf.basic.BasicScrollBarUI.)
         tp (new-custom-text-pane (fn [g] (.repaint lnp)) )
@@ -75,7 +86,7 @@
   (let [sb (javax.swing.JPanel.)
         lower-sb (javax.swing.JPanel.)
         lower-win (javax.swing.JTabbedPane.)
-        lnp-widgets (create-line-numbers-components)
+        lnp-widgets (create-line-numbers-components app)
         area (lnp-widgets :text-pane)
         indicator (javax.swing.JLabel. "    ")
         output-label (javax.swing.JLabel. "")]
@@ -97,7 +108,7 @@
                                   (doto (javax.swing.JPanel.)
                                     (.setLayout (BorderLayout.))
                                     (.add sb BorderLayout/NORTH)
-                                    (.add lower-win BorderLayout/CENTER)))       
+                                    (.add lower-win BorderLayout/CENTER)))
             (.setDividerLocation -1)
             (.setResizeWeight 1.0) )
           (. BorderLayout CENTER) )
@@ -111,12 +122,6 @@
       :indicator indicator
       :lower-status-bar lower-sb) 
     layout-observer) ))
-
-
-
-
-
-
 
 
 

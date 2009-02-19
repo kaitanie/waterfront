@@ -22,11 +22,14 @@
     (assert false) ))
 
 
-(defn- new-table-model [maps]
+(defn- new-table-model [existing-model maps]
   (let [keys [:line :column :msg] 
-        tm (javax.swing.table.DefaultTableModel.)]
-    (doseq [key keys]
-      (.addColumn tm (str-from-keyword key)))
+        tm (if existing-model existing-model (javax.swing.table.DefaultTableModel.))]
+    
+    (.setRowCount tm 0)
+    (when (nil? existing-model)
+      (doseq [key keys]
+        (.addColumn tm (str-from-keyword key)) ))
 
     (doseq [m maps]
       (loop [ks keys row nil]
@@ -37,8 +40,7 @@
       
 (defn- problem-table-observer [table scrolled-table old-app new-app]
   (when (maps-differ-on old-app new-app :problems)
-    (let [tm (new-table-model (new-app :problems))]
-      (.. table (getTableHeader) (getColumnModel) (getColumn 0) (setPreferredWidth 100))
+    (let [tm (new-table-model (.getModel table) (new-app :problems))]
       (.setModel table tm)
       (.setSelectedComponent (new-app :lower-window) scrolled-table) ))
   new-app)
@@ -46,7 +48,7 @@
 
 (defn- new-table [double-click-handler]
   (let [keys [:line :msg] 
-        tm (new-table-model [])
+        tm (new-table-model nil [])
         result (proxy [javax.swing.JTable] [tm]
                   (isCellEditable [row col] false) )]
 
@@ -76,6 +78,7 @@
         scrolled (javax.swing.JScrollPane. table)]    
     (.addTab (app :lower-window) "Problems" scrolled)
     (add-observers (assoc app :problem-window table) (partial problem-table-observer table scrolled))))
+
 
 
 

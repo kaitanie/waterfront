@@ -63,24 +63,32 @@
       (assert false) )))
 
 (defn- find-syntax-errors [source-code]
-   (let [pairs (compute-paren-matching-pairs source-code)
-         bad-pairs (filter (fn[x] (not= (first x) :match)) pairs)
-         temp (filter (fn[x] (or 
-            (not= (first x) :mismatch)
-            (< (second x) (third x)))) bad-pairs)
-         unique (set temp)
-         sorted (sort-by (fn [x] (second x)) unique)
-         formatted (map (partial form-msg source-code) sorted)]
-     (if (empty? unique) [] formatted) ))
+  (let [pairs (compute-paren-matching-pairs source-code)
+        bad-pairs (filter (fn[x] (not= (first x) :match)) pairs)
+        temp (filter (fn[x] (or 
+          (not= (first x) :mismatch)
+          (< (second x) (third x)))) bad-pairs)
+        unique (set temp)
+        sorted (sort-by (fn [x] (second x)) unique)]
+    sorted ))
 
 
 (defn detect-syntax-errors [app]
-  (assoc app :problems (find-syntax-errors (.getText (app :area)))))
+  (let [src (.getText (app :area))
+        sorted (find-syntax-errors src)
+        formatted (map (partial form-msg src) sorted)
+        probs (if (empty? sorted) [] formatted)
+        markers (sort (distinct (map (fn[x] (x :line)) formatted)))]
+    (assoc app :problems probs :markers markers) ))
 
-(fn [app] 
-  (add-to-menu app "Source"
-    { :name "Check Syntax" :mnemonic KeyEvent/VK_C :key KeyEvent/VK_F4 :mask 0
-      :action detect-syntax-errors }))
+;  (add-to-menu app "Source"
+;    { :name "Check Syntax" :mnemonic KeyEvent/VK_C :key KeyEvent/VK_F4 :mask 0
+;      :action detect-syntax-errors }))
+(fn [app] app)
+
+
+
+
 
 
 

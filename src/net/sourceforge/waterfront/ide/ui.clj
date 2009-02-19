@@ -237,6 +237,7 @@
 
 
 ; Least important -->
+;  (22) Indicator should be red when there are syntax errors
 ;  (12) surround with try catch
 ;  (11) gen. overloading: ask arities, generate forwarding
 ; +(21) Check syntax as part of eval as you type
@@ -320,24 +321,5 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
