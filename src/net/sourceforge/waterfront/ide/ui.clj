@@ -236,15 +236,17 @@
 ; Highlight full width of current line
 
 ; Least important -->
-;  (19) Eliminate auto-completion if too many completions
-;  (18) Line:col indicator should not jump
-;  (17) Make sure the chooser adds *.clj
 ;  (12) surround with try catch
 ;  (11) gen. overloading: ask arities, generate forwarding
-; +(15) File chooser should show *.clj files by default
+;  (21) Run syntax as part of eval as you type
 ;  (13) uncomment does not trigger on line evaluation
+;  (20) Make status bar a little bit taller than its contents
+;  (19) Eliminate auto-completion if too many completions
+;  (18) Line:col indicator should not jump
 ;  (10) Red marker on the errorneus line (line-number pane)
 ;   (9) Red markers on syntax errors
+; +(17) Make sure the chooser adds *.clj
+; +(15) File chooser should show *.clj files by default
 ; + (6) undo after replace-all erases the document and the pastes
 ; + (5) undo after replace erases and then pastes
 ; +(14) Write to log
@@ -317,6 +319,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

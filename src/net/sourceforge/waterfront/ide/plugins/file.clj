@@ -45,9 +45,18 @@
    (write-file text (get-current-document app))
    (assoc app :initial-text text) )))
  
-(def save-as (fn [app]
- (when (= (. javax.swing.JFileChooser APPROVE_OPTION) (.showSaveDialog (app :file-chooser) (app :frame)))
-   (save-directly (set-current-document app (.getSelectedFile (app :file-chooser)))) )))
+(defn- save-as [app]
+  (when (and
+      (= (. javax.swing.JFileChooser APPROVE_OPTION) (.showSaveDialog (app :file-chooser) (app :frame)))
+      (.getSelectedFile (app :file-chooser)))
+    (let [f (.. (app :file-chooser) (getSelectedFile) (getAbsoluteFile))
+          name (.getName f)
+          dot (.indexOf (inspect name) ".")
+          fixed-name (if (neg? dot)
+                        (str name ".clj")
+                        name )
+          fixed-file (java.io.File. (.getParent f) (inspect fixed-name))]
+      (save-directly (set-current-document app fixed-file)) )))
 
 (def save-now (fn [app]
  (let [text (.getText (app :area))]
@@ -147,9 +156,7 @@
 
 (defn add-chooser [app]
   (let [chooser (javax.swing.JFileChooser. (. System getProperty "user.dir"))
-        filter (proxy [javax.swing.filechooser.FileFilter] []
-                  (accept [#^java.io.File f] (and f (or (.isDirectory f) (.. f (getName) (toLowerCase) (endsWith ".clj")))))
-                  (getDescription [] "Clojure (*.clj)"))]
+        filter (javax.swing.filechooser.FileNameExtensionFilter. "Clojure files" (into-array String ["clj"]))]
     (.setFileFilter chooser filter) 
     (assoc app :file-chooser chooser) ))
 
@@ -169,18 +176,6 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
