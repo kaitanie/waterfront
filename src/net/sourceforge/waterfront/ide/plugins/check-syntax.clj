@@ -62,7 +62,7 @@
       :else
       (assert false) )))
 
-(defn find-syntax-errors [success-message source-code]
+(defn- find-syntax-errors [source-code]
    (let [pairs (compute-paren-matching-pairs source-code)
          bad-pairs (filter (fn[x] (not= (first x) :match)) pairs)
          temp (filter (fn[x] (or 
@@ -71,13 +71,17 @@
          unique (set temp)
          sorted (sort-by (fn [x] (second x)) unique)
          formatted (map (partial form-msg source-code) sorted)]
-     (if (empty? unique) success-message formatted) ))
+     (if (empty? unique) [] formatted) ))
+
+
+(defn detect-syntax-errors [app]
+  (assoc app :problems (find-syntax-errors (.getText (app :area)))))
 
 (fn [app] 
   (add-to-menu app "Source"
     { :name "Check Syntax" :mnemonic KeyEvent/VK_C :key KeyEvent/VK_F4 :mask 0
-      :action (fn m-check-syntax [app] 
-                (assoc app :problems (find-syntax-errors [] (.getText (app :area)))))} ))
+      :action detect-syntax-errors }))
+
 
 
 

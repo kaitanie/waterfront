@@ -42,7 +42,7 @@
     "font-size.clj"
     "indent.clj"
     "load-recent-on-startup.clj"
-    "check-syntax-online.clj"
+    "eval-as-you-type.clj"
     "templates.clj"
     "auto-complete.clj"]
   :recent-files []

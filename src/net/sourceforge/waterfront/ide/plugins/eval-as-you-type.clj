@@ -38,12 +38,15 @@
   (assoc app :output-title msg :jump-to-line (zero-to-nil (get-line msg))) )
 
 
-(defn- run-syntax-check [app]
-  (try
-    (load-string (app :text))
-    (show-msg app true "")
-    (catch Throwable t     
-      (show-msg app false (.getMessage t)) )))
+(defn- eval-file [app]
+  (let [temp (detect-syntax-errors app)]
+    (if-not (empty? (temp :problems))
+      (show-msg temp true "")
+      (try
+        (load-string (temp :text))
+        (show-msg temp true "")
+        (catch Throwable t     
+          (show-msg temp false (.getMessage t)) )))))
          
 (defn- eval-disabled-observer [old-app new-app]
   (if (maps-differ-on old-app new-app :eval-as-you-type)
@@ -58,7 +61,7 @@
   (if (and
          (new-app :eval-as-you-type)
          (maps-differ-on old-app new-app :text :eval-as-you-type) )
-    (run-syntax-check new-app)
+    (eval-file new-app)
     new-app ))
 
 (fn [app] 
@@ -67,9 +70,11 @@
           { :name "Eval as You Type" :mnemonic KeyEvent/VK_T :boolean-value (a0 :eval-as-you-type)
             :action (fn [app-tag b] 
                       (assoc app-tag :eval-as-you-type b)) })
-        result (load-plugin (assoc after-menu-change :eval-as-you-type true) "custom-editor.clj" "layout.clj")]
+        result (load-plugin (assoc after-menu-change :eval-as-you-type true) "custom-editor.clj" "layout.clj" "check-syntax.clj")]
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
+
+
 
 
 

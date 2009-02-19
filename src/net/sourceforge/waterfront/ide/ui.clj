@@ -239,7 +239,7 @@
 ; Least important -->
 ;  (12) surround with try catch
 ;  (11) gen. overloading: ask arities, generate forwarding
-;  (21) Run syntax as part of eval as you type
+; +(21) Check syntax as part of eval as you type
 ;  (10) Red marker on the errorneus line (line-number pane)
 ;   (9) Red markers on syntax errors
 ; +(20) Make status bar a little bit taller than its contents
@@ -320,6 +320,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
