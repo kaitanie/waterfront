@@ -242,9 +242,9 @@
 ;  (21) Run syntax as part of eval as you type
 ;  (10) Red marker on the errorneus line (line-number pane)
 ;   (9) Red markers on syntax errors
-;  (20) Make status bar a little bit taller than its contents
-;  (18) Line:col indicator should not jump
-;  (13) uncomment does not trigger on line evaluation
+; +(20) Make status bar a little bit taller than its contents
+; +(18) Line:col indicator should not jump
+; +(13) uncomment does not trigger on line evaluation
 ; +(19) Eliminate auto-completion if too many completions
 ; +(17) Make sure the chooser adds *.clj
 ; +(15) File chooser should show *.clj files by default
@@ -320,6 +320,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

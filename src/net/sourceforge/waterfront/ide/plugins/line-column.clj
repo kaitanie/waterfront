@@ -32,9 +32,13 @@
           (assoc app :caret-dot (.getDot e) :caret-mark (.getMark e)) )))))
 
 (fn [app] 
-  (let [label (javax.swing.JLabel.)]
+  (let [p (javax.swing.JPanel.) 
+        label (javax.swing.JLabel.)]
 
-    (.add (app :lower-status-bar) label)
+    (.add p label) 
+    (.setMaximumSize p (java.awt.Dimension. 100 50))
+
+    (.add (app :lower-status-bar) p)
 
     (.add (app :lower-status-bar) 
       (doto (javax.swing.JSeparator. javax.swing.SwingConstants/VERTICAL)
@@ -44,17 +48,4 @@
     (.addCaretListener (app :area) (make-listener (app :later))) 
     ((app :register-periodic-observer) 50 (partial caret-pos-observer label)) ) 
     app)
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -25,9 +25,14 @@
 
 
 (fn [app] 
-  (let [label (javax.swing.JLabel. " ")]
+  (let [p (javax.swing.JPanel.)
+        label (javax.swing.JLabel. " ")]
     
-    (.add (app :lower-status-bar) label)
+    (.. p (getLayout) (setAlignment java.awt.FlowLayout/LEFT))
+    (.setMaximumSize p (java.awt.Dimension. 300 50))
+    (.add p label)
+
+    (.add (app :lower-status-bar) p)
     (.setBorder label (javax.swing.BorderFactory/createEmptyBorder 0 10 0 10))
 
     (.add (app :lower-status-bar) 
@@ -36,4 +41,5 @@
         (.setMinimumSize (java.awt.Dimension. 20 100)) ))
 
     (add-observers (assoc app :find-status "  ") (partial find-status-observer label)) )) 
+
 
