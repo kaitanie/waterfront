@@ -237,6 +237,9 @@
 
 
 ; Least important -->
+;  (25) New window (File->New) should inherit the divider location
+;  (24) Fix bad column/line when opening a new window
+;  (23) Do eval via clojure.main ?
 ;  (22) Indicator should be red when there are syntax errors
 ;  (12) surround with try catch
 ;  (11) gen. overloading: ask arities, generate forwarding
@@ -321,5 +324,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 

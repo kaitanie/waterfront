@@ -43,10 +43,17 @@
     (assoc app :output-title msg :jump-to-line ln :markers new-markers :problems new-problems) ))
 
 
+(defn- put-highlights [app]
+;  (.clearHighlights (app :area))
+;  (doseq [p (app :problems)]
+;    (.addHighlights (app :area) java.awt.Color/RED (p :offset)) )
+  (show-msg app false ""))
+
 (defn- eval-file [app]
   (let [temp (detect-syntax-errors app)]
+    (put-highlights temp)
     (if-not (empty? (temp :problems))
-      (show-msg temp false "")
+      temp
       (try
         (load-string (temp :text))
         (show-msg temp true "")
@@ -78,6 +85,11 @@
         result (load-plugin (assoc after-menu-change :eval-as-you-type true) "custom-editor.clj" "layout.clj" "check-syntax.clj")]
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
+
+
+
+
+
 
 
 

@@ -47,7 +47,7 @@
         name-other (paren-name c-other)
         c (.charAt source-code offset)
         name (paren-name c)
-        where { :line line :column col }
+        where { :line line :column col :offset offset }
         s (str problem)]
     (cond
       (= problem :mismatch)
@@ -85,6 +85,9 @@
 ;    { :name "Check Syntax" :mnemonic KeyEvent/VK_C :key KeyEvent/VK_F4 :mask 0
 ;      :action detect-syntax-errors }))
 (fn [app] app)
+
+
+
 
 
 
