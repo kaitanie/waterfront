@@ -51,11 +51,11 @@
       (.getSelectedFile (app :file-chooser)))
     (let [f (.. (app :file-chooser) (getSelectedFile) (getAbsoluteFile))
           name (.getName f)
-          dot (.indexOf (inspect name) ".")
+          dot (.indexOf name ".")
           fixed-name (if (neg? dot)
                         (str name ".clj")
                         name )
-          fixed-file (java.io.File. (.getParent f) (inspect fixed-name))]
+          fixed-file (java.io.File. (.getParent f) fixed-name)]
       (save-directly (set-current-document app fixed-file)) )))
 
 (def save-now (fn [app]
@@ -176,6 +176,7 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
 
 
 

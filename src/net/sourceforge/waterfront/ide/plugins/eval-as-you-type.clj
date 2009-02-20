@@ -33,10 +33,14 @@
       :else
       x ))
 
+(defn- set-indicator-color [app is-ok?]
+  (if (app :eval-as-you-type)
+    (.setBackground (app :indicator) (.darker (if is-ok? java.awt.Color/GREEN java.awt.Color/RED)))
+    (.setBackground (app :indicator) java.awt.Color/GRAY) ))
 
 
 (defn- show-msg [app is-ok?  msg]
-  (.setBackground (app :indicator) (.darker (if is-ok? java.awt.Color/GREEN java.awt.Color/RED)))
+  (set-indicator-color app is-ok?)
   (let [ln (zero-to-nil (get-line msg))
         new-markers (if ln (cons ln (app :markers)) (app :markers))
         new-problems (if is-ok? [] [{:line ln :column 0 :msg msg }]) ]
@@ -65,7 +69,7 @@
     (if (new-app :eval-as-you-type)
       new-app
       (do
-        (.setBackground (new-app :indicator) java.awt.Color/GRAY)
+        (set-indicator-color new-app false)
         (assoc new-app :output-title "" :jump-to-line nil) ))
     new-app ))
 
@@ -77,20 +81,15 @@
     new-app ))
 
 (fn [app] 
-  (let [a0 (merge { :eval-as-you-type true } app)
+  (let [a0 (merge { :eval-as-you-type true } (add-to-keys-to-save app :eval-as-you-type))
         after-menu-change (add-to-menu a0  "Run"
           { :name "Eval as You Type" :mnemonic KeyEvent/VK_T :boolean-value (a0 :eval-as-you-type)
             :action (fn [app-tag b] 
                       (assoc app-tag :eval-as-you-type b)) })
-        result (load-plugin (assoc after-menu-change :eval-as-you-type true) "custom-editor.clj" "layout.clj" "check-syntax.clj")]
+        result (load-plugin after-menu-change "custom-editor.clj" "layout.clj" "check-syntax.clj")]
+    (set-indicator-color app false)
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
-
-
-
-
-
-
 
 
 

@@ -231,21 +231,23 @@
 ; run.clj depends on get-selected-text as a library function from another plugin. refactor into kit.clj
 
 ; Add "run expression" history to the run menu
-; In proxy generation dialog: no need to proivde at least one interface (if a class is specified)
 ; New proxy wizard: choose which ctor (of super-class) to call. Choose which methods you want to override
 ; Highlight full width of current line
 
 
 ; Least important -->
 ;  (25) New window (File->New) should inherit the divider location
-;  (24) Fix bad column/line when opening a new window
-;  (23) Do eval via clojure.main ?
-;  (22) Indicator should be red when there are syntax errors
 ;  (12) surround with try catch
 ;  (11) gen. overloading: ask arities, generate forwarding
+
+
+; +(27) Eval-as-you-type status is now persistent
+; +(26) Indicator color is green when starting with eval-as-you-type disabled
+; +(24) Bad column/line when opening a new window
+; +(22) Indicator should be red when there are syntax errors
 ; +(21) Check syntax as part of eval as you type
-;  (10) Red marker on the errorneus line (line-number pane)
-;   (9) Red markers on syntax errors
+; +(10) Red marker on the errorneus line (line-number pane)
+; + (9) Red markers on syntax errors
 ; +(20) Make status bar a little bit taller than its contents
 ; +(18) Line:col indicator should not jump
 ; +(13) uncomment does not trigger on line evaluation
@@ -332,6 +334,12 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
+
+
+
+
 
 
 

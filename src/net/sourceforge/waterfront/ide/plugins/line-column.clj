@@ -47,5 +47,6 @@
 
     (.addCaretListener (app :area) (make-listener (app :later))) 
     ((app :register-periodic-observer) 50 (partial caret-pos-observer label)) ) 
-    app)
+    (assoc app :caret-dot 0 :caret-mark 0))
+
 
