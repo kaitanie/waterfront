@@ -1,9 +1,5 @@
 (ns net.sourceforge.waterfront.ide.plugins)
 
-
-
-
-
 (refer 'net.sourceforge.waterfront.kit)
 (refer 'net.sourceforge.waterfront.ide.services)
 
@@ -22,9 +18,8 @@
     (assert false) ))
 
 
-(defn- new-table-model [existing-model maps]
-  (let [keys [:line :column :msg] 
-        tm (if existing-model existing-model (javax.swing.table.DefaultTableModel.))]
+(defn- new-table-model [existing-model keys maps]
+  (let [tm (if existing-model existing-model (javax.swing.table.DefaultTableModel.))]
     
     (.setRowCount tm 0)
     (when (nil? existing-model)
@@ -38,17 +33,16 @@
           (recur (rest ks) (cons (get m (first ks)) row)) )))
     tm ))
       
-(defn- problem-table-observer [table scrolled-table old-app new-app]
+(defn- problem-table-observer [table keys scrolled-table old-app new-app]
   (when (maps-differ-on old-app new-app :problems)
-    (let [tm (new-table-model (.getModel table) (new-app :problems))]
+    (let [tm (new-table-model (.getModel table) keys (new-app :problems))]
       (.setModel table tm)
       (.setSelectedComponent (new-app :lower-window) scrolled-table) ))
   new-app)
 
 
-(defn- new-table [double-click-handler]
-  (let [keys [:line :msg] 
-        tm (new-table-model nil [])
+(defn- new-table [keys double-click-handler]
+  (let [tm (new-table-model nil keys [])
         result (proxy [javax.swing.JTable] [tm]
                   (isCellEditable [row col] false) )]
 
@@ -62,6 +56,7 @@
               (double-click-handler result (aget selRows 0)) ))))))
           
     (.setAutoResizeMode result (javax.swing.JTable/AUTO_RESIZE_LAST_COLUMN))
+         
     result ))
 
 
@@ -74,10 +69,13 @@
     
 
 (fn [app] 
-  (let [table (new-table (partial jump-to-problem app))
+  (let [keys [:line :column :msg]        
+        table (new-table keys (partial jump-to-problem app))
         scrolled (javax.swing.JScrollPane. table)]    
     (.addTab (app :lower-window) "Problems" scrolled)
-    (add-observers (assoc app :problem-window table) (partial problem-table-observer table scrolled))))
+    (add-observers (assoc app :problem-window table) (partial problem-table-observer table keys scrolled))))
+
+
 
 
 

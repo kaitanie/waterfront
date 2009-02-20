@@ -312,7 +312,15 @@
 ; 16-Feb-09: Eval as you type can be disabled (Run -> Eval as you type)
 ; 17-Feb-09: Disabling of menu items (undo, redo, increase/decrease font)
 ; 17-Feb-09: Eval menu item is now either "Eval File" or "Eval Selection"
+; 17-Feb-09: Improved the undo behavior of replace, replace-all
+; 19-Feb-09: In save-as a *.clj extension is added if none specified
+; 19-Feb-09: Auto-completion only shows the first N entries
+; 19-Feb-09: Periodic text observer added => The greed/red indicator is repsonsive to uncomment, undo, replace, etc.
+; 19-Feb-09: Improved looks of the lower status bar
+
+
  
+
 ; Highlights:
 ;
 ; - spaces not tabs
@@ -324,6 +332,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
