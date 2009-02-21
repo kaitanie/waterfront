@@ -9,9 +9,19 @@
 (refer 'net.sourceforge.waterfront.ide.services)
 
 (defn- get-line [msg]
-  (if (nil? msg)
+  (cond 
+
+    (nil? msg)
     nil
-    (let [prefix "NO_SOURCE_FILE:"
+
+    (and (.startsWith msg "Line ") (pos? (.indexOf msg " - ")))
+    (let [sub (.trim (.substring msg 5 (.indexOf msg " - ")))]
+      (try 
+        (int sub)
+        (catch Exception e nil) ))
+        
+    :else
+    (let [prefix "sourcefile:"
           begin-prefix (.indexOf msg prefix)
           end-prefix (+ begin-prefix (count prefix))
           pos-colon (.indexOf msg ")" (max 0 begin-prefix))]
@@ -20,8 +30,7 @@
         (try 
           (Integer/parseInt (.substring msg end-prefix pos-colon))
           (catch NumberFormatException e nil) )))))
-        
-      
+              
 (defn- zero-to-nil [x]
    (cond 
       (nil? x)
@@ -53,16 +62,17 @@
 ;    (.addHighlights (app :area) java.awt.Color/RED (p :offset)) )
   (show-msg app false ""))
 
+
 (defn- eval-file [app]
   (let [temp (detect-syntax-errors app)]
     (put-highlights temp)
     (if-not (empty? (temp :problems))
       temp
       (try
-        (load-string (temp :text))
-        (show-msg temp true "")
-        (catch Throwable t     
-          (show-msg temp false (.getMessage t)) )))))
+        (let [exception (second (run-program temp (temp :text)))]
+        (if exception
+          (show-msg temp false (.getMessage exception))
+          (show-msg temp true "")) )))))
          
 (defn- eval-disabled-observer [old-app new-app]
   (if (maps-differ-on old-app new-app :eval-as-you-type)
@@ -90,6 +100,13 @@
     (set-indicator-color app false)
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
+
+
+
+
+
+
+
 
 
 

@@ -21,7 +21,7 @@
 
 
 
-(defn read-objects-from-file [f]
+(defn read-objects-from-file [f first-line-number]
   (let [stream (new clojure.lang.LineNumberingPushbackReader (new java.io.FileReader f))]
     (try
       (. clojure.lang.Var pushThreadBindings { 
@@ -36,24 +36,34 @@
           (.set clojure.lang.Compiler/LINE_BEFORE la)
           (if (nil? o)
             (reverse result)
-            (recur la (cons (with-meta o { :line lb }) result)) )))
+            (recur la (cons (with-meta o { :line (+ la first-line-number) }) result)) )))
       (finally (. clojure.lang.Var popThreadBindings)) )))
 
 
 
-(defn- gen-location [app ln msg]
-  (let [file-name (.getName (java.io.File. (app :file-name)))]
-    (str msg "(" file-name ":" ln ")") ))
+(defn- synthesize-exception [app temp-file-name ln e]
+  (let [index (.indexOf (.getMessage e) (str "(" temp-file-name))
+        msg (if (neg? index) (.getMessage e) (.substring (.getMessage e) 0 index))
+        re (RuntimeException. (str msg "(sourcefile:" ln ")"))]
+      (.setStackTrace re (.getStackTrace e))
+      re ))
+      
 
-(defn eval-objects [app objects]  
+(defn eval-objects [app objects temp-file-name]  
   (binding [*app* (assoc app :program objects) ]
     (doseq [obj objects]
-        (println (eval obj)) )))
+      (try
+        (println (eval obj))
+        (catch Exception e
+          (throw (synthesize-exception app temp-file-name ((meta obj) :line) (clojure.main/repl-exception e))) )))))
 
-
-(defn run-program [app text] 
+(defn run-program 
   "run a program. return a two element list: first element is the output, second element is the exception
     that stopped the program (nil if completed normally)"
+  ([app text]
+  (run-program app text 0))
+
+  ([app text first-line]    
   (let [src-file (get-temp-file) 
         stream (new java.io.StringWriter)
         print-writer (new java.io.PrintWriter stream true)]
@@ -66,12 +76,12 @@
           { clojure.lang.Compiler/SOURCE (.getName src-file),
             clojure.lang.Compiler/SOURCE_PATH (.getAbsolutePath src-file),
             clojure.lang.RT/CURRENT_NS (.get clojure.lang.RT/CURRENT_NS) })
-        (eval-objects app (read-objects-from-file (.getAbsolutePath src-file))) 
-        (str stream)
+        (eval-objects app (read-objects-from-file (.getAbsolutePath src-file) first-line) (.getName src-file)) 
+        [(str stream) nil]
         (catch Exception e         
           (.printStackTrace e print-writer)
-          (str stream) )
-        (finally (.delete src-file) (. clojure.lang.Var popThreadBindings))  ))))
+          [(str stream) e] )
+        (finally (.delete src-file) (. clojure.lang.Var popThreadBindings))  )))))
 
 
 (defn- add-output [output app]
@@ -97,7 +107,7 @@
   (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
   (let [t0 (. System currentTimeMillis) 
         sel-text (get-selected-text app (.getText (app :area)))
-        output (run-program (assoc app :change change-func) sel-text)]
+        output (first (run-program (assoc app :change change-func) sel-text))]
     (add-output output (assoc (merge app @a)
       :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
       :output output 
@@ -110,6 +120,12 @@
     (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
       { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
         :action (partial eval-file-or-selection a change-func) })))
+
+
+
+
+
+
 
 
 

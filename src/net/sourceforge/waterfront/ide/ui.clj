@@ -233,12 +233,9 @@
 ; Add "run expression" history to the run menu
 ; New proxy wizard: choose which ctor (of super-class) to call. Choose which methods you want to override
 ; Highlight full width of current line
-
-
-; Least important -->
-;  (25) New window (File->New) should inherit the divider location
-;  (12) surround with try catch
-;  (11) gen. overloading: ask arities, generate forwarding
+; New window (File->New) should inherit the divider location
+; surround with try catch
+; gen. overloading: ask arities, generate forwarding
 
 
 ; +(27) Eval-as-you-type status is now persistent
@@ -334,6 +331,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
