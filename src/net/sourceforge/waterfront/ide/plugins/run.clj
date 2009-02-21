@@ -9,17 +9,6 @@
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
 
-(import 
-  '(javax.swing JFrame JLabel JScrollPane JTextField JButton JTextArea UIManager JMenuItem JMenu JMenuBar)
-  '(javax.swing JPopupMenu KeyStroke JSplitPane JOptionPane)
-  '(javax.swing.event CaretEvent CaretListener)
-  '(javax.swing.text DefaultStyledDocument StyleConstants StyleConstants$CharacterConstants SimpleAttributeSet)
-  '(java.awt Color)
-  '(java.awt.event ActionListener KeyEvent ActionEvent)
-  '(java.awt GridLayout BorderLayout Font EventQueue)
-  '(java.io File))
-
-
 
 
 (defn read-objects-from-file [f first-line-number]
@@ -58,7 +47,21 @@
     (recur c)
     e ))
 
-(defn- synthesize-exception [app temp-file-name ln e-orig]
+(defn- get-err-line [temp-file-name err-msg]
+  (let [patt (str "(" temp-file-name ":")
+        begin (.indexOf err-msg patt)]
+    (if (neg? (inspect begin))
+      nil
+      (let [end (.indexOf err-msg ")" begin)]
+        (if (neg? (inspect end))
+          nil
+          (try
+            (Integer/parseInt (.substring err-msg (+ begin (count patt)) end))
+            (catch NumberFormatException e
+              nil )))))))
+
+
+(defn- synthesize-exception [app temp-file-name e-orig]
   (let [e (get-cause e-orig)
         file-name (get-user-visible-file-name app)
         tr (seq (.getStackTrace e))
@@ -66,16 +69,16 @@
             (fn [so-far curr] (or so-far (if (= (.getFileName curr) temp-file-name) curr nil)))
             nil   
             tr)
+        ln (if stack-trace-elem (.getLineNumber stack-trace-elem) (get-err-line temp-file-name (.getMessage e-orig)))
         new-tr (map (fn [x] 
                   (if (= (.getFileName x) temp-file-name) 
                     (StackTraceElement. (.getClassName x) (.getMethodName x) file-name (.getLineNumber x)) 
-                    x)) tr)]
-
-    (let [re (RuntimeException. (str (.getMessage e) (if stack-trace-elem (str " (" file-name ":" (.getLineNumber stack-trace-elem) ")") ""))) ]
-      (.setStackTrace re (into-array StackTraceElement new-tr))
-      { :exception re 
-        :msg (.getMessage re) 
-        :err-line (if stack-trace-elem (.getLineNumber stack-trace-elem) 0)} )))
+                    x)) tr)
+        re (RuntimeException. (str (.getMessage e) (if (inspect ln) (str " (" file-name ":" ln ")") ""))) ]
+    (.setStackTrace re (into-array StackTraceElement new-tr))
+    { :exception re 
+      :msg (.getMessage re) 
+      :err-line (or ln nil) }))
       
 
 (defn- eval-via-load-file [app temp-file]
@@ -86,20 +89,7 @@
       (synthesize-exception 
         app
         (.getName temp-file)
-        999
         e ))))
-
-(defn eval-objects [app objects temp-file-name]  
-  (binding [*app* (assoc app :program objects) ]
-    (doseq [obj objects]
-      (try
-        (println (eval obj))
-        (catch Exception e
-          (throw (synthesize-exception 
-            app 
-            temp-file-name 
-            ((meta obj) :line) 
-            e )) )))))
 
 (defn run-program 
   "run a program. return a two element list: first element is the output, second element is the exception
@@ -132,12 +122,10 @@
     (assoc app :output-text output)
     app ))
 
-
 (defn- abs-val [x]
   (if (pos? x)
     x
     (- x)))
-
 
 (defn- eval-menu-observer [old-app new-app]
   (if (maps-differ-on old-app new-app :caret-dot :caret-mark)
@@ -163,11 +151,6 @@
     (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
       { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
         :action (partial eval-file-or-selection a change-func) })))
-
-
-
-
-
 
 
 
