@@ -1,5 +1,4 @@
 
-
 (def *app* {})
 
 (ns net.sourceforge.waterfront.ide.plugins)
@@ -8,27 +7,6 @@
 
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
-
-
-
-(defn read-objects-from-file [f first-line-number]
-  (let [stream (new clojure.lang.LineNumberingPushbackReader (new java.io.FileReader f))]
-    (try
-      (. clojure.lang.Var pushThreadBindings { 
-          clojure.lang.Compiler/SOURCE f, 
-          clojure.lang.Compiler/SOURCE_PATH f,
-          clojure.lang.Compiler/LINE_BEFORE (.getLineNumber stream),
-          clojure.lang.Compiler/LINE_AFTER (.getLineNumber stream) })
-      (loop [lb (.getLineNumber stream)
-             result ()]
-        (let [o (read stream false nil)
-              la (.getLineNumber stream)]
-          (.set clojure.lang.Compiler/LINE_BEFORE la)
-          (if (nil? o)
-            (reverse result)
-            (recur la (cons (with-meta o { :line (+ la first-line-number) }) result)) )))
-      (finally (. clojure.lang.Var popThreadBindings)) )))
-
 
 (defn- drop-until [x coll]
   (cond
@@ -50,10 +28,10 @@
 (defn- get-err-line [temp-file-name err-msg]
   (let [patt (str "(" temp-file-name ":")
         begin (.indexOf err-msg patt)]
-    (if (neg? (inspect begin))
+    (if (neg? begin)
       nil
       (let [end (.indexOf err-msg ")" begin)]
-        (if (neg? (inspect end))
+        (if (neg? end)
           nil
           (try
             (Integer/parseInt (.substring err-msg (+ begin (count patt)) end))
@@ -81,15 +59,30 @@
       :err-line (or ln nil) }))
       
 
-(defn- eval-via-load-file [app temp-file]
+
+(defn- run-repl [abs-path]
+  (let [stream (new clojure.lang.LineNumberingPushbackReader (new java.io.FileReader abs-path))
+        prompt (fn [] )
+        catcher (fn [t] (throw t))
+        pr-handler (fn [x] (println x))
+        r (fn [x] (read stream false x))]
+    (clojure.main/repl :read r :print pr-handler :prompt prompt :caught catcher)))
+
+
+(defn- eval-via-repl [app temp-file]
   (try
-    (load-file (.getAbsolutePath temp-file))
+    (run-repl (.getAbsolutePath temp-file))
     nil
     (catch Exception e
       (synthesize-exception 
         app
         (.getName temp-file)
         e ))))
+
+
+(defn- vis [x]
+  (javax.swing.JOptionPane/showMessageDialog nil (str "x=" (.substring x 0 (min (count x) 300)))) 
+  x)
 
 (defn run-program 
   "run a program. return a two element list: first element is the output, second element is the exception
@@ -110,10 +103,10 @@
           { clojure.lang.Compiler/SOURCE (.getName src-file),
             clojure.lang.Compiler/SOURCE_PATH (.getAbsolutePath src-file),
             clojure.lang.RT/CURRENT_NS (.get clojure.lang.RT/CURRENT_NS) })
-          (let [eval-result (eval-via-load-file app src-file)]
+          (let [eval-result (eval-via-repl app src-file)]
             (when eval-result
-              (.printStackTrace (eval-result :exception) print-writer)
-            [(str stream) eval-result] ))
+              (.printStackTrace (eval-result :exception) print-writer))
+            [(str stream) eval-result] )
         (finally (.delete src-file) (. clojure.lang.Var popThreadBindings))  )))))
 
 
@@ -151,6 +144,11 @@
     (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
       { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
         :action (partial eval-file-or-selection a change-func) })))
+
+
+
+
+
 
 
 

@@ -237,6 +237,16 @@
 ; surround with try catch
 ; gen. overloading: ask arities, generate forwarding
 
+; show only first exc.
+; show stack trace of exc.
+; quick relaunch of new windows (remembber init. funcs. of plugins)
+; relfect - show java structure.
+; File changed, reload?
+; Check what happens if the file is read-only
+; read-only indication
+; Tooltip on red markers
+; Remove the red/green indicator
+
 
 ; +(27) Eval-as-you-type status is now persistent
 ; +(26) Indicator color is green when starting with eval-as-you-type disabled
@@ -263,6 +273,9 @@
 ; + (1) Mnemonics on buttons of forms
 ; ? (0) Font issue
 ; <-- Most important
+
+
+
 
 ; 28-Dec-08: plugins (setup function)
 ; 28-Dec-08: Bug fix - Exception in dispatch are now caught
@@ -331,15 +344,5 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
-
-
-
-
-
-
-
-
-
-
 
 
