@@ -55,7 +55,15 @@
             (when (pos? (alength selRows))
               (double-click-handler result (aget selRows 0)) ))))))
           
-    (.setAutoResizeMode result (javax.swing.JTable/AUTO_RESIZE_LAST_COLUMN))
+    (.setAutoResizeMode result (javax.swing.JTable/AUTO_RESIZE_OFF))
+
+    (doseq [i (reverse (range (dec (count keys))))]
+      (.. result (getColumnModel) (getColumn i) (setMaxWidth 100)) )
+
+    (.setAutoResizeMode result (javax.swing.JTable/AUTO_RESIZE_NEXT_COLUMN))
+
+    (doseq [i (reverse (range (dec (count keys))))]
+      (.. result (getColumnModel) (getColumn i) (setMaxWidth 350)) )
          
     result ))
 
@@ -74,6 +82,8 @@
         scrolled (javax.swing.JScrollPane. table)]    
     (.addTab (app :lower-window) "Problems" scrolled)
     (add-observers (assoc app :problem-window table) (partial problem-table-observer table keys scrolled))))
+
+
 
 
 

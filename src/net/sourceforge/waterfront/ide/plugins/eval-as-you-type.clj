@@ -8,39 +8,10 @@
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
 
-(defn- get-line [msg]
-  (cond 
 
-    (nil? msg)
-    nil
 
-    (and (.startsWith msg "Line ") (pos? (.indexOf msg " - ")))
-    (let [sub (.trim (.substring msg 5 (.indexOf msg " - ")))]
-      (try 
-        (int sub)
-        (catch Exception e nil) ))
-        
-    :else
-    (let [prefix "sourcefile:"
-          begin-prefix (.indexOf msg prefix)
-          end-prefix (+ begin-prefix (count prefix))
-          pos-colon (.indexOf msg ")" (max 0 begin-prefix))]
-      (if (or (neg? begin-prefix) (neg? pos-colon))
-        nil
-        (try 
-          (Integer/parseInt (.substring msg end-prefix pos-colon))
-          (catch NumberFormatException e nil) )))))
+
               
-(defn- zero-to-nil [x]
-   (cond 
-      (nil? x)
-      nil
-
-      (zero? x)
-      nil
-
-      :else
-      x ))
 
 (defn- set-indicator-color [app is-ok?]
   (if (app :eval-as-you-type)
@@ -48,19 +19,20 @@
     (.setBackground (app :indicator) java.awt.Color/GRAY) ))
 
 
-(defn- show-msg [app is-ok?  msg]
-  (set-indicator-color app is-ok?)
-  (let [ln (zero-to-nil (get-line msg))
-        new-markers (if ln (cons ln (app :markers)) (app :markers))
-        new-problems (if is-ok? [] [{:line ln :column 0 :msg msg }]) ]
-    (assoc app :output-title msg :jump-to-line ln :markers new-markers :problems new-problems) ))
+(defn- show-msg [app is-ok?  eval-result]
+  (let [msg (if eval-result (eval-result :msg) "")]
+    (set-indicator-color app is-ok?)
+    (let [ln (if eval-result (eval-result :err-line) nil)
+          new-markers (if ln (cons ln (app :markers)) (app :markers))
+          new-problems (if is-ok? [] [{:line ln :column 0 :msg msg }]) ]
+      (assoc app :output-title msg :jump-to-line ln :markers new-markers :problems new-problems) )))
 
 
 (defn- put-highlights [app]
 ;  (.clearHighlights (app :area))
 ;  (doseq [p (app :problems)]
 ;    (.addHighlights (app :area) java.awt.Color/RED (p :offset)) )
-  (show-msg app false ""))
+  (show-msg app false nil))
 
 
 (defn- eval-file [app]
@@ -69,10 +41,10 @@
     (if-not (empty? (temp :problems))
       temp
       (try
-        (let [exception (second (run-program temp (temp :text)))]
-        (if exception
-          (show-msg temp false (.getMessage exception))
-          (show-msg temp true "")) )))))
+        (let [eval-result (second (run-program temp (temp :text)))]
+        (if eval-result
+          (show-msg temp false eval-result)
+          (show-msg temp true nil)) )))))
          
 (defn- eval-disabled-observer [old-app new-app]
   (if (maps-differ-on old-app new-app :eval-as-you-type)
@@ -100,6 +72,15 @@
     (set-indicator-color app false)
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
+
+
+
+
+
+
+
+
+
 
 
 

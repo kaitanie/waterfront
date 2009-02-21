@@ -78,6 +78,10 @@
      
 
 
+(defn get-user-visible-file-name [app]
+   (if (unknown-document? app) 
+      "Unnamed" 
+      (.getName (get-current-document app))))
 
 (defn save-and-or-do-something [app do-something]
   (if (not (is-dirty app))

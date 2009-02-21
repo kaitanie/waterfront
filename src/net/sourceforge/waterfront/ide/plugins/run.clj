@@ -21,6 +21,7 @@
 
 
 
+
 (defn read-objects-from-file [f first-line-number]
   (let [stream (new clojure.lang.LineNumberingPushbackReader (new java.io.FileReader f))]
     (try
@@ -40,14 +41,53 @@
       (finally (. clojure.lang.Var popThreadBindings)) )))
 
 
+(defn- drop-until [x coll]
+  (cond
+    (empty? coll)
+    nil
 
-(defn- synthesize-exception [app temp-file-name ln e]
-  (let [index (.indexOf (.getMessage e) (str "(" temp-file-name))
-        msg (if (neg? index) (.getMessage e) (.substring (.getMessage e) 0 index))
-        re (RuntimeException. (str msg "(sourcefile:" ln ")"))]
-      (.setStackTrace re (.getStackTrace e))
-      re ))
+    (= x (first coll))
+    coll
+
+    :else
+    (drop-until x (rest coll)) ))
+
+
+(defn- get-cause [e]
+  (if-let [c (.getCause e)]
+    (recur c)
+    e ))
+
+(defn- synthesize-exception [app temp-file-name ln e-orig]
+  (let [e (get-cause e-orig)
+        file-name (get-user-visible-file-name app)
+        tr (seq (.getStackTrace e))
+        stack-trace-elem (reduce 
+            (fn [so-far curr] (or so-far (if (= (.getFileName curr) temp-file-name) curr nil)))
+            nil   
+            tr)
+        new-tr (map (fn [x] 
+                  (if (= (.getFileName x) temp-file-name) 
+                    (StackTraceElement. (.getClassName x) (.getMethodName x) file-name (.getLineNumber x)) 
+                    x)) tr)]
+
+    (let [re (RuntimeException. (str (.getMessage e) (if stack-trace-elem (str " (" file-name ":" (.getLineNumber stack-trace-elem) ")") ""))) ]
+      (.setStackTrace re (into-array StackTraceElement new-tr))
+      { :exception re 
+        :msg (.getMessage re) 
+        :err-line (if stack-trace-elem (.getLineNumber stack-trace-elem) 0)} )))
       
+
+(defn- eval-via-load-file [app temp-file]
+  (try
+    (load-file (.getAbsolutePath temp-file))
+    nil
+    (catch Exception e
+      (synthesize-exception 
+        app
+        (.getName temp-file)
+        999
+        e ))))
 
 (defn eval-objects [app objects temp-file-name]  
   (binding [*app* (assoc app :program objects) ]
@@ -55,7 +95,11 @@
       (try
         (println (eval obj))
         (catch Exception e
-          (throw (synthesize-exception app temp-file-name ((meta obj) :line) (clojure.main/repl-exception e))) )))))
+          (throw (synthesize-exception 
+            app 
+            temp-file-name 
+            ((meta obj) :line) 
+            e )) )))))
 
 (defn run-program 
   "run a program. return a two element list: first element is the output, second element is the exception
@@ -71,16 +115,15 @@
               *err* print-writer 
               *out* print-writer]
       (write-file text src-file)
-      (try 
+      (try
         (. clojure.lang.Var pushThreadBindings 
           { clojure.lang.Compiler/SOURCE (.getName src-file),
             clojure.lang.Compiler/SOURCE_PATH (.getAbsolutePath src-file),
             clojure.lang.RT/CURRENT_NS (.get clojure.lang.RT/CURRENT_NS) })
-        (eval-objects app (read-objects-from-file (.getAbsolutePath src-file) first-line) (.getName src-file)) 
-        [(str stream) nil]
-        (catch Exception e         
-          (.printStackTrace e print-writer)
-          [(str stream) e] )
+          (let [eval-result (eval-via-load-file app src-file)]
+            (when eval-result
+              (.printStackTrace (eval-result :exception) print-writer)
+            [(str stream) eval-result] ))
         (finally (.delete src-file) (. clojure.lang.Var popThreadBindings))  )))))
 
 
@@ -120,9 +163,6 @@
     (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
       { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
         :action (partial eval-file-or-selection a change-func) })))
-
-
-
 
 
 
