@@ -51,7 +51,7 @@
              fontDesc) )]
       (dispatch (fn[app]
         (swap! storage (fn [old-value] old-value { :startline startline :endline endline :starting_y starting_y :font-height fontHeight }))
-        (paint-line-numbers tp lnp g startline endline starting_y fontHeight fontDesc fontAscent (sort (app :markers)))))
+        (paint-line-numbers tp lnp g startline endline starting_y fontHeight fontDesc fontAscent (sort (map (fn[x] (x :line)) (app :markers))))))
       g )))
     
 (defn- new-panel [paint-hook tooltip-provider]
@@ -76,9 +76,10 @@
     (if (and (>= line (state :startline)) (<= line (state :endline)))
       (do 
         ((app :dispatch) (fn [app-tag]
-          (if (includes line (app-tag :markers))
-            (swap! local-atom (fn [x] (str "Marker @" line)))
-            (swap! local-atom (fn [x] nil)) )
+          (let [chosen (filter (fn [x] (= (x :line) line)) (app-tag :markers))]
+            (if (empty? chosen)
+              (swap! local-atom (fn [x] nil)) 
+              (swap! local-atom (fn [x] (apply str (rest (apply concat (map (fn [x y] [x (y :msg)]) (repeat "; ") chosen)))))) ))
           app-tag ))
         @local-atom )
       nil )))
@@ -157,18 +158,5 @@
       :indicator indicator
       :lower-status-bar lower-sb) 
     layout-observer) ))
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

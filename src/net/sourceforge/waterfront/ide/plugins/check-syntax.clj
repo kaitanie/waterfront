@@ -73,18 +73,30 @@
     sorted ))
 
 
+(defn- new-marker-comparator []
+  (proxy [java.util.Comparator] []
+    (compare [lhs rhs] 
+      (let [temp (- (lhs :line) (rhs :line))]
+        (if (zero? temp)
+          (.compareTo (lhs :msg) (rhs :msg))
+          temp )))))
+
 (defn detect-syntax-errors [app]
   (let [src (.getText (app :area))
         sorted (find-syntax-errors src)
         formatted (map (partial form-msg src) sorted)
         probs (if (empty? sorted) [] formatted)
-        markers (sort (distinct (map (fn[x] (x :line)) formatted)))]
+        markers (sort (new-marker-comparator) (distinct (map (fn[x] (select-keys x [:line :msg])) formatted)))]
     (assoc app :problems probs :markers markers) ))
 
 ;  (add-to-menu app "Source"
 ;    { :name "Check Syntax" :mnemonic KeyEvent/VK_C :key KeyEvent/VK_F4 :mask 0
 ;      :action detect-syntax-errors }))
 (fn [app] app)
+
+
+
+
 
 
 

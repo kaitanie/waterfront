@@ -56,7 +56,7 @@
     (.setStackTrace re (into-array StackTraceElement new-tr))
     { :exception re 
       :msg (.getMessage re) 
-      :err-line (or ln nil) }))
+      :line (or ln nil) }))
       
 
 
@@ -144,6 +144,7 @@
     (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
       { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
         :action (partial eval-file-or-selection a change-func) })))
+
 
 
 

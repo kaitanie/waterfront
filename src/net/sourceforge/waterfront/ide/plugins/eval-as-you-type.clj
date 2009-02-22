@@ -22,10 +22,10 @@
 (defn- show-msg [app is-ok?  eval-result]
   (let [msg (if eval-result (eval-result :msg) "")]
     (set-indicator-color app is-ok?)
-    (let [ln (if eval-result (eval-result :err-line) nil)
-          new-markers (if ln (cons ln (app :markers)) (app :markers))
-          new-problems (if is-ok? [] [{:line ln :column 0 :msg msg }]) ]
-      (assoc app :output-title msg :jump-to-line ln :markers new-markers :problems new-problems) )))
+    (let [marker (if eval-result (select-keys eval-result [:line :msg]) nil)
+          new-markers (if marker (cons marker (app :markers)) (app :markers))
+          new-problems (if is-ok? [] [(merge marker {:column 0})]) ]
+      (assoc app :output-title msg :jump-to-line ((or marker {}) :line) :markers new-markers :problems new-problems) )))
 
 
 (defn- put-highlights [app]
@@ -72,6 +72,8 @@
     (set-indicator-color app false)
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
+
+
 
 
 
