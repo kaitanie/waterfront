@@ -27,7 +27,7 @@
       (recur (inc line) (+ y fontHeight)) )))
 
 
-(defn- paint-line-numbers-panel [sp tp lnp g dispatch] 
+(defn- paint-line-numbers-panel [storage sp tp lnp g dispatch] 
   (if (or (<= (.getWidth tp) 0) (<= (.getHeight tp) 0) (nil? (.modelToView tp 0)))
     nil
     (let [start (.viewToModel tp (.. sp (getViewport) (getViewPosition)))   
@@ -50,20 +50,50 @@
               (.. sp (getViewport) (getViewPosition) y) 
              fontDesc) )]
       (dispatch (fn[app]
+        (swap! storage (fn [old-value] old-value { :startline startline :endline endline :starting_y starting_y :font-height fontHeight }))
         (paint-line-numbers tp lnp g startline endline starting_y fontHeight fontDesc fontAscent (sort (app :markers)))))
       g )))
     
+(defn- new-panel [paint-hook tooltip-provider]
+  (let [provider
+        (proxy [net.sourceforge.waterfront.ide.services.CustomTooltipPanel$Provider] []
+          (getText [#^java.awt.event.MouseEvent me] (tooltip-provider me)))
+
+        result 
+          (proxy [net.sourceforge.waterfront.ide.services.CustomTooltipPanel] [provider]
+
+            (paint [g]
+              (proxy-super paint g)
+              ((graphics-wrapper paint-hook) g) ))]
+    result ))
+
+
+
+
+(defn- compute-tooltip [app storage local-atom mouse-event]  
+  (let [state @storage
+        line (int (+  1 (state :startline) (/ (- (.getY mouse-event) (state :starting_y)) (state :font-height))))]
+    (if (and (>= line (state :startline)) (<= line (state :endline)))
+      (do 
+        ((app :dispatch) (fn [app-tag]
+          (if (includes line (app-tag :markers))
+            (swap! local-atom (fn [x] (str "Marker @" line)))
+            (swap! local-atom (fn [x] nil)) )
+          app-tag ))
+        @local-atom )
+      nil )))
+
 (defn create-line-numbers-components [app]
   (let [parts (atom nil)
+        storage (atom {})
         paint-numbers-wrapped (fn [g]
           (let [new-g (.create g)]
             (try
-              (paint-line-numbers-panel (@parts :scroll-pane) (@parts :text-pane) 
+              (paint-line-numbers-panel storage (@parts :scroll-pane) (@parts :text-pane) 
                 (@parts :line-number-panel) new-g (app :dispatch))
               (finally (.dispose new-g) ))))
-        lnp (doto (new-custom-panel paint-numbers-wrapped)
-              (.setMinimumSize (java.awt.Dimension. 40 30))
-              (.setPreferredSize (java.awt.Dimension. 40 30)) )
+        lnp (new-panel paint-numbers-wrapped (partial compute-tooltip app storage (atom nil)))
+
 
         scroll-bar-ui (javax.swing.plaf.basic.BasicScrollBarUI.)
         tp (new-custom-text-pane (fn [g] (.repaint lnp)) )
@@ -71,6 +101,11 @@
         composite (javax.swing.JPanel.)]
 
     (swap! parts (fn [x] { :text-pane tp :scroll-pane sp :line-number-panel lnp }))
+
+    (.setToolTipText lnp "")
+    (.setMinimumSize lnp (java.awt.Dimension. 40 30))
+    (.setPreferredSize lnp (java.awt.Dimension. 40 30)) 
+    
     (doto composite
       (.setLayout (java.awt.BorderLayout.))
       (.add (@parts :scroll-pane) (java.awt.BorderLayout/CENTER))
@@ -122,6 +157,18 @@
       :indicator indicator
       :lower-status-bar lower-sb) 
     layout-observer) ))
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
