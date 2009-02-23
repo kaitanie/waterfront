@@ -45,13 +45,14 @@
     (.addMouseListener (app :output-label)
       (proxy [java.awt.event.MouseAdapter] []
         (mouseClicked [e] ((app :dispatch) label-clicked)) ))
-    (.addTab (app :lower-window) "Doc." scrolled-darea)
+    (.addTab (app :lower-window) "Doc./Reflection" scrolled-darea)
     (.addTab (app :lower-window) "Output" scrolled)
     (add-observers (assoc app :output-area output-area :doc-area darea) 
       update-output-label 
       jump-to-observer 
       (partial update-doc darea scrolled-darea)
       (partial update-output scrolled)) ))
+
 
 
 

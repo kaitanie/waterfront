@@ -244,10 +244,10 @@
 ; File changed, reload?
 ; Check what happens if the file is read-only
 ; read-only indication
-; Tooltip on red markers
 ; Remove the red/green indicator
 
-
+; +(29) Reflect
+; +(28) Tooltip on red markers
 ; +(27) Eval-as-you-type status is now persistent
 ; +(26) Indicator color is green when starting with eval-as-you-type disabled
 ; +(24) Bad column/line when opening a new window
@@ -329,8 +329,8 @@
 ; 19-Feb-09: Auto-completion only shows the first N entries
 ; 19-Feb-09: Periodic text observer added => The greed/red indicator is repsonsive to uncomment, undo, replace, etc.
 ; 19-Feb-09: Improved looks of the lower status bar
-
-
+; 22-Feb-09: Tooltip on red markers
+; 23-Feb-09: Reflect java classes 
  
 
 ; Highlights:
@@ -344,5 +344,6 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 

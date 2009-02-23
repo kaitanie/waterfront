@@ -36,6 +36,7 @@
     "find.clj"
     "comments.clj"
     "show-doc.clj"
+    "reflect.clj"
     "check-syntax.clj"
     "run.clj"
     "paren-matching.clj"
