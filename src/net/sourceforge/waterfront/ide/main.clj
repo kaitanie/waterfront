@@ -38,22 +38,25 @@
     "undo.clj"
     "basic-editing.clj"
     "goto.clj"
-    "line-column.clj"
-    "find.clj"
     "comments.clj"
     "show-doc.clj"
     "reflect.clj"
     "check-syntax.clj"
+    "line-column.clj"
+    "find.clj"
     "run.clj"
-    "paren-matching.clj"
     "font-size.clj"
     "indent.clj"
     "load-recent-on-startup.clj"
+    "paren-matching.clj"
     "eval-as-you-type.clj"
     "templates.clj"
-    "auto-complete.clj"]
+    "auto-complete.clj" ]
   :recent-files []
-  :startup (quote( fn [app] ((load-file "src/net/sourceforge/waterfront/ide/plugins/plugin-loader.clj") app)))})   
+  :startup (quote( fn [app] ((load-file (.getAbsolutePath (java.io.File.(System/getProperty "net.sourceforge.waterfront.plugins") "plugin-loader.clj"))) app))) })
+            
+
+
 
 
 

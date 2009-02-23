@@ -14,6 +14,8 @@
 (refer 'net.sourceforge.waterfront.kit)
 
 (require 'net.sourceforge.waterfront.ide.services.services)
+(require 'net.sourceforge.waterfront.ide.services.selections)
+
 (refer 'net.sourceforge.waterfront.ide.services)
 
 (defn- drop-until [x coll]

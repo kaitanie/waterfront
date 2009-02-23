@@ -20,13 +20,6 @@
 (defn- set-find-status [app found?]
   (assoc app :find-status (if found? "" "String not found")) )
 
-(defn get-selected-text [app result-if-selection-empty]
-  (test (not (nil? app))) 
-  (let [t (.getSelectedText (app :area))]
-    (if (= 0 (count t))
-      result-if-selection-empty
-      t)))
-
 
 (defn- make-lower-if-needed [app s]
   (let [case-sensitive (if (nil? (app :search-settings))
@@ -222,12 +215,13 @@
 
 (fn [app] 
   (add-to-menu 
-    (load-plugin (add-to-keys-to-save app :search-settings) "menu-observer.clj" "find-indicator.clj") 
+    (load-plugin (add-to-keys-to-save app :search-settings :last-replace-with) "menu-observer.clj" "find-indicator.clj") 
     "Edit" 
     {}
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } 
     { :name "Replace" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_R :action replace-in-document  }))
+
 
 
 

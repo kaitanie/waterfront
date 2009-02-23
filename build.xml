@@ -10,7 +10,6 @@
       <tstamp>
          <format property="BUILD_GMT" pattern="yyyyMMdd-HHmm" timezone="GMT+0"/>
       </tstamp>
-      <mkdir dir="target"/>      
    </target>
 
    <target name="compile" depends="init">
@@ -26,7 +25,7 @@
       </copy>          
    </target>
 
-   <target name="create.deployment" depends="compile">
+   <target name="deploy" depends="compile">
       <delete dir="${deployment.dir}" quiet="true"/>
       <mkdir dir="${deployment.dir}"/>
       <mkdir dir="${deployment.dir}/java"/>
@@ -45,4 +44,6 @@
    </target>
 
 </project>
+
+
 

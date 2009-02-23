@@ -57,4 +57,10 @@
   (.scrollRectToVisible area (.modelToView area offset)) )
 
 
+(defn get-selected-text [app result-if-selection-empty]
+  (test (not (nil? app))) 
+  (let [t (.getSelectedText (app :area))]
+    (if (= 0 (count t))
+      result-if-selection-empty
+      t)))
 
