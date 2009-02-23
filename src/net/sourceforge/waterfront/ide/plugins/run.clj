@@ -66,12 +66,13 @@
         catcher (fn [t] (throw t))
         pr-handler (fn [x] (println x))
         r (fn [x] (read stream false x))]
-    (clojure.main/repl :read r :print pr-handler :prompt prompt :caught catcher)))
+      (clojure.main/repl :read r :print pr-handler :prompt prompt :caught catcher)))
 
 
 (defn- eval-via-repl [app temp-file]
   (try
-    (run-repl (.getAbsolutePath temp-file))
+    (binding [*app* app]
+      (run-repl (.getAbsolutePath temp-file)) )
     nil
     (catch Exception e
       (synthesize-exception 
@@ -144,6 +145,7 @@
     (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
       { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
         :action (partial eval-file-or-selection a change-func) })))
+
 
 
 
