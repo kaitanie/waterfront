@@ -9,6 +9,9 @@
 
 (ns net.sourceforge.waterfront.ide.plugins)
 
+(require 'net.sourceforge.waterfront.ide.services.services)
+(refer 'net.sourceforge.waterfront.ide.services)
+
 (refer 'net.sourceforge.waterfront.kit)
 (refer 'net.sourceforge.waterfront.ide)
 
@@ -24,8 +27,8 @@
       (.println (app :log) (print-str (str (apply str (replicate (* 3 depth) \space)) "- " curr-plugin-name)))
       (let [
           temp-app (assoc app :loading-depth (inc depth) :loaded-plugins (conj (app :loaded-plugins) curr-plugin-name))
-          curr-plugin-path (str (temp-app :plugin-path) curr-plugin-name)
-          next-app-or-nil ((load-file curr-plugin-path) temp-app)
+          curr-plugin-path (java.io.File. (System/getProperty "net.sourceforge.waterfront.plugins") curr-plugin-name)
+          next-app-or-nil ((load-file (.getAbsolutePath curr-plugin-path)) temp-app)
           next-app (if next-app-or-nil next-app-or-nil temp-app)]
         (assoc next-app :loading-depth depth)))))
 
@@ -34,13 +37,20 @@
     (when (pos? (count to-load))
       (.println (new-app :log) "Loading plugins:") )
     (reduce 
-      (fn [curr-app curr-plugin-name] (load-plugin-impl curr-app curr-plugin-name))
+      (fn [curr-app curr-plugin-name] 
+        (try
+          (load-plugin-impl curr-app curr-plugin-name)
+          (catch Exception e
+            (println (.getMessage e)) curr-app )))
       new-app 
       to-load )))
             
 (fn [app] 
-  (transform (assoc app :loaded-plugins [] :load-plugin load-plugin-impl) :observers []
-    (fn[observers] (cons plugin-observer observers)) ))
+  
+  (add-observers (assoc app :loaded-plugins [] :load-plugin load-plugin-impl) plugin-observer) )
+
+
+
 
 
 

@@ -41,7 +41,7 @@
   (and (not (unknown-document? app)) (.exists (get-current-document app))))
 
 (defn is-dirty [app]
-  (not= (.getText (app :area)) (app :initial-text)) )
+  (not= (.getText (app :area)) (or (app :initial-text) "")) )
   
 
 ; actions
@@ -188,6 +188,7 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
 
 
 

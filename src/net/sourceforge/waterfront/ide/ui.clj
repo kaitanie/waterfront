@@ -253,8 +253,10 @@
 ; Check what happens if the file is read-only
 ; read-only indication
 ; Remove the red/green indicator
+; 
 
 ;  (30) Eliminate the printstacktrace when reflecting an unresolved symbol
+; +(31) File menu: eliminated double separators when the recent list is empty
 ; +(29) Reflect
 ; +(28) Tooltip on red markers
 ; +(27) Eval-as-you-type status is now persistent
@@ -353,6 +355,8 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
+
 
 
 

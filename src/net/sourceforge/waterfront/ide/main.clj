@@ -20,7 +20,6 @@
   :ignore ["syntax-coloring.clj"]
   :keys-to-save [
     :keys-to-save
-    :plugin-path
     :last-search
     :font-size
     :font-name
@@ -28,7 +27,6 @@
     :plugins
     :recent-files
     :ignore]
-  :plugin-path "src/net/sourceforge/waterfront/ide/plugins/"
   :plugins [ 
     "custom-editor.clj"
     "output-window.clj"
@@ -56,6 +54,7 @@
     "auto-complete.clj"]
   :recent-files []
   :startup (quote( fn [app] ((load-file "src/net/sourceforge/waterfront/ide/plugins/plugin-loader.clj") app)))})   
+
 
 
 

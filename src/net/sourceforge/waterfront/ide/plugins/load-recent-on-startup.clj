@@ -29,7 +29,10 @@
 
     
 (defn- something-to-load? [app]
-  (.exists (path-to-file (get-file-to-load app))))
+  (let [f (get-file-to-load app)]
+    (if (nil? f) 
+      false 
+      (.exists (path-to-file f)))))
 
 
 (defn- load-on-startup [old-app new-app]

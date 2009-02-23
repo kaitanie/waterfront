@@ -64,9 +64,12 @@
           "File" 
           (fn [items] 
             (to-vec 
-              (apply conj 
+              (concat 
                 (to-vec (filter (fn [x] (not (:is-history-item (meta x)))) items))
-                (to-vec (cons (add-history-tag {}) (create-history-items (new-app :recent-files) (new-app :file-name)))) )))))]
+                (let [items (create-history-items (new-app :recent-files) (new-app :file-name))]
+                  (if (empty? items) 
+                    (to-vec items)
+                    (to-vec (cons (add-history-tag {}) items)) )))))))]
       result )))
       
             
@@ -88,6 +91,8 @@
             recent-files-observer recent-files-menu-observer)) 
           :recent-menu-created nil)]
       result ))
+
+
 
 
 

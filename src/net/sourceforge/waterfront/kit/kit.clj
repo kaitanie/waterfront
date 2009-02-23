@@ -196,6 +196,7 @@
     (.deleteOnExit)))
 
 (defn path-to-file [path] 
+  (assert path)
   (. (if (string? path)
        (new java.io.File path)
        path) 
@@ -672,6 +673,7 @@
 
 
 ; (net.sourceforge.waterfront.kit/main)
+
 
 
 
