@@ -1,0 +1,48 @@
+<project name="Waterfront" basedir="." default="compile">
+   <property name="deployment.dir" location="deployment"/>
+
+   <target name="clean">
+      <delete dir="${deployment.dir}" quiet="true" />
+      <delete dir="bin" quiet="true" />
+   </target>
+
+   <target name="init">
+      <tstamp>
+         <format property="BUILD_GMT" pattern="yyyyMMdd-HHmm" timezone="GMT+0"/>
+      </tstamp>
+      <mkdir dir="target"/>      
+   </target>
+
+   <target name="compile" depends="init">
+      <mkdir dir="bin"/>
+      <javac srcdir="../lab/src" destdir="bin">
+         <classpath>
+         </classpath>
+      </javac>
+      <copy todir="bin">
+         <fileset dir="../lab/src">
+            <exclude name="**/*.java"/>
+         </fileset>
+      </copy>          
+   </target>
+
+   <target name="create.deployment" depends="compile">
+      <delete dir="${deployment.dir}" quiet="true"/>
+      <mkdir dir="${deployment.dir}"/>
+      <mkdir dir="${deployment.dir}/java"/>
+      <mkdir dir="${deployment.dir}/clj"/>
+      <copy file="root/epl-v10.html" todir="${deployment.dir}"/>
+      <copy file="root/wf.bat" todir="${deployment.dir}"/>
+      <copy todir="${deployment.dir}/java">
+         <fileset dir="bin"/>
+      </copy>          
+      <copy todir="${deployment.dir}/java">
+         <fileset dir="../lab/src"/>
+      </copy>          
+      <copy todir="${deployment.dir}/clj">
+         <fileset dir="src"/>
+      </copy>          
+   </target>
+
+</project>
+
