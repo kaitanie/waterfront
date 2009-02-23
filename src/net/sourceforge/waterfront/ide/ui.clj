@@ -255,6 +255,7 @@
 ; Remove the red/green indicator
 ; 
 
+;  (32) Add (app :visit) to allow inspection of the tree of objects making up the program
 ;  (30) Eliminate the printstacktrace when reflecting an unresolved symbol
 ; +(31) File menu: eliminated double separators when the recent list is empty
 ; +(29) Reflect
@@ -342,6 +343,7 @@
 ; 19-Feb-09: Improved looks of the lower status bar
 ; 22-Feb-09: Tooltip on red markers
 ; 23-Feb-09: Reflect java classes 
+; 24-Feb-09: (app :visit) added
  
 
 ; Highlights:
@@ -355,6 +357,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 

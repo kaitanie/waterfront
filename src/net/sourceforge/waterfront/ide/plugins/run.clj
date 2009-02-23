@@ -18,6 +18,38 @@
 
 (refer 'net.sourceforge.waterfront.ide.services)
 
+
+
+(defn- read-objects 
+  ([s]
+  (reverse (read-objects (java.io.PushbackReader. (java.io.StringReader. s)) nil) ))
+
+  ([r results]
+  (try
+    (let [o (read r false :eof)]
+      (if (= :eof o)
+        results
+        (recur r (cons o results)) ))
+    (catch Exception e nil) )))
+    
+  
+
+(defn- apply-visitor
+
+  ([f form]
+    (cond
+
+      (not (seq? form))
+      form
+
+      (empty? form)
+      form
+
+      :else
+      (do (f form)
+        (doall (map (partial apply-visitor f) form))
+        form ))))
+
 (defn- drop-until [x coll]
   (cond
     (empty? coll)
@@ -138,11 +170,16 @@
       (assoc new-app :menu (menu-assoc (new-app :menu) ["Run" :eval] :name item-name)) ))) 
 
 
+(defn- create-evaluation-app [app change-func]
+  (let [os (read-objects (app :text))]
+    (assoc app :change change-func :visit (fn [v] (apply-visitor v os) nil)) ))
+
+
 (defn- eval-file-or-selection [a change-func app] 
   (.setText (app :output-label) (str "Evaluation #" (app :eval-count)))
   (let [t0 (. System currentTimeMillis) 
-        sel-text (get-selected-text app (.getText (app :area)))
-        output (first (run-program (assoc app :change change-func) sel-text))]
+        sel-text (get-selected-text app (.getText (app :area)))    
+        output (first (run-program (create-evaluation-app app change-func) sel-text))]
     (add-output output (assoc (merge app @a)
       :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
       :output output 
@@ -155,8 +192,6 @@
     (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
       { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
         :action (partial eval-file-or-selection a change-func) })))
-
-
 
 
 
