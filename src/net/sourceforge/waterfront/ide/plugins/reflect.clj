@@ -53,16 +53,14 @@
       (println (str "  " m ";")) )
     (println "}") ))
 
-
 (defn- reflect [s]
   (try
     (let [x (eval (symbol s))]
       (if x 
         (print-defs-of (if (class? x) x (class x)))
-        (println "I didn't find a binding for '" s "'")))
+        (println (str "I didn't find a binding for '" s "'"))))
     (catch Exception e
-        (.printStackTrace e)
-        (println "I could not evaluate the symbol '" s "'")) ))
+        (println (str "I could not evaluate the symbol '" s "'"))) ))
         
 (fn [app] 
   (add-to-menu (load-plugin app "menu-observer.clj" "output-window.clj" "font-observer.clj") "Source"  
@@ -74,6 +72,8 @@
               t (if s s (tok :word))]
           (when t
             (assoc app :doc-text (with-out-str (reflect (symbol t)))) )))}))
+
+
 
 
 

@@ -253,10 +253,10 @@
 ; Check what happens if the file is read-only
 ; read-only indication
 ; Remove the red/green indicator
-; 
+; Source -> Generate -> copyright 
 
-;  (32) Add (app :visit) to allow inspection of the tree of objects making up the program
-;  (30) Eliminate the printstacktrace when reflecting an unresolved symbol
+; +(32) Add (app :visit) to allow inspection of the tree of objects making up the program
+; +(30) Eliminate the printstacktrace when reflecting an unresolved symbol
 ; +(31) File menu: eliminated double separators when the recent list is empty
 ; +(29) Reflect
 ; +(28) Tooltip on red markers
@@ -357,6 +357,7 @@
 ; - format code
 ; - true paren. matching
 ; - syntax coloring
+
 
 
 
