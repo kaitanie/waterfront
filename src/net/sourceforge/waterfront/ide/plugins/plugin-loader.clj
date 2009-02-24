@@ -16,10 +16,6 @@
 (refer 'net.sourceforge.waterfront.ide)
 
 
-
-
-
-
 (defn- load-plugin-impl [app curr-plugin-name]
   (if (includes curr-plugin-name (app :loaded-plugins))
     app
@@ -41,24 +37,12 @@
         (try
           (load-plugin-impl curr-app curr-plugin-name)
           (catch Exception e
-            (println (.getMessage e)) curr-app )))
+            (println "Can't load plugin " (str curr-plugin-name \.) "Reason:" (.getMessage e)) curr-app )))
       new-app 
       to-load )))
             
-(fn [app] 
-  
+(fn [app]   
   (add-observers (assoc app :loaded-plugins [] :load-plugin load-plugin-impl) plugin-observer) )
-
-
-
-
-
-
-
-
-
-
-
 
 
 

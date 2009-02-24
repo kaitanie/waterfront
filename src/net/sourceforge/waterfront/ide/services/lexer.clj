@@ -27,7 +27,7 @@
             (assert-eq 7 (find-string-literal-end (seq "45\"78") 4 false))
             (assert-eq 3 (find-string-literal-end (seq "1\"34\"") 1 false)) )}
   [s offset escape-mode]
-  (if (nil? s)
+  (if (empty? s)
     offset    
     (let [c (first s)]
       (cond 
@@ -291,9 +291,6 @@
 (defn extr [list]
   (cons (first list) (map (fn [x] (x :where)) (rest list))) )
 
-
-
-
 (defn match-paren 
   { :test (fn []
       (let [aux (fn [list-of-results]
@@ -332,8 +329,7 @@
                                                                                                 ;;;;01234567
             (assert-eq '([:match 6 7] [:match 4 5] [:match 2 3] [:mismatch 0 1]) (aux (match-paren "(]{}[]()")) )
                                                                                              ;;;;01234567
-            (assert-eq '([:match 0 7] [:match 5 6] [:match 3 4] [:match 1 2]) (aux (match-paren "({}[]())")) )
-))}
+            (assert-eq '([:match 0 7] [:match 5 6] [:match 3 4] [:match 1 2]) (aux (match-paren "({}[]())")) )))}
 
   ([text]
     (match-paren (tokenize text) () ()) )
