@@ -140,19 +140,22 @@
     (.setBorder (javax.swing.BorderFactory/createLoweredBevelBorder)))
 
   (.setLayout sb (java.awt.FlowLayout. java.awt.FlowLayout/LEFT 5 3))
-  (.add sb indicator)
-  (.add sb output-label)
+  (.add lower-sb (javax.swing.Box/createRigidArea (java.awt.Dimension. 10 3)))
+  (.add lower-sb indicator)
+  (.add lower-sb (javax.swing.Box/createRigidArea (java.awt.Dimension. 10 3)))
+  (.add lower-sb output-label)
 
   (.setLayout lower-sb (javax.swing.BoxLayout. lower-sb javax.swing.BoxLayout/LINE_AXIS))
 
   (.add (app :frame) lower-sb BorderLayout/SOUTH)
   
-  (.add (app :frame) (doto (new JSplitPane (. JSplitPane VERTICAL_SPLIT) 
-                                  (lnp-widgets :composite)
-                                  (doto (javax.swing.JPanel.)
-                                    (.setLayout (BorderLayout.))
-                                    (.add sb BorderLayout/NORTH)
-                                    (.add lower-win BorderLayout/CENTER)))
+  (.add (app :frame) (doto (JSplitPane. 
+                              JSplitPane/HORIZONTAL_SPLIT
+                              (lnp-widgets :composite)
+                              (doto (javax.swing.JPanel.)
+                                (.setLayout (BorderLayout.))
+;                                (.add sb BorderLayout/NORTH)
+                                (.add lower-win BorderLayout/CENTER)))
             (.setDividerLocation -1)
             (.setResizeWeight 1.0) )
           (. BorderLayout CENTER) )
@@ -166,5 +169,7 @@
       :indicator indicator
       :lower-status-bar lower-sb) 
     layout-observer) ))
+
+
 
 

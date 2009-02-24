@@ -65,17 +65,13 @@
 (fn [app] 
   (add-to-menu (load-plugin app "menu-observer.clj" "output-window.clj" "font-observer.clj") "Source"  
     { :name "Reflect"
-      :mnemonic java.awt.event.KeyEvent/VK_R :on-context-menu true
+      :mnemonic java.awt.event.KeyEvent/VK_R :key java.awt.event.KeyEvent/VK_F1 :mask java.awt.event.InputEvent/SHIFT_MASK :on-context-menu true
       :action (fn[app] 
         (let [s (get-selected-text-trimmed app)
               tok (trim-token (get-selected-token app))
               t (if s s (tok :word))]
           (when t
             (assoc app :doc-text (with-out-str (reflect (symbol t)))) )))}))
-
-
-
-
 
 
 
