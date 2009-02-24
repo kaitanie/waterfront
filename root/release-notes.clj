@@ -56,4 +56,5 @@
 ; 23-Feb-09: Reflect java classes 
 ; 24-Feb-09: (app :visit) added
 ; 24-Feb-09: Ported to Clojure's latest snapshot 
-
+; 25-Feb-09: Side-by-side layout
+; 25-Feb-09: If loading of a plugin fails, continue with other plugins
