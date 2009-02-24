@@ -99,13 +99,13 @@
         searches (new-recent-list app :last-search current-selection)
         search-settings (show-input-form 
             (app :frame)                   
-            { :title "Find" :ok "Find" :cancel "Close" :msg nil :width (old-settings :width) :height (old-settings :height) }
+            { :title "Find" :ok "Find" :cancel "Close" :msg nil :width (old-settings :width) :height (old-settings :height)  :min-width 350 :min-height 300 }
             (javax.swing.JLabel. "\n\n")
             (fn [model] nil)
-            { :name "Find:" :value searches :validator (fn [x] (if (zero? (count x)) "too short" nil)) }
+            { :name "Find" :value searches :validator (fn [x] (if (zero? (count x)) "too short" nil)) }
             { :name "Case sensitive" :value (get old-settings "Case sensitive") } 
             { :name "Wrap search" :value (get old-settings "Wrap search") })
-        find-what (if search-settings (get search-settings "Find:") nil)
+        find-what (if search-settings (get search-settings "Find") nil)
         new-app (if find-what 
          (assoc app :last-search (new-recent-list app :last-search find-what)) app)]
     (when (and find-what (not (empty? (new-app :last-search))))
@@ -165,7 +165,7 @@
         (set-find-status app false)
         (do
           (scroll-to app offset-length)
-          (let [replace-with (get (app :search-settings) "Replace with:")
+          (let [replace-with (get (app :search-settings) "Replace with")
                 reply (javax.swing.JOptionPane/showOptionDialog 
                         (app :frame)
                         (str "Replace with '" replace-with "' ?")
@@ -196,17 +196,17 @@
         replacements (new-recent-list app :last-replace-with nil)
         search-settings (show-input-form 
             (app :frame)                   
-            { :title "Replace" :ok "Replace..." :cancel "Close" :width (old-settings :width) :height (old-settings :height) }
-            (javax.swing.JLabel. "\n\n")
+            { :title "Replace" :ok "Replace..." :cancel "Close" :width (old-settings :width) :height (old-settings :height) :min-width 350 :min-height 300 }
+            (doto (javax.swing.JLabel. "\n\n") (.setMinimumSize (java.awt.Dimension. 200 10)))
             (fn [model] nil)
-            { :name "Find:" :value searches :validator (fn [x] (if (zero? (count x)) " " nil)) }
-            { :name "Replace with:" :value replacements :validator (fn [x] nil) }
+            { :name "Find" :value searches :validator (fn [x] (if (zero? (count x)) "No search string was specified" nil)) }
+            { :name "Replace with" :value replacements :validator (fn [x] nil) }
             { :name "Case sensitive" :value (get old-settings "Case sensitive") } 
             { :name "Wrap search" :value (get old-settings "Wrap search") })]
         (if (not search-settings)
           nil
-          (let [find-what (get search-settings "Find:")
-                replace-with (get search-settings "Replace with:")
+          (let [find-what (get search-settings "Find")
+                replace-with (get search-settings "Replace with")
                 new-app (assoc app 
                   :search-settings search-settings 
                   :last-search (new-recent-list app :last-search find-what)
@@ -221,8 +221,6 @@
     { :name "Find" :mnemonic KeyEvent/VK_F :key KeyEvent/VK_F :action find-in-document  }
     { :name "Find Next" :mnemonic KeyEvent/VK_N :key KeyEvent/VK_F3 :mask 0 :action find-next } 
     { :name "Replace" :mnemonic KeyEvent/VK_R :key KeyEvent/VK_R :action replace-in-document  }))
-
-
 
 
 

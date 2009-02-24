@@ -560,8 +560,10 @@
                   :ok - Text of the OK button (\"Ok\")
                   :cancel - Text of the cancel button (\"Cancel\")
                   :msg - A widget on which status messages will be shown, or a nil. (JLabel)
-                  :width - Preferred width in pixel (200)
-                  :height - Preferred height in pixel (150)
+                  :width - Preferred width in pixels (200)
+                  :height - Preferred height in pixels (150)
+                  :min-width - Minimum width in pixels (200)
+                  :min-height - Minimum height in pixels (150)
 
    heading-widget - A widget to be placed at the dialog's upper part. May be nil.
    ok-condition - a function taking a map (in the same structure as the return value) describing the 
@@ -586,7 +588,7 @@
         { :name \"Has cats?\" :value false } )))"
       
   [#^javax.swing.JFrame owner user-props heading-widget ok-condition & fields]
-  (let [props (merge { :title "" :ok "Ok" :cancel "Cancel" :msg (javax.swing.JLabel.)} user-props)
+  (let [props (merge { :title "" :ok "Ok" :cancel "Cancel" :msg (javax.swing.JLabel.) :min-width 200 :min-height 150} user-props)
         cancelled? (atom true)
         d (javax.swing.JDialog. owner true)
         upper-panel (javax.swing.JPanel.)
@@ -642,6 +644,8 @@
       (add-escape-handler d (fn [d] (.doClick cancel-button)))
       (.. d (getRootPane) (setDefaultButton ok-button))
 
+      (.setMinimumSize d (java.awt.Dimension. (props :min-width) (props :min-height)))
+
       (when (or (props :width) (props :height))
         (.setPreferredSize d (java.awt.Dimension. (defaults-to (props :width) 200) (defaults-to (props :height) 150))))
 
@@ -671,13 +675,13 @@
 
 
 
-; (net.sourceforge.waterfront.kit/main)
+(comment 
 
 
+(net.sourceforge.waterfront.kit/main)
 
 
-
-
+)
 
 
 
