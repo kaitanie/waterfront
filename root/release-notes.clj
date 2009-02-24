@@ -55,5 +55,5 @@
 ; 22-Feb-09: Tooltip on red markers
 ; 23-Feb-09: Reflect java classes 
 ; 24-Feb-09: (app :visit) added
- 
+; 24-Feb-09: Ported to Clojure's latest snapshot 
 

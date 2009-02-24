@@ -210,7 +210,7 @@
       (assert-eq '(1 -3 -3 4) (map-first-not-nil (fn [x] (if (neg? x) (dec x) nil)) [1 -2 -3 4]))
       (assert-eq '(2 2 3) (map-first-not-nil inc [1 2 3]))
       (assert-eq '(1 2 3) (map-first-not-nil (fn[x] nil) [1 2 3]))
-      (assert-eq nil (map-first-not-nil (fn[x] nil) nil)) )}
+      (assert-eq () (map-first-not-nil (fn[x] nil) nil)) )}
   ([f coll]
   (reverse (second (reduce (fn [v c] 
     (if (first v) 
@@ -252,7 +252,6 @@
   (menu-replace-impl m path kvs) )
 
 
-
 (defn line-to-offset 
   { :test (fn []
     (assert (= 4 (line-to-offset (seq "\n\na\n") 0 3)))
@@ -276,7 +275,7 @@
     (zero? line-number)
     offset
 
-    (nil? s)
+    (empty? s)
     -1
 
     (= (first s) \newline)
@@ -286,7 +285,6 @@
     (recur (rest s) (inc offset) line-number) ))
 
 (test (var line-to-offset))
-
 
 (defn scroll-to-line 
   ([app ln]
@@ -305,9 +303,4 @@
           (.select (app :area) (dec (+ offset from-col)) (dec (+ offset to-col)))
           (assoc app :last-goto ln) ))
       (println "Bad value " ln) ))))
-
-
-
-
-
 

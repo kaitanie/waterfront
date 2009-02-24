@@ -94,7 +94,7 @@
                   (if (= (.getFileName x) temp-file-name) 
                     (StackTraceElement. (.getClassName x) (.getMethodName x) file-name (.getLineNumber x)) 
                     x)) tr)
-        re (RuntimeException. (str (.getMessage e) (if (inspect ln) (str " (" file-name ":" ln ")") ""))) ]
+        re (RuntimeException. (str (.getMessage e) (if ln (str " (" file-name ":" ln ")") ""))) ]
     (.setStackTrace re (into-array StackTraceElement new-tr))
     { :exception re 
       :msg (.getMessage re) 
@@ -107,8 +107,8 @@
         prompt (fn [] )
         catcher (fn [t] (throw t))
         pr-handler (fn [x] (println x))
-        r (fn [x] (read stream false x))]
-      (clojure.main/repl :read r :print pr-handler :prompt prompt :caught catcher)))
+        r (fn [request-prompt request-exit] (read stream false request-exit))]
+      (clojure.main/repl :need-prompt (constantly false) :read r :print pr-handler :prompt prompt :caught catcher)))
 
 
 (defn- eval-via-repl [app temp-file]
@@ -192,12 +192,5 @@
     (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
       { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
         :action (partial eval-file-or-selection a change-func) })))
-
-
-
-
-
-
-
 
 

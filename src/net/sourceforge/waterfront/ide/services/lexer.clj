@@ -70,7 +70,7 @@
             (assert-eq 6 (take-prefix (seq "  \r\n\t a") whitespace? ))
             (assert-eq 3 (take-prefix (seq "abbxa") (fn [x] (or (= x \a) (= x \b))))) )}
   ([s p result]
-    (if (nil? s)
+    (if (empty? s)
       result
       (if (p (first s))
         (recur (rest s) p (inc result))
@@ -112,6 +112,7 @@
 
 (test (var first-is))
 
+
 (defn first-in
   { :test (fn []
             (assert-eq false (first-in () (seq "ab"))) 
@@ -123,19 +124,19 @@
             (assert-eq false (first-in [\a \b] ())) 
             (assert-eq false (first-in [\a \b] (seq ""))) )}
   [options es]
-  (if options
-    (or (first-is (first options) es) (first-in (rest options) es))
-    false) )
+  (if (empty? options)
+    false
+    (or (first-is (first options) es) (first-in (rest options) es)) ))
 
 (test (var first-in))
 
 (defn pick 
   { :test (fn []
-            (assert-eq {:length 2, :kind :token-symbol, :where 0} (pick 0 (seq "ab"))) 
-            (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x]"))) 
-            (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x["))) 
-            (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x{"))) 
-            (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x}"))) 
+            (assert-eq {:length 2, :kind :token-symbol, :where 0} (pick 0 (seq "ab")))
+            (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x]")))
+            (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x[")))
+            (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x{")))
+            (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x}")))
             (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x)"))) 
             (assert-eq {:length 1, :kind :token-symbol, :where 0} (pick 0 (seq "x("))) )}
 
@@ -191,7 +192,6 @@
     (tok offset s (take-prefix s not-stop-char) :token-symbol))))
 
 (test (var pick))
-
 
 (defn tokenize 
   { :test (fn [] 
@@ -250,7 +250,7 @@
     (reduce conj () (tokenize (if (seq? text) text (seq text)) offset ())))
 
   ([text offset result]
-    (if text
+    (if (not (empty? text))
       (let [p (pick offset text (first text))]
         (assert (pos? (p :length)))
         (recur (drop (p :length) text) (+ offset (p :length)) (cons p result)) )
@@ -285,6 +285,7 @@
   (if (empty? stack)
     result
     (recur (rest stack) (cons [:no-close (first stack)] result)) ))
+
 
 
 (defn extr [list]
@@ -538,7 +539,6 @@
       (.setTitle "Title")
       (.setSize 800 600)
       (.setVisible true) )))
-
 
 
 

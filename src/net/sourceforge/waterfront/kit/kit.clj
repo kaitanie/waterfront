@@ -80,13 +80,12 @@
       (assert-eq [\a \b] (get-duplicates [\a \b \c \a \b]))
       (assert-eq [\b] (get-duplicates [\a \b \b]))
       (assert-eq [\a] (get-duplicates [\a \b \a]))
-      (assert-eq nil (get-duplicates [\a \b]))
-      (assert-eq nil (get-duplicates [\a]))
-      (assert-eq nil (get-duplicates [])) 
-)}
+      (assert-eq [] (get-duplicates [\a \b]))
+      (assert-eq [] (get-duplicates [\a]))
+      (assert-eq [] (get-duplicates [])) )}
   [coll]
   (if (empty? coll)
-    nil
+    []
     (distinct(filter (fn [x] (> (get-num-occurences x coll) 1)) coll)) ))
 
 
@@ -115,9 +114,9 @@
 
 (defn drop-first 
   { :test (fn []
-      (assert (= nil (drop-first \x nil)))
+      (assert (= [] (drop-first \x nil)))
       (assert (= '(\a) (drop-first \x [ \a ]))) 
-      (assert (= nil (drop-first \x [ \x ]))) 
+      (assert (= [] (drop-first \x [ \x ]))) 
       (assert (= '(\a) (drop-first \x [ \a \x ]))) 
       (assert (= '(\a) (drop-first \x [ \x \a ]))) 
       (assert (= '(\a \x) (drop-first \x [ \x \a \x ]))) 
@@ -673,6 +672,7 @@
 
 
 ; (net.sourceforge.waterfront.kit/main)
+
 
 
 
