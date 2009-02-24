@@ -131,19 +131,9 @@
         lower-sb (javax.swing.JPanel.)
         lower-win (javax.swing.JTabbedPane.)
         lnp-widgets (create-line-numbers-components app)
-        area (lnp-widgets :text-pane)
-        indicator (javax.swing.JLabel. "    ")
-        output-label (javax.swing.JLabel. "")]
-
-  (doto indicator 
-    (.setOpaque true)
-    (.setBorder (javax.swing.BorderFactory/createLoweredBevelBorder)))
+        area (lnp-widgets :text-pane)]
 
   (.setLayout sb (java.awt.FlowLayout. java.awt.FlowLayout/LEFT 5 3))
-  (.add lower-sb (javax.swing.Box/createRigidArea (java.awt.Dimension. 10 3)))
-  (.add lower-sb indicator)
-  (.add lower-sb (javax.swing.Box/createRigidArea (java.awt.Dimension. 10 3)))
-  (.add lower-sb output-label)
 
   (.setLayout lower-sb (javax.swing.BoxLayout. lower-sb javax.swing.BoxLayout/LINE_AXIS))
 
@@ -163,12 +153,11 @@
   
   (add-observers (assoc app 
       :area area 
-      :output-label output-label 
       :lower-window lower-win 
       :status-bar sb 
-      :indicator indicator
       :lower-status-bar lower-sb) 
     layout-observer) ))
+
 
 
 

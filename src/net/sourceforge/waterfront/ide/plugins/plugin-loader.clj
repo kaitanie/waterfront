@@ -37,12 +37,16 @@
         (try
           (load-plugin-impl curr-app curr-plugin-name)
           (catch Exception e
-            (println "Can't load plugin " (str curr-plugin-name \.) "Reason:" (.getMessage e)) curr-app )))
+            (.printStackTrace e (new-app :log))
+            (println "Can't load plugin" (str curr-plugin-name \.) "Reason:" (.getMessage e)) 
+            (assoc curr-app :loaded-plugins (conj (curr-app :loaded-plugins) curr-plugin-name)) )))
       new-app 
       to-load )))
             
 (fn [app]   
   (add-observers (assoc app :loaded-plugins [] :load-plugin load-plugin-impl) plugin-observer) )
+
+
 
 
 

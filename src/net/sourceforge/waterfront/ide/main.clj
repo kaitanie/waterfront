@@ -29,7 +29,6 @@
     :ignore]
   :plugins [ 
     "custom-editor.clj"
-    "output-window.clj"
     "context-menu.clj"
     "file.clj"
     "recent-files.clj"
@@ -39,11 +38,13 @@
     "basic-editing.clj"
     "goto.clj"
     "comments.clj"
+    "line-column.clj"
+    "find.clj"
+    "indicator.clj"
+    "output-window.clj"
     "show-doc.clj"
     "reflect.clj"
     "check-syntax.clj"
-    "line-column.clj"
-    "find.clj"
     "run.clj"
     "font-size.clj"
     "indent.clj"
@@ -55,6 +56,7 @@
   :recent-files []
   :startup (quote( fn [app] ((load-file (.getAbsolutePath (java.io.File.(System/getProperty "net.sourceforge.waterfront.plugins") "plugin-loader.clj"))) app))) })
             
+
 
 
 
