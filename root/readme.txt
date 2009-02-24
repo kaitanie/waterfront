@@ -21,8 +21,9 @@ Key features
   * Other goodies such as undo/redo, toggle comment, recently opened files, indent/unindent, Tab is *always* two spaces, ...
 
 
-Download and installations
-==========================
+Download and installation
+=========================
+
   (0) Prerequisite: Download and install Clojure: http://clojure.org
   (1) Download the waterfront zip file from: http://sourceforge.net/project/showfiles.php?group_id=249246.
   (2) Unpack it into a local directory. 
@@ -30,7 +31,8 @@ Download and installations
 
 
 License
-======
+=======
+
 Copyright (c) Itay Maman. All rights reserved.
 The use and distribution terms for this software are covered by the
 Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
@@ -42,6 +44,7 @@ You must not remove this notice, or any other, from this software.
 
 Contact
 =======
+
 Itay Maman
 
 E-mail: itay /dot/ maman /at/ gmail /dot/ com

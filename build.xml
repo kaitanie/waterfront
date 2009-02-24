@@ -30,8 +30,9 @@
       <mkdir dir="${deployment.dir}"/>
       <mkdir dir="${deployment.dir}/java"/>
       <mkdir dir="${deployment.dir}/clj"/>
-      <copy file="root/epl-v10.html" todir="${deployment.dir}"/>
-      <copy file="root/wf.bat" todir="${deployment.dir}"/>
+      <copy todir="${deployment.dir}">
+        <fileset dir="root"/>
+      </copy>
       <copy todir="${deployment.dir}/java">
          <fileset dir="bin"/>
       </copy>          
@@ -44,6 +45,8 @@
    </target>
 
 </project>
+
+
 
 
 
