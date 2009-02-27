@@ -394,7 +394,7 @@
           (.setMnemonic res (desc :mnemonic)) )
 
         (when (desc :key)
-          (.setAccelerator res (KeyStroke/getKeyStroke (desc :key) (if (desc :mask) (desc :mask) (ActionEvent/CTRL_MASK)))) )
+          (.setAccelerator res (KeyStroke/getKeyStroke (desc :key) (or (desc :mask) (.getMenuShortcutKeyMask (java.awt.Toolkit/getDefaultToolkit))))) )
 
         (if (desc :action)
           (if is-bool
@@ -682,6 +682,7 @@
 
 
 )
+
 
 
 

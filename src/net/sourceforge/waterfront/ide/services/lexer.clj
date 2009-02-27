@@ -418,11 +418,12 @@
         attr (if (= :match match-kind) 
                 (styles :match) 
                 (styles :mismatch))]
-      (.addHighlights text-pane (. StyleConstants getBackground attr) pos1)
-      (.addHighlights text-pane (. StyleConstants getBackground attr) pos2)
+      (when pos1
+        (.addHighlights text-pane (. StyleConstants getBackground attr) pos1) )
+      (when pos2
+        (.addHighlights text-pane (. StyleConstants getBackground attr) pos2) )
+
       (swap! cache (fn [x] (assoc x :offsets (cons pos1 (cons pos2 (x :offsets)))))) ))
-;      (.setCharacterAttributes doc pos2 1 attr true) 
-;      (.setCharacterAttributes doc pos1 1 attr true) 
 
 (defn- my-document-observer [text-pane cache]
   (let [c @cache 
@@ -535,6 +536,8 @@
       (.setTitle "Title")
       (.setSize 800 600)
       (.setVisible true) )))
+
+
 
 
 

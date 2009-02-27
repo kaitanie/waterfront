@@ -1,5 +1,5 @@
 <project name="Waterfront" basedir="." default="compile">
-   <property name="deployment.dir" location="deployment"/>
+   <property name="deployment.dir" location="zip/waterfront"/>
 
    <target name="clean">
       <delete dir="${deployment.dir}" quiet="true" />
@@ -13,8 +13,8 @@
    </target>
 
    <target name="compile" depends="init">
-      <mkdir dir="bin"/>
-      <javac srcdir="../lab/src" destdir="bin">
+      <mkdir dir="bin"/>      
+      <javac srcdir="../lab/src" destdir="bin" source="1.5">
          <classpath>
          </classpath>
       </javac>
@@ -25,7 +25,7 @@
       </copy>          
    </target>
 
-   <target name="deploy" depends="compile">
+   <target name="prepare" depends="compile">
       <delete dir="${deployment.dir}" quiet="true"/>
       <mkdir dir="${deployment.dir}"/>
       <mkdir dir="${deployment.dir}/java"/>
@@ -44,7 +44,15 @@
       </copy>          
    </target>
 
+   <target name="zip" depends="prepare">
+      <zip 
+         destfile="waterfront-${BUILD_GMT}.zip" 
+         basedir="zip"/>
+   </target>
+
 </project>
+
+
 
 
 

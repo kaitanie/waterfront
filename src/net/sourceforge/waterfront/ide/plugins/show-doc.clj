@@ -28,10 +28,48 @@
         (if (pos? (count res))
           res
           nil )))))        
+
+
+(defn- print-defs-of [x]
+  (let [is (.getInterfaces x)]
+    (println (java.lang.reflect.Modifier/toString (.getModifiers x)) (str x))
+    (when (.getSuperclass x)
+      (println "    extends" (.. x (getSuperclass) (getName))))
+    (when-not (empty? is)      
+      (print (str "    " (if (.isInterface x) "extends" "implements"))) 
+      (doseq [i is]
+        (print " " (.getName i)))
+      (println))
+    (println "{")
+    (doseq [f (.getDeclaredFields x)]
+      (println (str "  " f ";")) )
+    (when-not (empty? (.getDeclaredFields x))
+      (println))
+    (doseq [c (.getDeclaredConstructors x)]
+      (println (str "  " c ";")) )
+    (when-not (empty? (.getDeclaredConstructors x))
+      (println))
+    (doseq [m (.getDeclaredMethods x)]
+      (println (str "  " m ";")) )
+    (println "}") ))
+
+(defn- reflect [s]
+  (try
+    (let [x (eval (symbol s))]
+      (if (class? x)
+        (with-out-str (print-defs-of x))
+        nil ))
+    (catch Exception e nil) ))
+
+(defn- get-doc [t]
+  (if (inspect (resolve (symbol (inspect t))))
+    (with-out-str (eval (cons 'doc (list (symbol t)))))
+    nil ))
+
         
 (fn [app] 
   (add-to-menu (load-plugin app "menu-observer.clj" "output-window.clj" "font-observer.clj") "Source"  
-    { :name "(doc <selection>)"
+    { :name "Show Doc/Reflection"
       :key java.awt.event.KeyEvent/VK_F1 :mask 0 :mnemonic java.awt.event.KeyEvent/VK_D  :on-context-menu true
       :action (fn[app] 
         (let [s (get-selected-text-trimmed app)
@@ -39,9 +77,8 @@
               t (if s s (tok :word))]
           (when t
             (assoc app :doc-text
-              (if (resolve (symbol t))
-                (with-out-str (eval (cons 'doc (list (symbol t)))))
-                (str "I didn't find a definition for '" t "'") )))))}))
+                (or (reflect (symbol t)) (get-doc t) (str "I didn't find a binding for '" t "'"))))))}))
+
 
 
 

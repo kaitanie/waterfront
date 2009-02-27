@@ -91,9 +91,32 @@
 
 
 
+; eval as you should be active only if file type is .clj
 
 
+; Closing the window with a dirty unnamed doc => Choose Yes => Cancel the chooser => The application shutsdown. Should cancel the save and the exit
 
+
+* a separate REPL tab would be very useful and save me from having to 
+enter code into the file, highlight and execute it, and then delete it 
+(leaving the file in a "dirty" state and me wondering what I changed 
+that caused that.) 
+* multiple source tabs in the source editor. Very useful to have. 
+* documentation for everything in the "generate" sub-menu. I'd write 
+it myself if I had any idea how it worked, but I don't have the time 
+to dig into the source code. 
+* capability to evaluate the form the cursor is currently in with, 
+say, Ctrl+E, using (say) Shift+Ctrl+E to eval the whole file. Or some 
+such. This will be a common operation and saves having to highlight 
+the text every time. Bonus points if it will evaluate the previous 
+form when it is not inside a form. 
+* smart indentation. On "enter key pressed", indent on the next line 
+to the first dark space on the previous line. Bonus points if detects 
+the end of a form and goes to the first column. 
+* documentation on plug-ins (lower priority for me and probably for 
+others). Could you give at least a high-level sense of what plug-ins 
+you're currently using and what for. This would give the users a sense 
+of what they may or may not be missing. 
 
 
 

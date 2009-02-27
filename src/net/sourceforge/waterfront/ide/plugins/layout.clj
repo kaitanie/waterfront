@@ -144,7 +144,7 @@
                               (lnp-widgets :composite)
                               (doto (javax.swing.JPanel.)
                                 (.setLayout (BorderLayout.))
-;                                (.add sb BorderLayout/NORTH)
+                                (.setMinimumSize (java.awt.Dimension. 300 10))
                                 (.add lower-win BorderLayout/CENTER)))
             (.setDividerLocation -1)
             (.setResizeWeight 1.0) )
@@ -157,6 +157,9 @@
       :status-bar sb 
       :lower-status-bar lower-sb) 
     layout-observer) ))
+
+
+
 
 
 

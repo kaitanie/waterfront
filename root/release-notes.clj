@@ -58,3 +58,13 @@
 ; 24-Feb-09: Ported to Clojure's latest snapshot 
 ; 25-Feb-09: Side-by-side layout
 ; 25-Feb-09: If loading of a plugin fails, continue with other plugins
+; 27-Feb-09: Changed default location of the divider
+; 27-Feb-09: Default key mask (for accelerators) is now obtained from the Toolkit class
+; 27-Feb-09: Java 1.5 compilance (prev. 1.6)
+; 27-Feb-09: Added a space in the execution time between the digits and "ms". E.g., "34ms" --> "34 ms" 
+; 27-Feb-09: Source -> Doc and Source -> Reflect consolidated into a single menu item
+; 27-Feb-09: wf.sh file added 
+
+
+
+

@@ -181,7 +181,7 @@
         sel-text (get-selected-text app (.getText (app :area)))    
         output (first (run-program (create-evaluation-app app change-func) sel-text))]
     (add-output output (assoc (merge app @a)
-      :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) "ms") 
+      :output-title (str "Evaluation #" (app :eval-count) " - Completed in " (- (. System currentTimeMillis) t0) " ms") 
       :output output 
       :eval-count (inc (app :eval-count) )))))
 
@@ -192,5 +192,6 @@
     (add-to-menu (load-plugin (add-observers app eval-menu-observer) "menu-observer.clj" "check-syntax.clj") "Run" 
       { :id :eval :name "Eval File" :key KeyEvent/VK_E :mnemonic KeyEvent/VK_E :on-context-menu true 
         :action (partial eval-file-or-selection a change-func) })))
+
 
 
