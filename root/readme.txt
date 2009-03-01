@@ -11,8 +11,9 @@ Key features
   * Edit -> Eval as you type: When turned on (default) periodically evaluates your code. Boosts productivity as many errors are detected on the spot.
   * Syntax and Evaluation errors are displayed on: (1) The Problems window; (2) The line-number panel, as red markers.
   * Source -> Generate -> Proxy: Generates a proxy for the given list of super-types, with stub implementations for all abstract methods.
-  * F1: Shows the doc (as per Clojure's (doc x) function) of the identifier under the caret.
-  * Source -> Reflect: Shows the synopsis of a Java class when the caret stands on a class symbol (e.g.: java.awt.Color).
+  * F1: Doc or Reflection
+       Shows the doc (as per Clojure's (doc x) function) of the identifier under the caret.
+       Shows the synopsis of a Java class if there is a class symbol under the caret (e.g.: java.awt.Color).
   * CTRL+Space: Token-based auto completion.
   * Full parenthesis matching.
   * An extensible plugin architecture.
@@ -27,7 +28,7 @@ Download and installation
   (0) Prerequisite: Download and install Clojure: http://clojure.org
   (1) Download the waterfront zip file from: http://sourceforge.net/project/showfiles.php?group_id=249246.
   (2) Unpack it into a local directory. 
-  (3) Edit wf.bat: fix the path to clojure.jar according to its location on your machine.
+  (3) Edit wf.bat or wf.sh: fix the path to clojure.jar according to its location on your machine.
 
 
 License
@@ -42,17 +43,22 @@ the terms of this license.
 You must not remove this notice, or any other, from this software.
 
 
-Contact
-=======
+Contact us
+==========
 
-Itay Maman
+Request for features, bugs, issues - 
+http://sourceforge.net/tracker2/?group_id=249246&atid=1126790
 
+
+ 
+Itay Maman - 
 E-mail: itay /dot/ maman /at/ gmail /dot/ com
 Blog: http://javadots.blogspot.com
 
 
 
   
+
 
 
 

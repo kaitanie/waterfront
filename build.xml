@@ -14,7 +14,7 @@
 
    <target name="compile" depends="init">
       <mkdir dir="bin"/>      
-      <javac srcdir="../lab/src" destdir="bin" source="1.5">
+      <javac srcdir="../lab/src" destdir="bin" target="1.5" source="1.5">
          <classpath>
          </classpath>
       </javac>
@@ -51,6 +51,7 @@
    </target>
 
 </project>
+
 
 
 

@@ -64,6 +64,8 @@
 ; 27-Feb-09: Added a space in the execution time between the digits and "ms". E.g., "34ms" --> "34 ms" 
 ; 27-Feb-09: Source -> Doc and Source -> Reflect consolidated into a single menu item
 ; 27-Feb-09: wf.sh file added 
+; 27-Feb-09: wf.bat handles spaces in the path
+
 
 
 
