@@ -29,11 +29,17 @@
       <delete dir="${deployment.dir}" quiet="true"/>
       <mkdir dir="${deployment.dir}"/>
       <mkdir dir="${deployment.dir}/java"/>
+      <mkdir dir="${deployment.dir}/bin"/>
       <mkdir dir="${deployment.dir}/clj"/>
+      <copy todir="${deployment.dir}">
+        <fileset dir=".">
+          <include name="wf.*"/>
+        </fileset>
+      </copy>
       <copy todir="${deployment.dir}">
         <fileset dir="root"/>
       </copy>
-      <copy todir="${deployment.dir}/java">
+      <copy todir="${deployment.dir}/bin">
          <fileset dir="bin"/>
       </copy>          
       <copy todir="${deployment.dir}/java">
@@ -44,13 +50,16 @@
       </copy>          
    </target>
 
-   <target name="zip" depends="prepare">
+   <target name="zip" depends="clean,prepare">
       <zip 
          destfile="waterfront-${BUILD_GMT}.zip" 
          basedir="zip"/>
    </target>
 
 </project>
+
+
+
 
 
 

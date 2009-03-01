@@ -1,5 +1,8 @@
 @echo off
-java -Dnet.sourceforge.waterfront.plugins=%~dp0clj/net/sourceforge/waterfront/ide/plugins/ -cp clj;bin\;c:\tools\clojure\clojure.jar clojure.main clj/net/sourceforge/waterfront/ide/main.clj %*
+java -cp c:\tools\clojure\clojure.jar;"%~dp0clj";"%~dp0bin" "-Dnet.sourceforge.waterfront.plugins=%~dp0clj/net/sourceforge/waterfront/ide/plugins" clojure.main "%~dp0clj/net/sourceforge/waterfront/ide/main.clj" %*
+
+
+
 
 
 
