@@ -65,6 +65,8 @@
 ; 27-Feb-09: Source -> Doc and Source -> Reflect consolidated into a single menu item
 ; 27-Feb-09: wf.sh file added 
 ; 27-Feb-09: wf.bat handles spaces in the path
+; 01-Mar-09: Log failure of setting L&F 
+
 
 
 

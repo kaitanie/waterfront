@@ -176,24 +176,30 @@
     (java.io.PrintWriter. (java.io.FileWriter. t) true) ))
 
 (defn launch-waterfront [argv fallback-context]
-  (later (fn []
-    (try 
+  (let [log-file (new-log-file)]
+    (later (fn []
+      (try 
+    
+        (try 
+          (UIManager/setLookAndFeel (UIManager/getSystemLookAndFeelClassName))
+          (catch Exception e 
+            (.printStackTrace e log-file)
+            (try
+              (UIManager/setLookAndFeel ("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel"))
+              (catch Exception e 
+                (.printStackTrace e log-file) )))) ;Intentionally ignore look & feel failure
+    
+        (let [file-to-load 
+                (if (empty? argv)
+                      nil
+                      (let [f (.getAbsoluteFile (java.io.File. (first argv)))]
+                        (if (.exists f)
+                          f
+                          nil)))
+              m (if file-to-load 
+                  { :file-name-to-load (.getAbsolutePath file-to-load) }
+                  {} )]
+          (new-waterfront-window fallback-context (merge { :window-counter (atom 0) :log log-file :title-prefix "" } m)))
+        (catch Throwable t (.printStackTrace t)) )))))
   
-      (try (. UIManager (setLookAndFeel (. UIManager getSystemLookAndFeelClassName)))
-        (catch Exception e nil) ) ;Intentionally ignore look & feel failure
-  
-      (let [file-to-load 
-              (if (empty? argv)
-                    nil
-                    (let [f (.getAbsoluteFile (java.io.File. (first argv)))]
-                      (if (.exists f)
-                        f
-                        nil)))
-            m (if file-to-load 
-                { :file-name-to-load (.getAbsolutePath file-to-load) }
-                {} )]
-        (new-waterfront-window fallback-context (merge { :window-counter (atom 0) :log (new-log-file) :title-prefix "" } m)))
-      (catch Throwable t (.printStackTrace t)) ))))
-  
-
 
