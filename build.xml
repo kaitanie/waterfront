@@ -14,12 +14,12 @@
 
    <target name="compile" depends="init">
       <mkdir dir="bin"/>      
-      <javac srcdir="../lab/src" destdir="bin" target="1.5" source="1.5">
+      <javac srcdir="java" destdir="bin" target="1.5" source="1.5">
          <classpath>
          </classpath>
       </javac>
       <copy todir="bin">
-         <fileset dir="../lab/src">
+         <fileset dir="java">
             <exclude name="**/*.java"/>
          </fileset>
       </copy>          
@@ -37,10 +37,10 @@
          <fileset dir="bin"/>
       </copy>          
       <copy todir="${deployment.dir}/java">
-         <fileset dir="../lab/src"/>
+         <fileset dir="java"/>
       </copy>          
       <copy todir="${deployment.dir}/clj">
-         <fileset dir="src"/>
+         <fileset dir="clj"/>
       </copy>          
    </target>
 
