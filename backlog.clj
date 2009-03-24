@@ -52,7 +52,6 @@
 ; show only first exc.
 ; show stack trace of exc.
 ; quick relaunch of new windows (remembber init. funcs. of plugins)
-; relfect - show java structure.
 ; File changed, reload?
 ; Check what happens if the file is read-only
 ; read-only indication
@@ -87,7 +86,7 @@
 ; + (3) click on error -> jump to location
 ; + (2) make undo less agressive
 ; + (1) Mnemonics on buttons of forms
-; ? (0) Font issue
+; + (0) Font issue
 
 
 
@@ -117,6 +116,7 @@ the end of a form and goes to the first column.
 others). Could you give at least a high-level sense of what plug-ins 
 you're currently using and what for. This would give the users a sense 
 of what they may or may not be missing. 
+
 
 
 

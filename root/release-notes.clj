@@ -66,6 +66,9 @@
 ; 27-Feb-09: wf.sh file added 
 ; 27-Feb-09: wf.bat handles spaces in the path
 ; 01-Mar-09: Log failure of setting L&F 
+; 24-Mar-09: Eliminated dependency on FileFilter (Java6-only class)
+; 24-Mar-09: Bug fix in generate proxy
+
 
 
 

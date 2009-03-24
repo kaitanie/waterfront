@@ -77,7 +77,7 @@
   (.append sb (.getName m))
   (.append sb " [")
   (loop [types (seq (.getParameterTypes m)) ordinal 1]
-    (when types
+    (when-not (empty? types)
       (when (> ordinal 1)
         (.append sb " ") )
       (.append sb "#^")
@@ -110,10 +110,10 @@
             (doto (javax.swing.JLabel. "Specify your proxy's super-type(s)")
               (.setPreferredSize (java.awt.Dimension. 500 30)) )
             (fn [model] (cond
-                           (zero? (reduce (fn [v c] (+ v (count (.trim (str (get model c)))))) 0 [cn i1 i2 i3 i4]))
+                            (zero? (reduce (fn [v c] (+ v (count (.trim (str (get model c)))))) 0 [cn i1 i2 i3 i4]))
                             "You must specify at least one super type"
 
-                            (get-duplicates (filter (fn [x] (pos? (count (.trim (str x))))) (vals model)))
+                            (not (empty? (get-duplicates (filter (fn [x] (pos? (count (.trim (str x))))) (vals model)))))
                             (str "The type '" (first (get-duplicates (filter (fn [x] (pos? (count (.trim (str x))))) (vals model)))) "' appears more than once")
                             
                             :else
@@ -163,5 +163,12 @@
               "  expr-1\n"
               "  expr-2\n"
               "  expr-3))" ))}]}))
+
+
+
+
+
+
+
 
 

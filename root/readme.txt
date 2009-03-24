@@ -26,6 +26,9 @@ Download and installation
 =========================
 
   (0) Prerequisite: Download and install Clojure: http://clojure.org
+      *** Note: At the time of this writing (March 8th, 2008), Waterfront requires Clojure's SVN snapshot
+          available at: http://code.google.com/p/clojure/source/checkout.
+          Waterfront will not work with the downloadable .zip pakcage (including the one from 20081217).
   (1) Download the waterfront zip file from: http://sourceforge.net/project/showfiles.php?group_id=249246.
   (2) Unpack it into a local directory. 
   (3) Edit wf.bat or wf.sh: fix the path to clojure.jar according to its location on your machine.

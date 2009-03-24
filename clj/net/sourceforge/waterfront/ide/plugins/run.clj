@@ -89,12 +89,12 @@
             (fn [so-far curr] (or so-far (if (= (.getFileName curr) temp-file-name) curr nil)))
             nil   
             tr)
-        ln (if stack-trace-elem (.getLineNumber stack-trace-elem) (get-err-line temp-file-name (.getMessage e-orig)))
+        ln (if stack-trace-elem (.getLineNumber stack-trace-elem) (get-err-line temp-file-name (or (inspect (.getMessage e-orig)) (inspect (str (class e-orig)))) ))
         new-tr (map (fn [x] 
                   (if (= (.getFileName x) temp-file-name) 
                     (StackTraceElement. (.getClassName x) (.getMethodName x) file-name (.getLineNumber x)) 
                     x)) tr)
-        re (RuntimeException. (str (.getMessage e) (if ln (str " (" file-name ":" ln ")") ""))) ]
+        re (RuntimeException. (str (.getMessage e) (if (inspect ln) (str " (" file-name ":" ln ")") ""))) ]
     (.setStackTrace re (into-array StackTraceElement new-tr))
     { :exception re 
       :msg (.getMessage re) 
