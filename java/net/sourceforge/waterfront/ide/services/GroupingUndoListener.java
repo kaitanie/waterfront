@@ -49,8 +49,8 @@ public class GroupingUndoListener implements UndoableEditListener
 
       for(int index = list.size() - 1; index >= 0; --index)
       {
-        UndoableEdit ue = list.get(index);
-        ue.undo();        
+        UndoableEdit temp = list.get(index);
+        temp.undo();        
       }
     }
 
@@ -62,10 +62,11 @@ public class GroupingUndoListener implements UndoableEditListener
         return;
       }
 
-      for(UndoableEdit ue : list)
-        ue.redo();        
+      for(UndoableEdit curr : list)
+        curr.redo();        
     }
     
+    @Override
     public String toString()
     {
       return ue == null ? "nothing" : ue.getPresentationName();
@@ -237,6 +238,7 @@ public class GroupingUndoListener implements UndoableEditListener
     return n < 0 ? "nothing" : "" + n;
   }
   
+  @Override
   public String toString()
   {
     return show(lastApplied) + "/" + show(lastPushed);

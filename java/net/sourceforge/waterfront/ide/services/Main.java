@@ -225,7 +225,7 @@ public class Main
         {
           for(int i = 0; i < len; ++i)
           {
-            int asc = (int) s.charAt(i);
+            int asc = s.charAt(i);
             if(asc % 5 == 0)
               doc.setCharacterAttributes(i, 1, sas, true);
             else

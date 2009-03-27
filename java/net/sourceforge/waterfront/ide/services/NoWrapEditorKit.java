@@ -78,6 +78,7 @@ public class NoWrapEditorKit extends StyledEditorKit
     }    
   }
   
+  @Override
   public ViewFactory getViewFactory()
   {
     return vf;
@@ -164,11 +165,13 @@ public class NoWrapEditorKit extends StyledEditorKit
       super(name);
     }
 
+    @Override
     protected int resolve(int offset)
     {
       return offset + 1;
     }
         
+    @Override
     protected int getNewOffset(String text, int len, int offset)
     {
       if(offset >= len)
@@ -246,11 +249,13 @@ public class NoWrapEditorKit extends StyledEditorKit
     }
 
 
+    @Override
     protected int resolve(int offset)
     {
       return offset - 1;
     }
     
+    @Override
     protected int getNewOffset(String text, int len, int offset)
     {      
       if(offset <= 1)        

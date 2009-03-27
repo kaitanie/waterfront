@@ -27,6 +27,7 @@ public class CustomTooltipPanel extends JPanel
     p = p_;
   }
   
+  @Override
   public String getToolTipText(MouseEvent me)
   {
     return p.getText(me);    
