@@ -169,7 +169,7 @@
 (defn add-chooser [app]
   (let [chooser (javax.swing.JFileChooser. (. System getProperty "user.dir"))
         filter (proxy [javax.swing.filechooser.FileFilter] [] 
-          (accept [#^java.io.File f] (.endsWith (.getName f) ".clj"))
+          (accept [#^java.io.File f] (or (.isDirectory f) (.endsWith (.getName f) ".clj")))
           (getDescription [] "Clojure files"))]
     (.setFileFilter chooser filter) 
     (assoc app :file-chooser chooser) ))
@@ -190,6 +190,7 @@
   
     (transform (add-file-menu (add-chooser (add-observers (load-plugin app "menu-observer.clj") update-title))) :actions {}
       (fn[curr] (assoc curr :load-document load-document)) ))
+
 
 
 
