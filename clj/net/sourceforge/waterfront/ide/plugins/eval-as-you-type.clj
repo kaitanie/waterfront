@@ -15,14 +15,13 @@
 
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
-
-
-
-
               
 
+(defn- is-active? [app]
+  (and (app :eval-as-you-type) (string? (app :file-name)) (.endsWith (app :file-name) ".clj")) )
+
 (defn- set-indicator-color [app is-ok?]
-  (if (app :eval-as-you-type)
+  (if (is-active? app)
     (.setBackground (app :indicator) (.darker (if is-ok? java.awt.Color/GREEN java.awt.Color/RED)))
     (.setBackground (app :indicator) java.awt.Color/GRAY) ))
 
@@ -36,16 +35,9 @@
       (assoc app :output-title msg :jump-to-line ((or marker {}) :line) :markers new-markers :problems new-problems) )))
 
 
-(defn- put-highlights [app]
-;  (.clearHighlights (app :area))
-;  (doseq [p (app :problems)]
-;    (.addHighlights (app :area) java.awt.Color/RED (p :offset)) )
-  (show-msg app false nil))
-
-
 (defn- eval-file [app]
   (let [temp (detect-syntax-errors app)]
-    (put-highlights temp)
+    (show-msg temp false nil)
     (if-not (empty? (temp :problems))
       temp
       (try
@@ -55,17 +47,17 @@
           (show-msg temp true nil)) )))))
          
 (defn- eval-disabled-observer [old-app new-app]
-  (if (maps-differ-on old-app new-app :eval-as-you-type)
-    (if (new-app :eval-as-you-type)
-      new-app
+  (if (not= (is-active? old-app) (is-active? new-app))
+    (if (is-active? new-app)
+      (set-indicator-color new-app true)
       (do
         (set-indicator-color new-app false)
-        (assoc new-app :output-title "" :jump-to-line nil) ))
+        (assoc new-app :output-title "" :jump-to-line nil :markers [] :problems []) ))
     new-app ))
 
 (defn- text-observer [old-app new-app]
   (if (and
-         (new-app :eval-as-you-type)
+         (is-active? new-app)
          (maps-differ-on old-app new-app :text :eval-as-you-type) )
     (eval-file new-app)
     new-app ))
@@ -80,23 +72,6 @@
     (set-indicator-color app false)
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

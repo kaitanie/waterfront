@@ -97,10 +97,8 @@
         markers (sort (new-marker-comparator) (distinct (map (fn[x] (select-keys x [:line :msg])) formatted)))]
     (assoc app :problems probs :markers markers) ))
 
-;  (add-to-menu app "Source"
-;    { :name "Check Syntax" :mnemonic KeyEvent/VK_C :key KeyEvent/VK_F4 :mask 0
-;      :action detect-syntax-errors }))
 (fn [app] app)
+
 
 
 
