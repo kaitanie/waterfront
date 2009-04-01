@@ -379,10 +379,10 @@
             res (cond 
             
                   is-bool
-                  (JCheckBoxMenuItem. (desc :name) (desc :boolean-value))
+                  (JCheckBoxMenuItem. (desc :name) ((desc :boolean-value)))
 
                   (desc :action)
-                  (JMenuItem. (desc :name)) 
+                  (javax.swing.JMenuItem. (desc :name)) 
 
                   :else
                   (JMenu. (desc :name)))]
@@ -682,6 +682,10 @@
 
 
 )
+
+
+
+
 
 
 

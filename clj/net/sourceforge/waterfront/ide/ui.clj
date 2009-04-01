@@ -119,7 +119,8 @@
   (let [a (atom {})
         result (partial wrapper (partial dispatcher a)) ]
     (atom-assoc a :app (assoc initial-app 
-                          :dispatch result           
+                          :dispatch result          
+                          :get (fn [] (atom-get a :app))
                           :observers []
                           :later (fn [f] (later (fn [] (result f))))
                           :register-periodic-observer (partial register-periodic-observer result) 

@@ -65,13 +65,15 @@
 (fn [app] 
   (let [a0 (merge { :eval-as-you-type true } (add-to-keys-to-save app :eval-as-you-type))
         after-menu-change (add-to-menu a0  "Run"
-          { :name "Eval as You Type" :mnemonic KeyEvent/VK_T :boolean-value (a0 :eval-as-you-type)
+          { :name "Eval as You Type" :mnemonic KeyEvent/VK_T 
+            :boolean-value (fn [] (((a0 :get)) :eval-as-you-type))
             :action (fn [app-tag b] 
                       (assoc app-tag :eval-as-you-type b)) })
         result (load-plugin after-menu-change "custom-editor.clj" "layout.clj" "check-syntax.clj")]
     (set-indicator-color app false)
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
+
 
 
 
