@@ -390,6 +390,9 @@
 
         (.setEnabled res (if (= (desc :status) :disabled) false true))
 
+        (when (desc :enabled?)
+          (.setEnabled res ((desc :enabled?))) )
+
         (when (desc :mnemonic)
           (.setMnemonic res (desc :mnemonic)) )
 
@@ -682,6 +685,7 @@
 
 
 )
+
 
 
 

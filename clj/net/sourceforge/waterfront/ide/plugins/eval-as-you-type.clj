@@ -16,9 +16,11 @@
 (require 'net.sourceforge.waterfront.ide.services.services)
 (refer 'net.sourceforge.waterfront.ide.services)
               
+(defn- is-enabled? [app]
+  (and (string? (app :file-name)) (.endsWith (app :file-name) ".clj")) ) 
 
 (defn- is-active? [app]
-  (and (app :eval-as-you-type) (string? (app :file-name)) (.endsWith (app :file-name) ".clj")) )
+  (and (app :eval-as-you-type) (is-enabled? app)) )
 
 (defn- set-indicator-color [app is-ok?]
   (if (is-active? app)
@@ -67,12 +69,14 @@
         after-menu-change (add-to-menu a0  "Run"
           { :name "Eval as You Type" :mnemonic KeyEvent/VK_T 
             :boolean-value (fn [] (((a0 :get)) :eval-as-you-type))
+            :enabled? (fn [] (is-enabled? ((a0 :get))))
             :action (fn [app-tag b] 
                       (assoc app-tag :eval-as-you-type b)) })
         result (load-plugin after-menu-change "custom-editor.clj" "layout.clj" "check-syntax.clj")]
     (set-indicator-color app false)
     ((app :register-periodic-observer) 1000 text-observer)
     (add-observers result eval-disabled-observer) ))
+
 
 
 

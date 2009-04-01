@@ -77,6 +77,7 @@
 ; 27-Mar-09: Bug fix: File filter shows directories
 ; 28-Mar-09: Eval as you type is disabled if file name does not end with ".clj"
 ; 01-Apr-09: Bug fix: Status of "eval as you type" is maintained when a new file is opened
+; 01-Apr-09: Disabling of the "eval as you type" menu item when a non-Clojure file is edited
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
