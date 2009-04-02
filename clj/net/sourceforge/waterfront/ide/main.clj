@@ -45,25 +45,18 @@
     "show-doc.clj"
     "reflect.clj"
     "check-syntax.clj"
+    "run-utils.clj"
+    "eval-as-you-type.clj"
     "run.clj"
     "font-size.clj"
     "indent.clj"
     "load-recent-on-startup.clj"
     "paren-matching.clj"
-    "eval-as-you-type.clj"
     "templates.clj"
     "auto-complete.clj" ]
   :recent-files []
   :startup (quote( fn [app] ((load-file (.getAbsolutePath (java.io.File.(System/getProperty "net.sourceforge.waterfront.plugins") "plugin-loader.clj"))) app))) })
             
-
-
-
-
-
-
-
-
 
 
 

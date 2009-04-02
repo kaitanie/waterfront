@@ -78,7 +78,7 @@
 ; 28-Mar-09: Eval as you type is disabled if file name does not end with ".clj"
 ; 01-Apr-09: Bug fix: Status of "eval as you type" is maintained when a new file is opened
 ; 01-Apr-09: Disabling of the "eval as you type" menu item when a non-Clojure file is edited
-
+; 02-Apr-09: Run menu shows last 9 eval-ed expressions
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; 
@@ -203,6 +203,7 @@ the end of a form and goes to the first column.
 others). Could you give at least a high-level sense of what plug-ins 
 you're currently using and what for. This would give the users a sense 
 of what they may or may not be missing. 
+
 
 
 

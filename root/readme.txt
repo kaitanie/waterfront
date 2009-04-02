@@ -19,6 +19,7 @@ Key features
   * An extensible plugin architecture.
   * Eval-ed code can inspect/mutate Waterfront by accessing the *app* variable. For instance, if you eval this expression, ((*app* :change) :font-name "Arial"), you will choose "Arial" as the UI font.
   * Eval-ed code can inspect the currently edited Clojure program. For instance, if you eval this expression, ((*app* :visit) #(when (= (str (first %1)) "cons") (println %1))), the output window will show all calls, made by your code, to the cons function.
+  * Run menu shows last nine eval-ed expressions
   * Other goodies such as undo/redo, toggle comment, recently opened files, indent/unindent, Tab is *always* two spaces, ...
 
 
@@ -61,6 +62,7 @@ Blog: http://javadots.blogspot.com
 
 
   
+
 
 
 

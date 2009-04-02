@@ -179,6 +179,10 @@
   (transform app :menu {}
     (partial change-menu parent-menu-name (fn [existing-items] (apply vector (concat existing-items new-items)))) ))
 
+(defn remove-from-menu [app parent-menu-name predicate]
+  (transform app :menu {}
+    (partial change-menu parent-menu-name (partial filter predicate)) ))
+
 (defn triggered-by [f & keys]
   (fn [old-app new-app]
     (if (maps-differ-on old-app new-app keys)
@@ -303,4 +307,3 @@
           (.select (app :area) (dec (+ offset from-col)) (dec (+ offset to-col)))
           (assoc app :last-goto ln) ))
       (println "Bad value " ln) ))))
-
