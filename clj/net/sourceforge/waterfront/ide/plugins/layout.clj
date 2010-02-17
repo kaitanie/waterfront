@@ -140,7 +140,7 @@
   (.add (app :frame) lower-sb BorderLayout/SOUTH)
   
   (.add (app :frame) (doto (JSplitPane. 
-                              JSplitPane/HORIZONTAL_SPLIT
+                              JSplitPane/VERTICAL_SPLIT
                               (lnp-widgets :composite)
                               (doto (javax.swing.JPanel.)
                                 (.setLayout (BorderLayout.))
